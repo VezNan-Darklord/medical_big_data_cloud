@@ -1,8 +1,8 @@
 // RoleRepository.java
 // 路径: src/main/java/csulzc/medical_big_data_cloud/module/account/repository/RoleRepository.java
-package csulzc.medical_big_data_cloud.module.account.repository;
+package csulzc.medical_big_data_cloud.module.repository;
 
-import csulzc.medical_big_data_cloud.module.account.entity.Role;
+import csulzc.medical_big_data_cloud.module.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

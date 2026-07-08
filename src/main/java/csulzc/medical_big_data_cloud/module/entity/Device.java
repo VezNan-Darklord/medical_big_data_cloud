@@ -1,6 +1,6 @@
 // Device.java
 // 路径: src/main/java/csulzc/medical_big_data_cloud/module/device/entity/Device.java
-package csulzc.medical_big_data_cloud.module.device.entity;
+package csulzc.medical_big_data_cloud.module.entity;
 
 import csulzc.medical_big_data_cloud.common.entity.BaseEntity;
 import jakarta.persistence.*;

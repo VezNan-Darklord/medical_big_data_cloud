@@ -1,8 +1,8 @@
 // DeviceRepository.java
 // 路径: src/main/java/csulzc/medical_big_data_cloud/module/device/repository/DeviceRepository.java
-package csulzc.medical_big_data_cloud.module.device.repository;
+package csulzc.medical_big_data_cloud.module.repository;
 
-import csulzc.medical_big_data_cloud.module.device.entity.Device;
+import csulzc.medical_big_data_cloud.module.entity.Device;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,8 @@
 // UserRepository.java
 // 路径: src/main/java/csulzc/medical_big_data_cloud/module/account/repository/UserRepository.java
-package csulzc.medical_big_data_cloud.module.account.repository;
+package csulzc.medical_big_data_cloud.module.repository;
 
-import csulzc.medical_big_data_cloud.module.account.entity.User;
+import csulzc.medical_big_data_cloud.module.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

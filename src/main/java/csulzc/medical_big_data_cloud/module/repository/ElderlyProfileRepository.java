@@ -1,8 +1,8 @@
 // ElderlyProfileRepository.java
 // 路径: src/main/java/csulzc/medical_big_data_cloud/module/elderly/repository/ElderlyProfileRepository.java
-package csulzc.medical_big_data_cloud.module.elderly.repository;
+package csulzc.medical_big_data_cloud.module.repository;
 
-import csulzc.medical_big_data_cloud.module.elderly.entity.ElderlyProfile;
+import csulzc.medical_big_data_cloud.module.entity.ElderlyProfile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

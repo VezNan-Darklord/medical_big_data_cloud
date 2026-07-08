@@ -1,4 +1,4 @@
-package csulzc.medical_big_data_cloud.module.elderly.entity;
+package csulzc.medical_big_data_cloud.module.entity;
 
 import csulzc.medical_big_data_cloud.common.converter.StringListJsonConverter;
 import csulzc.medical_big_data_cloud.common.entity.BaseEntity;
