@@ -1,0 +1,26 @@
+package csulzc.medical_big_data_cloud.module.service;
+
+import csulzc.medical_big_data_cloud.common.result.PageResult;
+import csulzc.medical_big_data_cloud.module.dto.request.user.*;
+import csulzc.medical_big_data_cloud.module.dto.response.user.UserResponse;
+
+public interface UserService {
+
+    UserResponse createUser(UserCreateRequest request);
+
+    UserResponse updateUser(String id, UserUpdateRequest request);
+
+    void updateStatus(String id, UserStatusUpdateRequest request);
+
+    void changePassword(String id, PasswordChangeRequest request);
+
+    void resetPassword(String id, String newPassword);
+
+    UserResponse getUserById(String id);
+
+    UserResponse getUserByUsername(String username);
+
+    PageResult<UserResponse> listUsers(String keyword, String roleCode, String status, int pageNo, int pageSize);
+
+    void deleteUser(String id);
+}

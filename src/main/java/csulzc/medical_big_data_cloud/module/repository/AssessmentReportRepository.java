@@ -13,7 +13,7 @@ import java.util.List;
 public interface AssessmentReportRepository
         extends JpaRepository<AssessmentReport, String>, JpaSpecificationExecutor<AssessmentReport> {
 
-    List<AssessmentReport> findByElderlyId(String elderlyId);
+    Page<AssessmentReport> findByElderlyId(String elderlyId);
 
     Page<AssessmentReport> findByAssessorId(String assessorId, Pageable pageable);
 
