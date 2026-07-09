@@ -1,5 +1,3 @@
-// DeviceRepository.java
-// 路径: src/main/java/csulzc/medical_big_data_cloud/module/device/repository/DeviceRepository.java
 package csulzc.medical_big_data_cloud.module.repository;
 
 import csulzc.medical_big_data_cloud.module.entity.Device;
@@ -7,31 +5,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DeviceRepository extends JpaRepository<Device, String>, JpaSpecificationExecutor<Device> {
-
-    List<Device> findByElderlyId(String elderlyId);
-
-    List<Device> findByDeviceType(String deviceType);
-
-    List<Device> findByBindingStatus(String bindingStatus);
-
-    List<Device> findByOnlineStatus(String onlineStatus);
+public interface DeviceRepository
+        extends JpaRepository<Device, String>, JpaSpecificationExecutor<Device> {
 
     Optional<Device> findByDeviceSn(String deviceSn);
 
-    Page<Device> findByElderlyIdOrderByLastReportAtDesc(String elderlyId, Pageable pageable);
+    List<Device> findByElderlyId(String elderlyId);
 
-    Page<Device> findByOnlineStatusOrderByLastReportAtDesc(String onlineStatus, Pageable pageable);
+    Page<Device> findByBindingStatus(String bindingStatus, Pageable pageable);
+
+    Page<Device> findByOnlineStatus(String onlineStatus, Pageable pageable);
 
     long countByOnlineStatus(String onlineStatus);
 
     long countByBindingStatus(String bindingStatus);
 
-    long countByElderlyId(String elderlyId);
+    @Modifying
+    @Query("UPDATE Device d SET d.elderlyId = ?2, d.bindingStatus = ?3 WHERE d.id = ?1")
+    void updateBinding(String id, String elderlyId, String bindingStatus);
 }

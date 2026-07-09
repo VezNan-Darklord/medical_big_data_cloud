@@ -1,5 +1,3 @@
-// AssessmentReportRepository.java
-// 路径: src/main/java/csulzc/medical_big_data_cloud/module/report/repository/AssessmentReportRepository.java
 package csulzc.medical_big_data_cloud.module.repository;
 
 import csulzc.medical_big_data_cloud.module.entity.AssessmentReport;
@@ -12,19 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AssessmentReportRepository extends JpaRepository<AssessmentReport, String>, JpaSpecificationExecutor<AssessmentReport> {
+public interface AssessmentReportRepository
+        extends JpaRepository<AssessmentReport, String>, JpaSpecificationExecutor<AssessmentReport> {
 
     List<AssessmentReport> findByElderlyId(String elderlyId);
 
-    List<AssessmentReport> findByReportType(String reportType);
+    Page<AssessmentReport> findByAssessorId(String assessorId, Pageable pageable);
 
-    List<AssessmentReport> findByAssessorId(String assessorId);
-
-    List<AssessmentReport> findByGrade(String grade);
-
-    Page<AssessmentReport> findByElderlyIdOrderByAssessedAtDesc(String elderlyId, Pageable pageable);
-
-    Page<AssessmentReport> findByReportTypeOrderByAssessedAtDesc(String reportType, Pageable pageable);
-
-    long countByElderlyId(String elderlyId);
+    List<AssessmentReport> findByElderlyIdOrderByAssessedAtDesc(String elderlyId);
 }

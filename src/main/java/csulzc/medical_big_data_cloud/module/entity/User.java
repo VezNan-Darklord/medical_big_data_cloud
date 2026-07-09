@@ -16,8 +16,11 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
+    @Transient
+    private String plainPassword;
+
     @Column(nullable = false, length = 100)
-    private String password;
+    private String passwordHash;
 
     @Column(length = 50)
     private String realName;
