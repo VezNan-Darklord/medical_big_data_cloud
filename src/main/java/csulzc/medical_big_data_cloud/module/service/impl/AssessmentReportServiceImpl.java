@@ -44,7 +44,7 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
     @Transactional(readOnly = true)
     public PageResult<AssessmentReportResponse> listByElderlyId(String elderlyId, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(Math.max(pageNo - 1, 0), pageSize, Sort.by(Sort.Direction.DESC, "assessedAt"));
-        Page<AssessmentReport> page = assessmentReportRepository.findByElderlyId(elderlyId);
+        Page<AssessmentReport> page = assessmentReportRepository.findByElderlyId(elderlyId, pageable);
         return new PageResult<>(
                 page.getContent().stream().map(assessmentReportMapper::toResponse).toList(),
                 pageNo,

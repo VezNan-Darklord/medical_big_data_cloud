@@ -60,3 +60,4 @@ build/
 hs_err_pid*
 replay_pid*
 /train (1).md
+/src/main/resources/
