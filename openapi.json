@@ -1,0 +1,2123 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "医养结合云端后台管理系统 API",
+		"version": "1.0.0",
+		"description": "前后端分离的医养结合管理平台 RESTful API 文档"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8080/api/v1",
+			"description": "本地开发服务器"
+		}
+	],
+	"tags": [
+		{
+			"name": "Auth",
+			"description": "用户认证接口"
+		},
+		{
+			"name": "Dashboard",
+			"description": "数据看板"
+		},
+		{
+			"name": "Elderly Profile",
+			"description": "老人资料管理"
+		},
+		{
+			"name": "Health Warning",
+			"description": "健康预警"
+		},
+		{
+			"name": "Assessment Report",
+			"description": "评估报告管理"
+		},
+		{
+			"name": "Key Population",
+			"description": "关键人群管理"
+		},
+		{
+			"name": "Device",
+			"description": "设备管理"
+		},
+		{
+			"name": "Elderly Account",
+			"description": "老人账户管理"
+		},
+		{
+			"name": "Doctor Account",
+			"description": "医生账号管理"
+		},
+		{
+			"name": "User Account",
+			"description": "用户账户管理API"
+		},
+		{
+			"name": "Report Statistics",
+			"description": "报表统计接口"
+		}
+	],
+	"paths": {
+		"/auth/login": {
+			"post": {
+				"tags": ["Auth"],
+				"summary": "用户登录",
+				"operationId": "login",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_LoginResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/me": {
+			"get": {
+				"tags": ["Auth"],
+				"summary": "获取当前用户信息",
+				"operationId": "getCurrentUser",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_LoginUserInfo"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/logout": {
+			"post": {
+				"tags": ["Auth"],
+				"summary": "退出登录",
+				"operationId": "logout",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dashboard/overview": {
+			"get": {
+				"tags": ["Dashboard"],
+				"summary": "获取首页总览",
+				"operationId": "getOverview",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_DashboardOverviewResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dashboard/charts": {
+			"get": {
+				"tags": ["Dashboard"],
+				"summary": "获取首页图表数据",
+				"operationId": "getCharts",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ArrayDashboardChartResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-profiles": {
+			"get": {
+				"tags": ["Elderly Profile"],
+				"summary": "老人列表",
+				"operationId": "listElderlyProfiles",
+				"parameters": [
+					{ "$ref": "#/components/parameters/keyword" },
+					{ "$ref": "#/components/parameters/gender" },
+					{ "$ref": "#/components/parameters/careLevel" },
+					{ "$ref": "#/components/parameters/status" },
+					{ "$ref": "#/components/parameters/regionCode" },
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_ElderlyProfileResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Elderly Profile"],
+				"summary": "新增老人档案",
+				"operationId": "createElderlyProfile",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ElderlyProfileCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ElderlyProfileResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-profiles/{id}": {
+			"get": {
+				"tags": ["Elderly Profile"],
+				"summary": "获取老人详情",
+				"operationId": "getElderlyProfileById",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ElderlyProfileResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": ["Elderly Profile"],
+				"summary": "编辑老人档案",
+				"operationId": "updateElderlyProfile",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ElderlyProfileUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ElderlyProfileResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": ["Elderly Profile"],
+				"summary": "删除老人档案",
+				"operationId": "deleteElderlyProfile",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-profiles/{id}/warnings": {
+			"get": {
+				"tags": ["Elderly Profile"],
+				"summary": "获取老人关联预警",
+				"operationId": "getElderlyWarnings",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ArrayHealthWarningResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-profiles/{id}/reports": {
+			"get": {
+				"tags": ["Elderly Profile"],
+				"summary": "获取老人关联报告",
+				"operationId": "getElderlyReports",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ArrayAssessmentReportResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-profiles/{id}/devices": {
+			"get": {
+				"tags": ["Elderly Profile"],
+				"summary": "获取老人关联设备",
+				"operationId": "getElderlyDevices",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ArrayDeviceResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-profiles/{id}/key-populations": {
+			"get": {
+				"tags": ["Elderly Profile"],
+				"summary": "获取老人关联重点人群",
+				"operationId": "getElderlyKeyPopulations",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ArrayKeyPopulationResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/health-warnings": {
+			"get": {
+				"tags": ["Health Warning"],
+				"summary": "预警列表",
+				"operationId": "listHealthWarnings",
+				"parameters": [
+					{ "$ref": "#/components/parameters/elderlyId" },
+					{ "$ref": "#/components/parameters/warningType" },
+					{ "$ref": "#/components/parameters/severity" },
+					{ "$ref": "#/components/parameters/status" },
+					{ "$ref": "#/components/parameters/source" },
+					{ "$ref": "#/components/parameters/startTime" },
+					{ "$ref": "#/components/parameters/endTime" },
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_HealthWarningResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/health-warnings/{id}": {
+			"get": {
+				"tags": ["Health Warning"],
+				"summary": "预警详情",
+				"operationId": "getHealthWarningById",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_HealthWarningResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/health-warnings/{id}/handle": {
+			"post": {
+				"tags": ["Health Warning"],
+				"summary": "处理预警",
+				"operationId": "handleHealthWarning",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/HealthWarningHandleRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/health-warnings/{id}/assign": {
+			"post": {
+				"tags": ["Health Warning"],
+				"summary": "转派预警",
+				"operationId": "assignHealthWarning",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/assessment-reports": {
+			"get": {
+				"tags": ["Assessment Report"],
+				"summary": "评估报告列表",
+				"operationId": "listAssessmentReports",
+				"parameters": [
+					{ "$ref": "#/components/parameters/elderlyIdOptional" },
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_AssessmentReportResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Assessment Report"],
+				"summary": "新增评估报告",
+				"operationId": "createAssessmentReport",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AssessmentReportCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_AssessmentReportResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/assessment-reports/{id}": {
+			"get": {
+				"tags": ["Assessment Report"],
+				"summary": "评估报告详情",
+				"operationId": "getAssessmentReportById",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_AssessmentReportResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/assessment-reports/{id}/export": {
+			"get": {
+				"tags": ["Assessment Report"],
+				"summary": "导出评估报告",
+				"operationId": "exportAssessmentReport",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_String"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/key-populations": {
+			"get": {
+				"tags": ["Key Population"],
+				"summary": "重点人群列表",
+				"operationId": "listKeyPopulations",
+				"parameters": [
+					{ "$ref": "#/components/parameters/status" },
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_KeyPopulationResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Key Population"],
+				"summary": "新增重点人群",
+				"operationId": "createKeyPopulation",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/KeyPopulationCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_KeyPopulationResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/key-populations/{id}": {
+			"put": {
+				"tags": ["Key Population"],
+				"summary": "更新重点人群",
+				"operationId": "updateKeyPopulation",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/KeyPopulationUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_KeyPopulationResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/key-populations/{id}/close": {
+			"post": {
+				"tags": ["Key Population"],
+				"summary": "关闭重点人群",
+				"operationId": "closeKeyPopulation",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/devices": {
+			"get": {
+				"tags": ["Device"],
+				"summary": "设备列表",
+				"operationId": "listDevices",
+				"parameters": [
+					{ "$ref": "#/components/parameters/bindingStatus" },
+					{ "$ref": "#/components/parameters/onlineStatus" },
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_DeviceResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/devices/{id}": {
+			"get": {
+				"tags": ["Device"],
+				"summary": "设备详情",
+				"operationId": "getDeviceById",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_DeviceResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": ["Device"],
+				"summary": "更新设备",
+				"operationId": "updateDevice",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DeviceUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_DeviceResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/devices/bind": {
+			"post": {
+				"tags": ["Device"],
+				"summary": "绑定设备",
+				"operationId": "bindDevice",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DeviceBindRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/devices/{id}/unbind": {
+			"post": {
+				"tags": ["Device"],
+				"summary": "解绑设备",
+				"operationId": "unbindDevice",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/devices/{id}/reports": {
+			"get": {
+				"tags": ["Device"],
+				"summary": "设备上报记录",
+				"operationId": "getDeviceReports",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_String"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-accounts": {
+			"get": {
+				"tags": ["Elderly Account"],
+				"summary": "老人账号列表",
+				"operationId": "listElderlyAccounts",
+				"parameters": [
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Elderly Account"],
+				"summary": "创建老人账号",
+				"operationId": "createElderlyAccount",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-accounts/{id}/reset-password": {
+			"post": {
+				"tags": ["Elderly Account"],
+				"summary": "重置老人账号密码",
+				"operationId": "resetElderlyAccountPassword",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/elderly-accounts/{id}/status": {
+			"post": {
+				"tags": ["Elderly Account"],
+				"summary": "启用或禁用老人账号",
+				"operationId": "updateElderlyAccountStatus",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserStatusUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/doctor-accounts": {
+			"get": {
+				"tags": ["Doctor Account"],
+				"summary": "医生账号列表",
+				"operationId": "listDoctorAccounts",
+				"parameters": [
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Doctor Account"],
+				"summary": "创建医生账号",
+				"operationId": "createDoctorAccount",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/doctor-accounts/{id}": {
+			"put": {
+				"tags": ["Doctor Account"],
+				"summary": "编辑医生账号",
+				"operationId": "updateDoctorAccount",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/doctor-accounts/{id}/reset-password": {
+			"post": {
+				"tags": ["Doctor Account"],
+				"summary": "重置医生账号密码",
+				"operationId": "resetDoctorAccountPassword",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users": {
+			"get": {
+				"tags": ["User Account"],
+				"summary": "系统账号列表",
+				"operationId": "listUsers",
+				"parameters": [
+					{ "$ref": "#/components/parameters/keyword" },
+					{ "$ref": "#/components/parameters/pageNo" },
+					{ "$ref": "#/components/parameters/pageSize" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PageResult_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["User Account"],
+				"summary": "创建系统账号",
+				"operationId": "createUser",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/{id}": {
+			"get": {
+				"tags": ["User Account"],
+				"summary": "账号详情",
+				"operationId": "getUserById",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": ["User Account"],
+				"summary": "修改账号",
+				"operationId": "updateUser",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_UserResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/{id}/status": {
+			"post": {
+				"tags": ["User Account"],
+				"summary": "修改账号状态",
+				"operationId": "updateUserStatus",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserStatusUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/{id}/roles": {
+			"post": {
+				"tags": ["User Account"],
+				"summary": "分配角色",
+				"operationId": "assignRoles",
+				"parameters": [
+					{ "$ref": "#/components/parameters/id" }
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Void"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reports/statistics/overview": {
+			"get": {
+				"tags": ["Report Statistics"],
+				"summary": "统计总览",
+				"operationId": "getStatisticsOverview",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_DashboardOverviewResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reports/statistics/trends": {
+			"get": {
+				"tags": ["Report Statistics"],
+				"summary": "趋势数据",
+				"operationId": "getStatisticsTrends",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_String"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reports/statistics/distributions": {
+			"get": {
+				"tags": ["Report Statistics"],
+				"summary": "分布数据",
+				"operationId": "getStatisticsDistributions",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_String"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reports/statistics/export": {
+			"get": {
+				"tags": ["Report Statistics"],
+				"summary": "导出统计报表",
+				"operationId": "exportStatistics",
+				"responses": {
+					"200": {
+						"description": "成功",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_String"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"securitySchemes": {
+			"BearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		},
+		"parameters": {
+			"id": {
+				"name": "id",
+				"in": "path",
+				"required": true,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"pageNo": {
+				"name": "pageNo",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "integer",
+					"format": "int32",
+					"default": 1,
+					"minimum": 1
+				}
+			},
+			"pageSize": {
+				"name": "pageSize",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "integer",
+					"format": "int32",
+					"default": 10,
+					"minimum": 1,
+					"maximum": 100
+				}
+			},
+			"keyword": {
+				"name": "keyword",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"gender": {
+				"name": "gender",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"careLevel": {
+				"name": "careLevel",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"status": {
+				"name": "status",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"regionCode": {
+				"name": "regionCode",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"elderlyId": {
+				"name": "elderlyId",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"elderlyIdOptional": {
+				"name": "elderlyId",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"warningType": {
+				"name": "warningType",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"severity": {
+				"name": "severity",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"source": {
+				"name": "source",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"startTime": {
+				"name": "startTime",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string",
+					"format": "date-time"
+				}
+			},
+			"endTime": {
+				"name": "endTime",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string",
+					"format": "date-time"
+				}
+			},
+			"bindingStatus": {
+				"name": "bindingStatus",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			},
+			"onlineStatus": {
+				"name": "onlineStatus",
+				"in": "query",
+				"required": false,
+				"schema": {
+					"type": "string"
+				}
+			}
+		},
+		"schemas": {
+			"ApiResponse_Void": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "nullable": true },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "traceId"]
+			},
+			"ApiResponse_String": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "type": "string" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_LoginResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/LoginResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_LoginUserInfo": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/LoginUserInfo" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_DashboardOverviewResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/DashboardOverviewResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_ArrayDashboardChartResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/DashboardChartResponse" }
+					},
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_PageResult_ElderlyProfileResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/PageResult_ElderlyProfileResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_ElderlyProfileResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/ElderlyProfileResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_ArrayHealthWarningResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/HealthWarningResponse" }
+					},
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_HealthWarningResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/HealthWarningResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_ArrayAssessmentReportResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/AssessmentReportResponse" }
+					},
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_AssessmentReportResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/AssessmentReportResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_ArrayDeviceResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/DeviceResponse" }
+					},
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_DeviceResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/DeviceResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_ArrayKeyPopulationResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/KeyPopulationResponse" }
+					},
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_KeyPopulationResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/KeyPopulationResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_PageResult_HealthWarningResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/PageResult_HealthWarningResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_PageResult_AssessmentReportResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/PageResult_AssessmentReportResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_PageResult_KeyPopulationResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/PageResult_KeyPopulationResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_PageResult_DeviceResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/PageResult_DeviceResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_PageResult_UserResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/PageResult_UserResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"ApiResponse_UserResponse": {
+				"type": "object",
+				"properties": {
+					"code": { "type": "integer", "format": "int32" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/UserResponse" },
+					"traceId": { "type": "string" }
+				},
+				"required": ["code", "message", "data", "traceId"]
+			},
+			"LoginRequest": {
+				"type": "object",
+				"properties": {
+					"username": { "type": "string", "maxLength": 50 },
+					"password": { "type": "string", "minLength": 6, "maxLength": 20 }
+				},
+				"required": ["username", "password"]
+			},
+			"LoginResponse": {
+				"type": "object",
+				"properties": {
+					"token": { "type": "string" },
+					"expireAt": { "type": "string", "format": "date-time" },
+					"user": { "$ref": "#/components/schemas/LoginUserInfo" }
+				},
+				"required": ["token", "expireAt", "user"]
+			},
+			"LoginUserInfo": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"realName": { "type": "string" },
+					"roleCode": { "type": "string" }
+				},
+				"required": ["id", "realName", "roleCode"]
+			},
+			"DashboardOverviewResponse": {
+				"type": "object",
+				"properties": {
+					"totalElderlyCount": { "type": "integer", "format": "int64" },
+					"warningCount": { "type": "integer", "format": "int64" },
+					"unhandledWarningCount": { "type": "integer", "format": "int64" },
+					"keyPopulationCount": { "type": "integer", "format": "int64" },
+					"deviceOnlineRate": { "type": "number", "format": "double" },
+					"recentTrend": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/DashboardTrendItem" }
+					}
+				},
+				"required": ["totalElderlyCount", "warningCount", "unhandledWarningCount", "keyPopulationCount", "deviceOnlineRate", "recentTrend"]
+			},
+			"DashboardTrendItem": {
+				"type": "object",
+				"properties": {
+					"date": { "type": "string" },
+					"value": { "type": "integer", "format": "int32" }
+				},
+				"required": ["date", "value"]
+			},
+			"DashboardChartResponse": {
+				"type": "object",
+				"properties": {
+					"chartType": { "type": "string" },
+					"title": { "type": "string" },
+					"xAxis": {
+						"type": "array",
+						"items": { "type": "string" }
+					},
+					"series": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/DashboardSeriesItem" }
+					}
+				},
+				"required": ["chartType", "title", "xAxis", "series"]
+			},
+			"DashboardSeriesItem": {
+				"type": "object",
+				"properties": {
+					"name": { "type": "string" },
+					"data": {
+						"type": "array",
+						"items": { "type": "number" }
+					}
+				},
+				"required": ["name", "data"]
+			},
+			"ElderlyProfileCreateRequest": {
+				"type": "object",
+				"properties": {
+					"name": { "type": "string", "maxLength": 100 },
+					"gender": { "type": "string", "maxLength": 10 },
+					"birthday": { "type": "string", "format": "date", "nullable": true },
+					"age": { "type": "integer", "format": "int32", "nullable": true },
+					"phone": { "type": "string", "maxLength": 20, "nullable": true },
+					"address": { "type": "string", "maxLength": 500, "nullable": true },
+					"institutionId": { "type": "string", "maxLength": 64, "nullable": true },
+					"medicalHistory": { "type": "string", "maxLength": 1000, "nullable": true },
+					"careLevel": { "type": "string", "maxLength": 10, "nullable": true },
+					"tags": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"status": { "type": "string", "maxLength": 20, "nullable": true }
+				},
+				"required": ["name", "gender"]
+			},
+			"ElderlyProfileUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"name": { "type": "string", "maxLength": 100, "nullable": true },
+					"gender": { "type": "string", "maxLength": 10, "nullable": true },
+					"birthday": { "type": "string", "format": "date", "nullable": true },
+					"age": { "type": "integer", "format": "int32", "nullable": true },
+					"phone": { "type": "string", "maxLength": 20, "nullable": true },
+					"address": { "type": "string", "maxLength": 500, "nullable": true },
+					"institutionId": { "type": "string", "maxLength": 64, "nullable": true },
+					"medicalHistory": { "type": "string", "maxLength": 1000, "nullable": true },
+					"careLevel": { "type": "string", "maxLength": 10, "nullable": true },
+					"tags": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"status": { "type": "string", "maxLength": 20, "nullable": true }
+				}
+			},
+			"ElderlyProfileResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"name": { "type": "string" },
+					"gender": { "type": "string" },
+					"birthday": { "type": "string", "format": "date", "nullable": true },
+					"age": { "type": "integer", "format": "int32", "nullable": true },
+					"phone": { "type": "string", "nullable": true },
+					"address": { "type": "string", "nullable": true },
+					"institutionId": { "type": "string", "nullable": true },
+					"medicalHistory": { "type": "string", "nullable": true },
+					"careLevel": { "type": "string", "nullable": true },
+					"tags": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"status": { "type": "string", "nullable": true },
+					"createdAt": { "type": "string", "format": "date-time", "nullable": true },
+					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["id", "name", "gender"]
+			},
+			"HealthWarningHandleRequest": {
+				"type": "object",
+				"properties": {
+					"status": { "type": "string", "maxLength": 20 },
+					"handlerId": { "type": "string", "maxLength": 64, "nullable": true },
+					"handlerName": { "type": "string", "maxLength": 100, "nullable": true },
+					"result": { "type": "string", "maxLength": 500, "nullable": true },
+					"nextAction": { "type": "string", "maxLength": 50, "nullable": true },
+					"remark": { "type": "string", "maxLength": 500, "nullable": true }
+				},
+				"required": ["status"]
+			},
+			"HealthWarningQueryRequest": {
+				"type": "object",
+				"properties": {
+					"elderlyId": { "type": "string", "nullable": true },
+					"warningType": { "type": "string", "nullable": true },
+					"severity": { "type": "string", "nullable": true },
+					"status": { "type": "string", "nullable": true },
+					"source": { "type": "string", "nullable": true },
+					"startTime": { "type": "string", "format": "date-time", "nullable": true },
+					"endTime": { "type": "string", "format": "date-time", "nullable": true },
+					"pageNo": { "type": "integer", "format": "int32", "default": 1 },
+					"pageSize": { "type": "integer", "format": "int32", "default": 10 }
+				}
+			},
+			"HealthWarningResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"elderlyId": { "type": "string" },
+					"warningType": { "type": "string" },
+					"severity": { "type": "string" },
+					"source": { "type": "string" },
+					"metricName": { "type": "string" },
+					"metricValue": { "type": "number", "format": "double", "nullable": true },
+					"thresholdValue": { "type": "number", "format": "double", "nullable": true },
+					"status": { "type": "string" },
+					"occurredAt": { "type": "string", "format": "date-time", "nullable": true },
+					"handledAt": { "type": "string", "format": "date-time", "nullable": true },
+					"handlerId": { "type": "string", "nullable": true },
+					"remark": { "type": "string", "nullable": true },
+					"createdAt": { "type": "string", "format": "date-time", "nullable": true },
+					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["id", "elderlyId", "warningType", "severity", "source", "metricName", "status"]
+			},
+			"AssessmentReportCreateRequest": {
+				"type": "object",
+				"properties": {
+					"elderlyId": { "type": "string", "maxLength": 64 },
+					"reportType": { "type": "string", "maxLength": 50 },
+					"score": { "type": "integer", "format": "int32", "nullable": true },
+					"grade": { "type": "string", "maxLength": 10, "nullable": true },
+					"summary": { "type": "string", "maxLength": 2000, "nullable": true },
+					"riskItems": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"recommendations": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"assessorId": { "type": "string", "maxLength": 64, "nullable": true },
+					"assessedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["elderlyId", "reportType"]
+			},
+			"AssessmentReportResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"elderlyId": { "type": "string" },
+					"reportType": { "type": "string" },
+					"score": { "type": "integer", "format": "int32", "nullable": true },
+					"grade": { "type": "string", "nullable": true },
+					"summary": { "type": "string", "nullable": true },
+					"riskItems": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"recommendations": { "type": "array", "items": { "type": "string" }, "nullable": true },
+					"assessorId": { "type": "string", "nullable": true },
+					"assessedAt": { "type": "string", "format": "date-time", "nullable": true },
+					"createdAt": { "type": "string", "format": "date-time", "nullable": true },
+					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["id", "elderlyId", "reportType"]
+			},
+			"KeyPopulationCreateRequest": {
+				"type": "object",
+				"properties": {
+					"elderlyId": { "type": "string", "maxLength": 64 },
+					"category": { "type": "string", "maxLength": 50 },
+					"reason": { "type": "string", "maxLength": 500, "nullable": true },
+					"level": { "type": "string", "maxLength": 10, "nullable": true },
+					"ownerDoctorId": { "type": "string", "maxLength": 64, "nullable": true },
+					"followUpCycleDays": { "type": "integer", "format": "int32", "nullable": true },
+					"status": { "type": "string", "maxLength": 20, "nullable": true }
+				},
+				"required": ["elderlyId", "category"]
+			},
+			"KeyPopulationUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"category": { "type": "string", "maxLength": 50, "nullable": true },
+					"reason": { "type": "string", "maxLength": 500, "nullable": true },
+					"level": { "type": "string", "maxLength": 10, "nullable": true },
+					"ownerDoctorId": { "type": "string", "maxLength": 64, "nullable": true },
+					"followUpCycleDays": { "type": "integer", "format": "int32", "nullable": true },
+					"status": { "type": "string", "maxLength": 20, "nullable": true }
+				}
+			},
+			"KeyPopulationResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"elderlyId": { "type": "string" },
+					"category": { "type": "string" },
+					"reason": { "type": "string", "nullable": true },
+					"level": { "type": "string", "nullable": true },
+					"ownerDoctorId": { "type": "string", "nullable": true },
+					"followUpCycleDays": { "type": "integer", "format": "int32", "nullable": true },
+					"status": { "type": "string" },
+					"createdAt": { "type": "string", "format": "date-time", "nullable": true },
+					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["id", "elderlyId", "category"]
+			},
+			"DeviceBindRequest": {
+				"type": "object",
+				"properties": {
+					"deviceId": { "type": "string", "maxLength": 64 },
+					"elderlyId": { "type": "string", "maxLength": 64 }
+				},
+				"required": ["deviceId", "elderlyId"]
+			},
+			"DeviceUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"deviceName": { "type": "string", "maxLength": 100, "nullable": true },
+					"deviceType": { "type": "string", "maxLength": 50, "nullable": true },
+					"firmwareVersion": { "type": "string", "maxLength": 20, "nullable": true }
+				}
+			},
+			"DeviceResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"deviceName": { "type": "string" },
+					"deviceType": { "type": "string" },
+					"deviceSn": { "type": "string" },
+					"elderlyId": { "type": "string", "nullable": true },
+					"bindingStatus": { "type": "string" },
+					"onlineStatus": { "type": "string" },
+					"lastReportAt": { "type": "string", "format": "date-time", "nullable": true },
+					"firmwareVersion": { "type": "string", "nullable": true },
+					"createdAt": { "type": "string", "format": "date-time", "nullable": true },
+					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["id", "deviceName", "deviceType", "deviceSn", "bindingStatus", "onlineStatus"]
+			},
+			"UserCreateRequest": {
+				"type": "object",
+				"properties": {
+					"username": { "type": "string", "maxLength": 50 },
+					"password": { "type": "string", "minLength": 6, "maxLength": 20 },
+					"realName": { "type": "string", "maxLength": 50, "nullable": true },
+					"roleCode": { "type": "string", "maxLength": 20 },
+					"mobile": { "type": "string", "maxLength": 20, "nullable": true },
+					"status": { "type": "string", "maxLength": 20, "nullable": true }
+				},
+				"required": ["username", "password", "roleCode"]
+			},
+			"UserUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"realName": { "type": "string", "maxLength": 50, "nullable": true },
+					"roleCode": { "type": "string", "maxLength": 20, "nullable": true },
+					"mobile": { "type": "string", "maxLength": 20, "nullable": true },
+					"status": { "type": "string", "maxLength": 20, "nullable": true }
+				}
+			},
+			"UserStatusUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"status": { "type": "string", "maxLength": 20 }
+				},
+				"required": ["status"]
+			},
+			"PasswordChangeRequest": {
+				"type": "object",
+				"properties": {
+					"oldPassword": { "type": "string" },
+					"newPassword": { "type": "string", "minLength": 6, "maxLength": 20 }
+				},
+				"required": ["oldPassword", "newPassword"]
+			},
+			"UserResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string" },
+					"username": { "type": "string" },
+					"realName": { "type": "string", "nullable": true },
+					"roleCode": { "type": "string" },
+					"mobile": { "type": "string", "nullable": true },
+					"status": { "type": "string" },
+					"lastLoginAt": { "type": "string", "format": "date-time", "nullable": true },
+					"createdAt": { "type": "string", "format": "date-time", "nullable": true },
+					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
+				},
+				"required": ["id", "username", "roleCode", "status"]
+			},
+			"PageResult_ElderlyProfileResponse": {
+				"type": "object",
+				"properties": {
+					"list": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/ElderlyProfileResponse" }
+					},
+					"pageNo": { "type": "integer", "format": "int32" },
+					"pageSize": { "type": "integer", "format": "int32" },
+					"total": { "type": "integer", "format": "int64" }
+				},
+				"required": ["list", "pageNo", "pageSize", "total"]
+			},
+			"PageResult_HealthWarningResponse": {
+				"type": "object",
+				"properties": {
+					"list": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/HealthWarningResponse" }
+					},
+					"pageNo": { "type": "integer", "format": "int32" },
+					"pageSize": { "type": "integer", "format": "int32" },
+					"total": { "type": "integer", "format": "int64" }
+				},
+				"required": ["list", "pageNo", "pageSize", "total"]
+			},
+			"PageResult_AssessmentReportResponse": {
+				"type": "object",
+				"properties": {
+					"list": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/AssessmentReportResponse" }
+					},
+					"pageNo": { "type": "integer", "format": "int32" },
+					"pageSize": { "type": "integer", "format": "int32" },
+					"total": { "type": "integer", "format": "int64" }
+				},
+				"required": ["list", "pageNo", "pageSize", "total"]
+			},
+			"PageResult_KeyPopulationResponse": {
+				"type": "object",
+				"properties": {
+					"list": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/KeyPopulationResponse" }
+					},
+					"pageNo": { "type": "integer", "format": "int32" },
+					"pageSize": { "type": "integer", "format": "int32" },
+					"total": { "type": "integer", "format": "int64" }
+				},
+				"required": ["list", "pageNo", "pageSize", "total"]
+			},
+			"PageResult_DeviceResponse": {
+				"type": "object",
+				"properties": {
+					"list": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/DeviceResponse" }
+					},
+					"pageNo": { "type": "integer", "format": "int32" },
+					"pageSize": { "type": "integer", "format": "int32" },
+					"total": { "type": "integer", "format": "int64" }
+				},
+				"required": ["list", "pageNo", "pageSize", "total"]
+			},
+			"PageResult_UserResponse": {
+				"type": "object",
+				"properties": {
+					"list": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/UserResponse" }
+					},
+					"pageNo": { "type": "integer", "format": "int32" },
+					"pageSize": { "type": "integer", "format": "int32" },
+					"total": { "type": "integer", "format": "int64" }
+				},
+				"required": ["list", "pageNo", "pageSize", "total"]
+			}
+		}
+	}
+}
