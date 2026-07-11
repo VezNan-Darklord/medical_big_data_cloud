@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/assessment-reports")
+@RequestMapping("/assessment-reports")
 @RequiredArgsConstructor
 @Tag(name = "Assessment Report", description = "评估报告管理")
 public class AssessmentReportController {

@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/key-populations")
+@RequestMapping("/key-populations")
 @RequiredArgsConstructor
 @Tag(name = "Key Population", description = "关键人群管理")
 public class KeyPopulationController {

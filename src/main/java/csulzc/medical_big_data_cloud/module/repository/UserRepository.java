@@ -24,6 +24,8 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     Optional<User> findByMobile(String mobile);
 
+    boolean existsByMobile(String mobile);
+
     boolean existsByUsername(String username);
 
     // ================== 按角色/状态统计与分页 ==================

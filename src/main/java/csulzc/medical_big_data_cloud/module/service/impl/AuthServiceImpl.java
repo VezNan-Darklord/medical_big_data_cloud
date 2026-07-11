@@ -5,14 +5,18 @@ import csulzc.medical_big_data_cloud.common.exception.BusinessException;
 import csulzc.medical_big_data_cloud.config.security.CustomUserDetails;
 import csulzc.medical_big_data_cloud.config.security.JwtUtil;
 import csulzc.medical_big_data_cloud.module.dto.request.auth.LoginRequest;
+import csulzc.medical_big_data_cloud.module.dto.request.auth.RegisterRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.auth.LoginResponse;
+import csulzc.medical_big_data_cloud.module.dto.response.user.UserResponse;
 import csulzc.medical_big_data_cloud.module.entity.User;
+import csulzc.medical_big_data_cloud.module.mapper.UserMapper;
 import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,29 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+
+    @Override
+    @Transactional
+    public UserResponse register(RegisterRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "用户名已存在");
+        }
+        if (userRepository.existsByMobile(request.getMobile())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "手机号已注册");
+        }
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRealName(request.getRealName());
+        user.setMobile(request.getMobile());
+        // Public registration is intentionally restricted to elderly accounts.
+        user.setRoleCode("elderly");
+        user.setStatus("enabled");
+        return userMapper.toResponse(userRepository.save(user));
+    }
 
     @Override
     @Transactional

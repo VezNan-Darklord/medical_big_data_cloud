@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/devices")
+@RequestMapping("/devices")
 @RequiredArgsConstructor
 @Tag(name = "Device", description = "设备管理")
 public class DeviceController {

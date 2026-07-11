@@ -1,0 +1,285 @@
+openapi: 3.0.3
+info:
+  title: 医养结合云端后台管理系统 API
+  version: 1.0.0
+  description: 基于项目当前 Spring Boot 实现与 train.md 整理的前后端接口契约。
+servers:
+  - url: http://localhost:8080/api/v1
+    description: 本地开发环境
+security:
+  - bearerAuth: []
+tags:
+  - { name: Auth, description: 登录认证 }
+  - { name: Dashboard, description: 首页看板 }
+  - { name: ElderlyProfile, description: 老人档案 }
+  - { name: HealthWarning, description: 健康预警 }
+  - { name: AssessmentReport, description: 评估报告 }
+  - { name: KeyPopulation, description: 重点人群 }
+  - { name: ReportStatistics, description: 报表统计 }
+  - { name: Device, description: 设备管理 }
+  - { name: ElderlyAccount, description: 老人账户 }
+  - { name: DoctorAccount, description: 医生账户 }
+  - { name: UserAccount, description: 系统账户 }
+  - { name: Profile, description: 个人中心 }
+  - { name: AIAnalysis, description: 决策分析 }
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 登录
+      operationId: login
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/LoginRequest' } } } }
+      responses: { '200': { $ref: '#/components/responses/LoginResponse' }, '400': { $ref: '#/components/responses/Error' }, '401': { $ref: '#/components/responses/Error' } }
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: 老人用户公开注册
+      operationId: register
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/RegisterRequest' } } } }
+      responses: { '200': { $ref: '#/components/responses/UserResponse' }, '400': { $ref: '#/components/responses/Error' } }
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: 当前用户
+      operationId: getCurrentUser
+      responses: { '200': { $ref: '#/components/responses/UserResponse' }, '401': { $ref: '#/components/responses/Error' } }
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: 退出登录
+      operationId: logout
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' } }
+  /dashboard/overview:
+    get:
+      tags: [Dashboard]
+      summary: 首页总览
+      operationId: getDashboardOverview
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiDashboardOverview' } } } } }
+  /dashboard/charts:
+    get:
+      tags: [Dashboard]
+      summary: 首页图表
+      operationId: getDashboardCharts
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiChartList' } } } } }
+  /elderly-profiles:
+    get:
+      tags: [ElderlyProfile]
+      summary: 老人档案列表
+      operationId: listElderlyProfiles
+      parameters:
+        - { $ref: '#/components/parameters/Keyword' }
+        - { name: gender, in: query, schema: { type: string, enum: [male, female] } }
+        - { name: careLevel, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string } }
+        - { name: regionCode, in: query, schema: { type: string } }
+        - { $ref: '#/components/parameters/PageNo' }
+        - { $ref: '#/components/parameters/PageSize' }
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiElderlyPage' } } } } }
+    post:
+      tags: [ElderlyProfile]
+      summary: 新增老人档案
+      operationId: createElderlyProfile
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ElderlyProfileInput' } } } }
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiElderly' } } } }, '400': { $ref: '#/components/responses/Error' } }
+  /elderly-profiles/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [ElderlyProfile]
+      summary: 老人档案详情
+      operationId: getElderlyProfile
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiElderly' } } } }, '404': { $ref: '#/components/responses/Error' } }
+    put:
+      tags: [ElderlyProfile]
+      summary: 更新老人档案
+      operationId: updateElderlyProfile
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ElderlyProfileInput' } } } }
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiElderly' } } } } }
+    delete:
+      tags: [ElderlyProfile]
+      summary: 软删除老人档案
+      operationId: deleteElderlyProfile
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' } }
+  /elderly-profiles/{id}/warnings: { get: { tags: [ElderlyProfile], summary: 老人关联预警, operationId: getElderlyWarnings, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /elderly-profiles/{id}/reports: { get: { tags: [ElderlyProfile], summary: 老人关联报告, operationId: getElderlyReports, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /elderly-profiles/{id}/devices: { get: { tags: [ElderlyProfile], summary: 老人关联设备, operationId: getElderlyDevices, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /elderly-profiles/{id}/key-populations: { get: { tags: [ElderlyProfile], summary: 老人关联重点人群, operationId: getElderlyKeyPopulations, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /health-warnings:
+    get:
+      tags: [HealthWarning]
+      summary: 预警列表
+      operationId: listHealthWarnings
+      parameters:
+        - { name: elderlyId, in: query, schema: { type: string } }
+        - { name: warningType, in: query, schema: { type: string } }
+        - { name: severity, in: query, schema: { type: string, enum: [low, medium, high, critical] } }
+        - { name: status, in: query, schema: { type: string } }
+        - { name: source, in: query, schema: { type: string } }
+        - { name: startTime, in: query, schema: { type: string, format: date-time } }
+        - { name: endTime, in: query, schema: { type: string, format: date-time } }
+        - { $ref: '#/components/parameters/PageNo' }
+        - { $ref: '#/components/parameters/PageSize' }
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiWarningPage' } } } } }
+  /health-warnings/{id}:
+    get:
+      tags: [HealthWarning]
+      summary: 预警详情
+      operationId: getHealthWarning
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiWarning' } } } } }
+  /health-warnings/{id}/handle:
+    post:
+      tags: [HealthWarning]
+      summary: 处理预警
+      operationId: handleHealthWarning
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/WarningHandleRequest' } } } }
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' } }
+  /health-warnings/{id}/assign:
+    post:
+      tags: [HealthWarning]
+      summary: 转派预警
+      operationId: assignHealthWarning
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: string } } } }
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' } }
+  /assessment-reports:
+    get:
+      tags: [AssessmentReport]
+      summary: 报告列表
+      operationId: listAssessmentReports
+      parameters: [{ name: elderlyId, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }]
+      responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } }
+    post:
+      tags: [AssessmentReport]
+      summary: 生成评估报告
+      operationId: createAssessmentReport
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AssessmentReportInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/ObjectResponse' } }
+  /assessment-reports/{id}: { get: { tags: [AssessmentReport], summary: 报告详情, operationId: getAssessmentReport, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /assessment-reports/{id}/export: { get: { tags: [AssessmentReport], summary: 导出报告, operationId: exportAssessmentReport, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/StringResponse' } } } }
+  /key-populations:
+    get: { tags: [KeyPopulation], summary: 重点人群列表, operationId: listKeyPopulations, parameters: [{ name: status, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }
+    post: { tags: [KeyPopulation], summary: 新增重点人群, operationId: createKeyPopulation, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/KeyPopulationInput' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
+  /key-populations/{id}: { put: { tags: [KeyPopulation], summary: 更新重点人群, operationId: updateKeyPopulation, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/KeyPopulationInput' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /key-populations/{id}/close: { post: { tags: [KeyPopulation], summary: 关闭重点人群, operationId: closeKeyPopulation, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /reports/statistics/overview: { get: { tags: [ReportStatistics], summary: 统计总览, operationId: getStatisticsOverview, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /reports/statistics/trends: { get: { tags: [ReportStatistics], summary: 趋势统计, operationId: getStatisticsTrends, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /reports/statistics/distributions: { get: { tags: [ReportStatistics], summary: 分布统计, operationId: getStatisticsDistributions, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /reports/statistics/export: { get: { tags: [ReportStatistics], summary: 导出统计报表, operationId: exportStatistics, responses: { '200': { $ref: '#/components/responses/StringResponse' } } } }
+  /devices:
+    get: { tags: [Device], summary: 设备列表, operationId: listDevices, parameters: [{ name: bindingStatus, in: query, schema: { type: string } }, { name: onlineStatus, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }
+  /devices/{id}:
+    get: { tags: [Device], summary: 设备详情, operationId: getDevice, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
+    put: { tags: [Device], summary: 更新设备, operationId: updateDevice, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceUpdateRequest' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
+  /devices/bind: { post: { tags: [Device], summary: 绑定设备, operationId: bindDevice, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceBindRequest' } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /devices/{id}/unbind: { post: { tags: [Device], summary: 解绑设备, operationId: unbindDevice, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /devices/{id}/reports: { get: { tags: [Device], summary: 设备上报记录, operationId: getDeviceReports, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /elderly-accounts: { get: { tags: [ElderlyAccount], summary: 老人账户列表, operationId: listElderlyAccounts, parameters: [{ $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }, post: { tags: [ElderlyAccount], summary: 创建老人账户, operationId: createElderlyAccount, requestBody: { $ref: '#/components/requestBodies/UserCreate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /elderly-accounts/{id}/reset-password: { post: { tags: [ElderlyAccount], summary: 重置老人密码, operationId: resetElderlyPassword, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/PasswordText' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /elderly-accounts/{id}/status: { post: { tags: [ElderlyAccount], summary: 修改老人账户状态, operationId: updateElderlyAccountStatus, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/Status' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /doctor-accounts: { get: { tags: [DoctorAccount], summary: 医生账户列表, operationId: listDoctorAccounts, parameters: [{ $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }, post: { tags: [DoctorAccount], summary: 创建医生账户, operationId: createDoctorAccount, requestBody: { $ref: '#/components/requestBodies/UserCreate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /doctor-accounts/{id}: { put: { tags: [DoctorAccount], summary: 更新医生账户, operationId: updateDoctorAccount, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/UserUpdate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /doctor-accounts/{id}/reset-password: { post: { tags: [DoctorAccount], summary: 重置医生密码, operationId: resetDoctorPassword, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/PasswordText' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /users: { get: { tags: [UserAccount], summary: 系统账户列表, operationId: listUsers, parameters: [{ $ref: '#/components/parameters/Keyword' }, { name: roleCode, in: query, schema: { type: string } }, { name: status, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }, post: { tags: [UserAccount], summary: 创建系统账户, operationId: createUser, requestBody: { $ref: '#/components/requestBodies/UserCreate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /users/{id}: { get: { tags: [UserAccount], summary: 系统账户详情, operationId: getUser, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/UserResponse' } } }, put: { tags: [UserAccount], summary: 更新系统账户, operationId: updateUser, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/UserUpdate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /users/{id}/status: { post: { tags: [UserAccount], summary: 修改账户状态, operationId: updateUserStatus, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/Status' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /users/{id}/roles: { post: { tags: [UserAccount], summary: 分配角色, operationId: assignUserRole, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { type: string } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /profile: { get: { tags: [Profile], summary: 获取个人资料, operationId: getProfile, responses: { '200': { $ref: '#/components/responses/UserResponse' } } }, put: { tags: [Profile], summary: 更新个人资料, operationId: updateProfile, requestBody: { $ref: '#/components/requestBodies/UserUpdate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /profile/change-password: { post: { tags: [Profile], summary: 修改密码, operationId: changePassword, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/PasswordChangeRequest' } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
+  /profile/todos: { get: { tags: [Profile], summary: 我的待办, operationId: getTodos, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /ai/analysis/care-decision: { post: { tags: [AIAnalysis], summary: 生成照护决策分析, operationId: createCareDecisionAnalysis, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AnalysisRequest' } } } }, responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiAnalysisResult' } } } } } } }
+  /ai/analysis/care-decision/history: { get: { tags: [AIAnalysis], summary: 分析历史, operationId: listCareDecisionHistory, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
+  /ai/analysis/care-decision/{id}: { get: { tags: [AIAnalysis], summary: 分析详情, operationId: getCareDecisionAnalysis, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiAnalysisResult' } } } }, '404': { $ref: '#/components/responses/Error' } } } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string } }
+    Keyword: { name: keyword, in: query, schema: { type: string } }
+    PageNo: { name: pageNo, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 10 } }
+  requestBodies:
+    UserCreate: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/UserCreateRequest' } } } }
+    UserUpdate: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/UserUpdateRequest' } } } }
+    PasswordText: { required: true, content: { text/plain: { schema: { type: string, minLength: 6, maxLength: 20 } } } }
+    Status: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/StatusRequest' } } } }
+  responses:
+    EmptyResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiEmpty' } } } }
+    StringResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiString' } } } }
+    ObjectResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiObject' } } } }
+    ObjectListResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiObjectList' } } } }
+    ObjectPageResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiObjectPage' } } } }
+    UserResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiUser' } } } }
+    LoginResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiLogin' } } } }
+    Error: { description: 业务错误, content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } } }
+  schemas:
+    ApiBase:
+      type: object
+      required: [code, message, traceId]
+      properties: { code: { type: integer, example: 0 }, message: { type: string, example: success }, traceId: { type: string } }
+    ApiEmpty: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { nullable: true } } }] }
+    ApiString: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { type: string } } }] }
+    ApiObject: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { type: object, additionalProperties: true } } }] }
+    ApiObjectList: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { type: array, items: { type: object, additionalProperties: true } } } }] }
+    ApiObjectPage: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/ObjectPage' } } }] }
+    ApiError: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { nullable: true } } }] }
+    ObjectPage:
+      type: object
+      required: [list, pageNo, pageSize, total]
+      properties: { list: { type: array, items: { type: object, additionalProperties: true } }, pageNo: { type: integer }, pageSize: { type: integer }, total: { type: integer, format: int64 } }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties: { username: { type: string, maxLength: 50 }, password: { type: string, minLength: 6, maxLength: 20, writeOnly: true } }
+    RegisterRequest:
+      type: object
+      required: [username, password, realName, mobile]
+      properties:
+        username: { type: string, minLength: 3, maxLength: 50, pattern: '^[A-Za-z0-9_]+$' }
+        password: { type: string, minLength: 6, maxLength: 20, writeOnly: true }
+        realName: { type: string, maxLength: 50 }
+        mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
+    LoginResult:
+      type: object
+      properties: { token: { type: string }, expireAt: { type: string, format: date-time }, user: { $ref: '#/components/schemas/User' } }
+    ApiLogin: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/LoginResult' } } }] }
+    User:
+      type: object
+      properties: { id: { type: string }, username: { type: string }, realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string }, lastLoginAt: { type: string, format: date-time }, createdAt: { type: string, format: date-time }, updatedAt: { type: string, format: date-time } }
+    ApiUser: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }] }
+    UserCreateRequest:
+      type: object
+      required: [username, password, roleCode]
+      properties: { username: { type: string, maxLength: 50 }, password: { type: string, minLength: 6, maxLength: 20, writeOnly: true }, realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string } }
+    UserUpdateRequest: { type: object, properties: { realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string } } }
+    StatusRequest: { type: object, required: [status], properties: { status: { type: string } } }
+    PasswordChangeRequest: { type: object, required: [oldPassword, newPassword], properties: { oldPassword: { type: string, writeOnly: true }, newPassword: { type: string, minLength: 6, maxLength: 20, writeOnly: true } } }
+    ElderlyProfileInput:
+      type: object
+      required: [name, gender]
+      properties: { name: { type: string }, gender: { type: string }, birthday: { type: string, format: date }, age: { type: integer }, phone: { type: string }, address: { type: string }, institutionId: { type: string }, medicalHistory: { type: string }, careLevel: { type: string }, tags: { type: array, items: { type: string } }, status: { type: string } }
+    ElderlyProfile: { allOf: [{ $ref: '#/components/schemas/ElderlyProfileInput' }, { type: object, properties: { id: { type: string }, createdAt: { type: string, format: date-time }, updatedAt: { type: string, format: date-time } } }] }
+    ApiElderly: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/ElderlyProfile' } } }] }
+    ElderlyPage: { allOf: [{ $ref: '#/components/schemas/ObjectPage' }, { type: object, properties: { list: { type: array, items: { $ref: '#/components/schemas/ElderlyProfile' } } } }] }
+    ApiElderlyPage: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/ElderlyPage' } } }] }
+    HealthWarning: { type: object, properties: { id: { type: string }, elderlyId: { type: string }, warningType: { type: string }, severity: { type: string }, source: { type: string }, metricName: { type: string }, metricValue: { type: number }, thresholdValue: { type: number }, status: { type: string }, occurredAt: { type: string, format: date-time }, handledAt: { type: string, format: date-time, nullable: true }, handlerId: { type: string, nullable: true }, remark: { type: string } } }
+    ApiWarning: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/HealthWarning' } } }] }
+    WarningPage: { allOf: [{ $ref: '#/components/schemas/ObjectPage' }, { type: object, properties: { list: { type: array, items: { $ref: '#/components/schemas/HealthWarning' } } } }] }
+    ApiWarningPage: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/WarningPage' } } }] }
+    WarningHandleRequest: { type: object, required: [status], properties: { status: { type: string }, handlerId: { type: string }, handlerName: { type: string }, result: { type: string }, nextAction: { type: string }, remark: { type: string } } }
+    AssessmentReportInput: { type: object, required: [elderlyId, reportType], properties: { elderlyId: { type: string }, reportType: { type: string }, score: { type: integer }, grade: { type: string }, summary: { type: string }, riskItems: { type: array, items: { type: string } }, recommendations: { type: array, items: { type: string } }, assessorId: { type: string }, assessedAt: { type: string, format: date-time } } }
+    KeyPopulationInput: { type: object, required: [elderlyId, category], properties: { elderlyId: { type: string }, category: { type: string }, reason: { type: string }, level: { type: string }, ownerDoctorId: { type: string }, followUpCycleDays: { type: integer }, status: { type: string } } }
+    DeviceBindRequest: { type: object, required: [deviceId, elderlyId], properties: { deviceId: { type: string }, elderlyId: { type: string } } }
+    DeviceUpdateRequest: { type: object, properties: { deviceName: { type: string }, deviceType: { type: string }, firmwareVersion: { type: string } } }
+    DashboardOverview: { type: object, properties: { totalElderlyCount: { type: integer, format: int64 }, warningCount: { type: integer, format: int64 }, unhandledWarningCount: { type: integer, format: int64 }, keyPopulationCount: { type: integer, format: int64 }, deviceOnlineRate: { type: number }, recentTrend: { type: array, items: { type: object, properties: { date: { type: string, format: date }, value: { type: integer } } } } } }
+    ApiDashboardOverview: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/DashboardOverview' } } }] }
+    Chart: { type: object, properties: { chartType: { type: string }, title: { type: string }, xAxis: { type: array, items: { type: string } }, series: { type: array, items: { type: object, properties: { name: { type: string }, data: { type: array, items: { type: number } } } } } } }
+    ApiChartList: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Chart' } } } }] }
+    AnalysisRequest:
+      type: object
+      required: [scene, metrics]
+      properties: { scene: { type: string }, tenantId: { type: string }, regionCode: { type: string }, timeRange: { type: object, properties: { start: { type: string, format: date }, end: { type: string, format: date } } }, metrics: { type: object, required: [elderlyCount, warningCount, unhandledWarningCount, highRiskPopulationCount, deviceOnlineRate], properties: { elderlyCount: { type: integer, minimum: 0 }, warningCount: { type: integer, minimum: 0 }, unhandledWarningCount: { type: integer, minimum: 0 }, highRiskPopulationCount: { type: integer, minimum: 0 }, deviceOnlineRate: { type: number, minimum: 0, maximum: 1 } } }, dimensions: { type: object, properties: { groupBy: { type: array, items: { type: string } } } }, constraints: { type: object, properties: { language: { type: string }, outputFormat: { type: string }, maxInsightCount: { type: integer }, mustInclude: { type: array, items: { type: string } } } } }
+    AnalysisResult: { type: object, properties: { id: { type: string }, scene: { type: string }, summary: { type: string }, insights: { type: array, items: { type: object, properties: { type: { type: string }, title: { type: string }, description: { type: string }, confidence: { type: number }, suggestion: { type: string } } } }, actions: { type: array, items: { type: object, additionalProperties: true } }, charts: { type: array, items: { type: object, additionalProperties: true } }, createdAt: { type: string, format: date-time } } }
+    ApiAnalysisResult: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/AnalysisResult' } } }] }

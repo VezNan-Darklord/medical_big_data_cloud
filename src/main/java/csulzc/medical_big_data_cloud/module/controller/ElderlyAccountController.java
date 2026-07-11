@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/elderly-accounts")
+@RequestMapping("/elderly-accounts")
 @RequiredArgsConstructor
 @Tag(name = "Elderly Account", description = "老人账户管理")
 public class ElderlyAccountController {

@@ -87,6 +87,32 @@
 				}
 			}
 		},
+		"/auth/register": {
+			"post": {
+				"tags": ["Auth"],
+				"summary": "老人用户公开注册",
+				"operationId": "register",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/RegisterRequest" }
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "注册成功",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "#/components/schemas/ApiResponse_UserResponse" }
+							}
+						}
+					},
+					"400": { "description": "参数错误、用户名或手机号已存在" }
+				}
+			}
+		},
 		"/auth/me": {
 			"get": {
 				"tags": ["Auth"],
@@ -1988,6 +2014,16 @@
 					"updatedAt": { "type": "string", "format": "date-time", "nullable": true }
 				},
 				"required": ["id", "deviceName", "deviceType", "deviceSn", "bindingStatus", "onlineStatus"]
+			},
+			"RegisterRequest": {
+				"type": "object",
+				"properties": {
+					"username": { "type": "string", "minLength": 3, "maxLength": 50, "pattern": "^[A-Za-z0-9_]+$" },
+					"password": { "type": "string", "minLength": 6, "maxLength": 20, "writeOnly": true },
+					"realName": { "type": "string", "maxLength": 50 },
+					"mobile": { "type": "string", "pattern": "^1[3-9]\\d{9}$" }
+				},
+				"required": ["username", "password", "realName", "mobile"]
 			},
 			"UserCreateRequest": {
 				"type": "object",

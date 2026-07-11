@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/elderly-profiles")
+@RequestMapping("/elderly-profiles")
 @RequiredArgsConstructor
 @Tag(name = "Elderly Profile", description = "老人资料管理")
 public class ElderlyProfileController {
