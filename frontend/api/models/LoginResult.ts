@@ -2,4 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PageNo = number;
+import type { User } from './User';
+export type LoginResult = {
+    token?: string;
+    expireAt?: string;
+    user?: User;
+};
+

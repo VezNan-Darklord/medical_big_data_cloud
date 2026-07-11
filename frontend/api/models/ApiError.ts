@@ -2,4 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PageNo = number;
+import type { ApiBase } from './ApiBase';
+export type ApiError = (ApiBase & {
+    data?: any;
+});
+

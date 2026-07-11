@@ -2,10 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UserUpdateRequest = {
+export type User = {
+    id?: string;
+    username?: string;
     realName?: string;
     roleCode?: string;
     mobile?: string;
     status?: string;
+    lastLoginAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
 };
 

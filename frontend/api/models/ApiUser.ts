@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type DeviceUpdateRequest = {
-    deviceName?: string;
-    deviceType?: string;
-    firmwareVersion?: string;
-};
+import type { ApiBase } from './ApiBase';
+import type { User } from './User';
+export type ApiUser = (ApiBase & {
+    data?: User;
+});
 

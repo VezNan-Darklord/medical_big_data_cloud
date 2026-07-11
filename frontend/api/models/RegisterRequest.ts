@@ -2,4 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PageNo = number;
+export type RegisterRequest = {
+    username: string;
+    password: string;
+    realName: string;
+    mobile: string;
+};
+

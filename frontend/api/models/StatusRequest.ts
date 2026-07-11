@@ -2,4 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PageNo = number;
+export type StatusRequest = {
+    status: string;
+};
+

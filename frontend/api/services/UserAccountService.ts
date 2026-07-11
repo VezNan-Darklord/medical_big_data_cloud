@@ -2,48 +2,54 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiResponse_PageResult_UserResponse } from '../models/ApiResponse_PageResult_UserResponse';
-import type { ApiResponse_UserResponse } from '../models/ApiResponse_UserResponse';
-import type { ApiResponse_Void } from '../models/ApiResponse_Void';
+import type { ApiEmpty } from '../models/ApiEmpty';
+import type { ApiObjectPage } from '../models/ApiObjectPage';
+import type { ApiUser } from '../models/ApiUser';
+import type { StatusRequest } from '../models/StatusRequest';
 import type { UserCreateRequest } from '../models/UserCreateRequest';
-import type { UserStatusUpdateRequest } from '../models/UserStatusUpdateRequest';
 import type { UserUpdateRequest } from '../models/UserUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class UserAccountService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 系统账号列表
+     * 系统账户列表
      * @param keyword
+     * @param roleCode
+     * @param status
      * @param pageNo
      * @param pageSize
-     * @returns ApiResponse_PageResult_UserResponse 成功
+     * @returns ApiObjectPage 成功
      * @throws ApiError
      */
     public listUsers(
         keyword?: string,
+        roleCode?: string,
+        status?: string,
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiResponse_PageResult_UserResponse> {
+    ): CancelablePromise<ApiObjectPage> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/users',
             query: {
                 'keyword': keyword,
+                'roleCode': roleCode,
+                'status': status,
                 'pageNo': pageNo,
                 'pageSize': pageSize,
             },
         });
     }
     /**
-     * 创建系统账号
+     * 创建系统账户
      * @param requestBody
-     * @returns ApiResponse_UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
     public createUser(
         requestBody: UserCreateRequest,
-    ): CancelablePromise<ApiResponse_UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/users',
@@ -52,14 +58,14 @@ export class UserAccountService {
         });
     }
     /**
-     * 账号详情
+     * 系统账户详情
      * @param id
-     * @returns ApiResponse_UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
-    public getUserById(
+    public getUser(
         id: string,
-    ): CancelablePromise<ApiResponse_UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/users/{id}',
@@ -69,16 +75,16 @@ export class UserAccountService {
         });
     }
     /**
-     * 修改账号
+     * 更新系统账户
      * @param id
      * @param requestBody
-     * @returns ApiResponse_UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
     public updateUser(
         id: string,
         requestBody: UserUpdateRequest,
-    ): CancelablePromise<ApiResponse_UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/users/{id}',
@@ -90,16 +96,16 @@ export class UserAccountService {
         });
     }
     /**
-     * 修改账号状态
+     * 修改账户状态
      * @param id
      * @param requestBody
-     * @returns ApiResponse_Void 成功
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
     public updateUserStatus(
         id: string,
-        requestBody: UserStatusUpdateRequest,
-    ): CancelablePromise<ApiResponse_Void> {
+        requestBody: StatusRequest,
+    ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/users/{id}/status',
@@ -114,13 +120,13 @@ export class UserAccountService {
      * 分配角色
      * @param id
      * @param requestBody
-     * @returns ApiResponse_Void 成功
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
-    public assignRoles(
+    public assignUserRole(
         id: string,
         requestBody: string,
-    ): CancelablePromise<ApiResponse_Void> {
+    ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/users/{id}/roles',

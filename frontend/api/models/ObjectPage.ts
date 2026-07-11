@@ -2,4 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PageNo = number;
+export type ObjectPage = {
+    list: Array<Record<string, any>>;
+    pageNo: number;
+    pageSize: number;
+    total: number;
+};
+

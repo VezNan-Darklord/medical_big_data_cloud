@@ -2,4 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PageNo = number;
+export type ApiBase = {
+    code: number;
+    message: string;
+    traceId: string;
+};
+
