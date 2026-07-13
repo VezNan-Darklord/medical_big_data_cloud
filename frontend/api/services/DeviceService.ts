@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiEmpty } from '../models/ApiEmpty';
-import type { ApiObject } from '../models/ApiObject';
-import type { ApiObjectList } from '../models/ApiObjectList';
-import type { ApiObjectPage } from '../models/ApiObjectPage';
+import type { ApiResponse_DeviceResponse } from '../models/ApiResponse_DeviceResponse';
+import type { ApiResponse_PageResult_DeviceResponse } from '../models/ApiResponse_PageResult_DeviceResponse';
+import type { ApiResponse_String } from '../models/ApiResponse_String';
+import type { ApiResponse_Void } from '../models/ApiResponse_Void';
 import type { DeviceBindRequest } from '../models/DeviceBindRequest';
 import type { DeviceUpdateRequest } from '../models/DeviceUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -18,7 +18,7 @@ export class DeviceService {
      * @param onlineStatus
      * @param pageNo
      * @param pageSize
-     * @returns ApiObjectPage 成功
+     * @returns ApiResponse_PageResult_DeviceResponse 成功
      * @throws ApiError
      */
     public listDevices(
@@ -26,7 +26,7 @@ export class DeviceService {
         onlineStatus?: string,
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiObjectPage> {
+    ): CancelablePromise<ApiResponse_PageResult_DeviceResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/devices',
@@ -41,12 +41,12 @@ export class DeviceService {
     /**
      * 设备详情
      * @param id
-     * @returns ApiObject 成功
+     * @returns ApiResponse_DeviceResponse 成功
      * @throws ApiError
      */
-    public getDevice(
+    public getDeviceById(
         id: string,
-    ): CancelablePromise<ApiObject> {
+    ): CancelablePromise<ApiResponse_DeviceResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/devices/{id}',
@@ -59,13 +59,13 @@ export class DeviceService {
      * 更新设备
      * @param id
      * @param requestBody
-     * @returns ApiObject 成功
+     * @returns ApiResponse_DeviceResponse 成功
      * @throws ApiError
      */
     public updateDevice(
         id: string,
         requestBody: DeviceUpdateRequest,
-    ): CancelablePromise<ApiObject> {
+    ): CancelablePromise<ApiResponse_DeviceResponse> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/devices/{id}',
@@ -79,12 +79,12 @@ export class DeviceService {
     /**
      * 绑定设备
      * @param requestBody
-     * @returns ApiEmpty 成功
+     * @returns ApiResponse_Void 成功
      * @throws ApiError
      */
     public bindDevice(
         requestBody: DeviceBindRequest,
-    ): CancelablePromise<ApiEmpty> {
+    ): CancelablePromise<ApiResponse_Void> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/devices/bind',
@@ -95,12 +95,12 @@ export class DeviceService {
     /**
      * 解绑设备
      * @param id
-     * @returns ApiEmpty 成功
+     * @returns ApiResponse_Void 成功
      * @throws ApiError
      */
     public unbindDevice(
         id: string,
-    ): CancelablePromise<ApiEmpty> {
+    ): CancelablePromise<ApiResponse_Void> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/devices/{id}/unbind',
@@ -112,12 +112,12 @@ export class DeviceService {
     /**
      * 设备上报记录
      * @param id
-     * @returns ApiObjectList 成功
+     * @returns ApiResponse_String 成功
      * @throws ApiError
      */
     public getDeviceReports(
         id: string,
-    ): CancelablePromise<ApiObjectList> {
+    ): CancelablePromise<ApiResponse_String> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/devices/{id}/reports',

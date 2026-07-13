@@ -5,9 +5,9 @@
 export type UserCreateRequest = {
     username: string;
     password: string;
-    realName?: string;
+    realName?: string | null;
     roleCode: string;
-    mobile?: string;
-    status?: string;
+    mobile?: string | null;
+    status?: string | null;
 };
 

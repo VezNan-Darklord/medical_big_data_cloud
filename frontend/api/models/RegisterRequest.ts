@@ -7,5 +7,6 @@ export type RegisterRequest = {
     password: string;
     realName: string;
     mobile: string;
+    roleCode: 'admin' | 'doctor' | 'elderly';
 };
 

@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UserUpdateRequest = {
-    realName?: string;
-    roleCode?: string;
-    mobile?: string;
-    status?: string;
+    realName?: string | null;
+    roleCode?: string | null;
+    mobile?: string | null;
+    status?: string | null;
 };
 

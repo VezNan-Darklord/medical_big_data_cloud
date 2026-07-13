@@ -10,7 +10,7 @@ const toneClasses: Record<MetricCardProps['tone'], string> = {
   red: 'from-rose-500/25 to-orange-500/10 text-rose-100',
   violet: 'from-violet-500/25 to-fuchsia-500/10 text-violet-100',
   emerald: 'from-emerald-500/25 to-teal-500/10 text-emerald-100',
-}
+};
 
 export function MetricCard({ label, value, delta, tone }: MetricCardProps) {
   return (

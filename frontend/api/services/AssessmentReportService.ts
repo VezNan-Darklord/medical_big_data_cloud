@@ -2,27 +2,27 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiObject } from '../models/ApiObject';
-import type { ApiObjectPage } from '../models/ApiObjectPage';
-import type { ApiString } from '../models/ApiString';
-import type { AssessmentReportInput } from '../models/AssessmentReportInput';
+import type { ApiResponse_AssessmentReportResponse } from '../models/ApiResponse_AssessmentReportResponse';
+import type { ApiResponse_PageResult_AssessmentReportResponse } from '../models/ApiResponse_PageResult_AssessmentReportResponse';
+import type { ApiResponse_String } from '../models/ApiResponse_String';
+import type { AssessmentReportCreateRequest } from '../models/AssessmentReportCreateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AssessmentReportService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 报告列表
+     * 评估报告列表
      * @param elderlyId
      * @param pageNo
      * @param pageSize
-     * @returns ApiObjectPage 成功
+     * @returns ApiResponse_PageResult_AssessmentReportResponse 成功
      * @throws ApiError
      */
     public listAssessmentReports(
         elderlyId?: string,
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiObjectPage> {
+    ): CancelablePromise<ApiResponse_PageResult_AssessmentReportResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/assessment-reports',
@@ -34,14 +34,14 @@ export class AssessmentReportService {
         });
     }
     /**
-     * 生成评估报告
+     * 新增评估报告
      * @param requestBody
-     * @returns ApiObject 成功
+     * @returns ApiResponse_AssessmentReportResponse 成功
      * @throws ApiError
      */
     public createAssessmentReport(
-        requestBody: AssessmentReportInput,
-    ): CancelablePromise<ApiObject> {
+        requestBody: AssessmentReportCreateRequest,
+    ): CancelablePromise<ApiResponse_AssessmentReportResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/assessment-reports',
@@ -50,14 +50,14 @@ export class AssessmentReportService {
         });
     }
     /**
-     * 报告详情
+     * 评估报告详情
      * @param id
-     * @returns ApiObject 成功
+     * @returns ApiResponse_AssessmentReportResponse 成功
      * @throws ApiError
      */
-    public getAssessmentReport(
+    public getAssessmentReportById(
         id: string,
-    ): CancelablePromise<ApiObject> {
+    ): CancelablePromise<ApiResponse_AssessmentReportResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/assessment-reports/{id}',
@@ -67,14 +67,14 @@ export class AssessmentReportService {
         });
     }
     /**
-     * 导出报告
+     * 导出评估报告
      * @param id
-     * @returns ApiString 成功
+     * @returns ApiResponse_String 成功
      * @throws ApiError
      */
     public exportAssessmentReport(
         id: string,
-    ): CancelablePromise<ApiString> {
+    ): CancelablePromise<ApiResponse_String> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/assessment-reports/{id}/export',
