@@ -14,6 +14,7 @@ import csulzc.medical_big_data_cloud.module.service.ElderlyProfileService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class ElderlyProfileController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ApiResponse<ElderlyProfileResponse> create(@Valid @RequestBody ElderlyProfileCreateRequest request) {
         return ApiResponse.success(elderlyProfileService.create(request));
     }

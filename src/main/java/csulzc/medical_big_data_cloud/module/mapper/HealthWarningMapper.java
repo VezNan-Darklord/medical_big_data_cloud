@@ -1,5 +1,6 @@
 package csulzc.medical_big_data_cloud.module.mapper;
 
+import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningHandleRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.warning.HealthWarningResponse;
 import csulzc.medical_big_data_cloud.module.entity.HealthWarning;
@@ -27,4 +28,11 @@ public interface HealthWarningMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void updateFromHandleRequest(HealthWarningHandleRequest request, @MappingTarget HealthWarning entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "handledAt", ignore = true)
+    @Mapping(target = "handlerId", ignore = true)
+    HealthWarning toEntity(HealthWarningCreateRequest request);
 }

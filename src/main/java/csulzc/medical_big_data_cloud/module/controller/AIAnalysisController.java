@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class AIAnalysisController {
     private final Map<String, AnalysisResult> history = new ConcurrentHashMap<>();
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ApiResponse<AnalysisResult> analyze(@Valid @RequestBody AnalysisRequest request) {
         String id = UUID.randomUUID().toString();
         Metrics metrics = request.metrics();

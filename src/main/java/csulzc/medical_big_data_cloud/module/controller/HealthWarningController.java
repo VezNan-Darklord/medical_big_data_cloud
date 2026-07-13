@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningCreateRequest;
 
 @RestController
 @RequestMapping("/health-warnings")
@@ -18,6 +19,11 @@ import org.springframework.web.bind.annotation.*;
 public class HealthWarningController {
 
     private final HealthWarningService healthWarningService;
+
+    @PostMapping
+    public ApiResponse<HealthWarningResponse> create(@Valid @RequestBody HealthWarningCreateRequest request) {
+        return ApiResponse.success(healthWarningService.create(request));
+    }
 
     @GetMapping
     public ApiResponse<PageResult<HealthWarningResponse>> list(HealthWarningQueryRequest request) {

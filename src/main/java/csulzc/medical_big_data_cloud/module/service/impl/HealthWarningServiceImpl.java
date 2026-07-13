@@ -3,6 +3,7 @@ package csulzc.medical_big_data_cloud.module.service.impl;
 import csulzc.medical_big_data_cloud.common.constant.ResultCode;
 import csulzc.medical_big_data_cloud.common.exception.BusinessException;
 import csulzc.medical_big_data_cloud.common.result.PageResult;
+import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningHandleRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningQueryRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.warning.HealthWarningResponse;
@@ -30,6 +31,14 @@ public class HealthWarningServiceImpl implements HealthWarningService {
 
     private final HealthWarningRepository healthWarningRepository;
     private final HealthWarningMapper healthWarningMapper;
+    @Transactional
+    @Override
+    public HealthWarningResponse create(HealthWarningCreateRequest request) {
+        HealthWarning entity = healthWarningMapper.toEntity(request);
+        HealthWarning saved = healthWarningRepository.save(entity);
+        return healthWarningMapper.toResponse(saved);
+    }
+
 
     @Override
     @Transactional(readOnly = true)
