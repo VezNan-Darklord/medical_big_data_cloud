@@ -2,10 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiResponse_HealthWarningResponse } from '../models/ApiResponse_HealthWarningResponse';
-import type { ApiResponse_PageResult_HealthWarningResponse } from '../models/ApiResponse_PageResult_HealthWarningResponse';
-import type { ApiResponse_Void } from '../models/ApiResponse_Void';
-import type { HealthWarningHandleRequest } from '../models/HealthWarningHandleRequest';
+import type { ApiEmpty } from '../models/ApiEmpty';
+import type { ApiWarning } from '../models/ApiWarning';
+import type { ApiWarningPage } from '../models/ApiWarningPage';
+import type { HealthWarningCreateRequest } from '../models/HealthWarningCreateRequest';
+import type { WarningHandleRequest } from '../models/WarningHandleRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class HealthWarningService {
@@ -21,20 +22,20 @@ export class HealthWarningService {
      * @param endTime
      * @param pageNo
      * @param pageSize
-     * @returns ApiResponse_PageResult_HealthWarningResponse 成功
+     * @returns ApiWarningPage 成功
      * @throws ApiError
      */
     public listHealthWarnings(
         elderlyId?: string,
         warningType?: string,
-        severity?: string,
+        severity?: 'low' | 'medium' | 'high' | 'critical',
         status?: string,
         source?: string,
         startTime?: string,
         endTime?: string,
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiResponse_PageResult_HealthWarningResponse> {
+    ): CancelablePromise<ApiWarningPage> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/health-warnings',
@@ -52,14 +53,33 @@ export class HealthWarningService {
         });
     }
     /**
-     * 预警详情
-     * @param id
-     * @returns ApiResponse_HealthWarningResponse 成功
+     * 新增健康预警
+     * @param requestBody
+     * @returns ApiWarning 成功
      * @throws ApiError
      */
-    public getHealthWarningById(
+    public createHealthWarning(
+        requestBody: HealthWarningCreateRequest,
+    ): CancelablePromise<ApiWarning> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/health-warnings',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `业务错误`,
+            },
+        });
+    }
+    /**
+     * 预警详情
+     * @param id
+     * @returns ApiWarning 成功
+     * @throws ApiError
+     */
+    public getHealthWarning(
         id: string,
-    ): CancelablePromise<ApiResponse_HealthWarningResponse> {
+    ): CancelablePromise<ApiWarning> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/health-warnings/{id}',
@@ -72,13 +92,13 @@ export class HealthWarningService {
      * 处理预警
      * @param id
      * @param requestBody
-     * @returns ApiResponse_Void 成功
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
     public handleHealthWarning(
         id: string,
-        requestBody: HealthWarningHandleRequest,
-    ): CancelablePromise<ApiResponse_Void> {
+        requestBody: WarningHandleRequest,
+    ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/health-warnings/{id}/handle',
@@ -93,13 +113,13 @@ export class HealthWarningService {
      * 转派预警
      * @param id
      * @param requestBody
-     * @returns ApiResponse_Void 成功
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
     public assignHealthWarning(
         id: string,
         requestBody: string,
-    ): CancelablePromise<ApiResponse_Void> {
+    ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/health-warnings/{id}/assign',

@@ -1,10 +1,9 @@
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
 import medical from '../instance'
-import type { KeyPopulationCreateRequest } from '../models/KeyPopulationCreateRequest'
-import type { KeyPopulationUpdateRequest } from '../models/KeyPopulationUpdateRequest'
-import type { ApiResponse_PageResult_KeyPopulationResponse } from '../models/ApiResponse_PageResult_KeyPopulationResponse'
+import type { KeyPopulationInput } from '../models/KeyPopulationInput'
+import type { ApiObjectPage } from '../models/ApiObjectPage'
 
-type LastPage = ApiResponse_PageResult_KeyPopulationResponse
+type LastPage = ApiObjectPage
 
 export function useListKeyPopulationsQuery(params: { status?: string; pageSize?: number } = {}) {
   const { pageSize = 10, status } = params
@@ -23,7 +22,7 @@ export function useListKeyPopulationsQuery(params: { status?: string; pageSize?:
 
 export function useCreateKeyPopulationMutation() {
   return useMutation({
-    mutationFn: async (req: KeyPopulationCreateRequest) =>
+    mutationFn: async (req: KeyPopulationInput) =>
       medical.keyPopulation.createKeyPopulation(req),
     mutationKey: ['createKeyPopulation'],
   })
@@ -31,7 +30,7 @@ export function useCreateKeyPopulationMutation() {
 
 export function useUpdateKeyPopulationMutation() {
   return useMutation({
-    mutationFn: async ({ id, ...req }: KeyPopulationUpdateRequest & { id: string }) =>
+    mutationFn: async ({ id, ...req }: KeyPopulationInput & { id: string }) =>
       medical.keyPopulation.updateKeyPopulation(id, req),
     mutationKey: ['updateKeyPopulation'],
   })

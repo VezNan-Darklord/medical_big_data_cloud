@@ -1,13 +1,14 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
-import type { HealthWarningHandleRequest } from '../models/HealthWarningHandleRequest'
-import type { ApiResponse_PageResult_HealthWarningResponse } from '../models/ApiResponse_PageResult_HealthWarningResponse'
+import type { HealthWarningCreateRequest } from '../models/HealthWarningCreateRequest'
+import type { WarningHandleRequest } from '../models/WarningHandleRequest'
+import type { ApiWarningPage } from '../models/ApiWarningPage'
 
-type LastPage = ApiResponse_PageResult_HealthWarningResponse
+type LastPage = ApiWarningPage
 
 export type WarningListParams = {
-  elderlyId?: string; warningType?: string; severity?: string; status?: string; source?: string
-  startTime?: string; endTime?: string; pageSize?: number
+  elderlyId?: string; warningType?: string; severity?: 'low' | 'medium' | 'high' | 'critical'
+  status?: string; source?: string; startTime?: string; endTime?: string; pageSize?: number
 }
 
 export function useListHealthWarningsQuery(params: WarningListParams = {}) {
@@ -28,17 +29,25 @@ export function useListHealthWarningsQuery(params: WarningListParams = {}) {
   })
 }
 
+export function useCreateHealthWarningMutation() {
+  return useMutation({
+    mutationFn: async (req: HealthWarningCreateRequest) =>
+      medical.healthWarning.createHealthWarning(req),
+    mutationKey: ['createHealthWarning'],
+  })
+}
+
 export function useGetHealthWarningQuery(id: string) {
   return useQuery({
     queryKey: ['getHealthWarning', id],
-    queryFn: async () => medical.healthWarning.getHealthWarningById(id),
+    queryFn: async () => medical.healthWarning.getHealthWarning(id),
     enabled: !!id,
   })
 }
 
 export function useHandleHealthWarningMutation() {
   return useMutation({
-    mutationFn: async ({ id, ...req }: HealthWarningHandleRequest & { id: string }) =>
+    mutationFn: async ({ id, ...req }: WarningHandleRequest & { id: string }) =>
       medical.healthWarning.handleHealthWarning(id, req),
     mutationKey: ['handleHealthWarning'],
   })

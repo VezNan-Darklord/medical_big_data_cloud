@@ -1,17 +1,17 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
 import type { UserUpdateRequest } from '../models/UserUpdateRequest'
-import type { UserStatusUpdateRequest } from '../models/UserStatusUpdateRequest'
-import type { ApiResponse_PageResult_UserResponse } from '../models/ApiResponse_PageResult_UserResponse'
+import type { StatusRequest } from '../models/StatusRequest'
+import type { ApiObjectPage } from '../models/ApiObjectPage'
 
-type LastPage = ApiResponse_PageResult_UserResponse
+type LastPage = ApiObjectPage
 
-export function useListUsersQuery(params: { keyword?: string; pageSize?: number } = {}) {
-  const { pageSize = 10, keyword } = params
+export function useListUsersQuery(params: { keyword?: string; roleCode?: string; status?: string; pageSize?: number } = {}) {
+  const { pageSize = 10, ...filters } = params
   return useInfiniteQuery({
-    queryKey: ['listUsers', { keyword }],
+    queryKey: ['listUsers', filters],
     queryFn: async ({ pageParam = 1 }) =>
-      medical.userAccount.listUsers(keyword, pageParam, pageSize),
+      medical.userAccount.listUsers(filters.keyword, filters.roleCode, filters.status, pageParam, pageSize),
     getNextPageParam: (lastPage: LastPage) => {
       const d = lastPage.data
       if (d && d.pageNo * pageSize < d.total) return d.pageNo + 1
@@ -24,7 +24,7 @@ export function useListUsersQuery(params: { keyword?: string; pageSize?: number 
 export function useGetUserQuery(id: string) {
   return useQuery({
     queryKey: ['getUser', id],
-    queryFn: async () => medical.userAccount.getUserById(id),
+    queryFn: async () => medical.userAccount.getUser(id),
     enabled: !!id,
   })
 }
@@ -39,7 +39,7 @@ export function useUpdateUserMutation() {
 
 export function useUpdateUserStatusMutation() {
   return useMutation({
-    mutationFn: async ({ id, ...req }: UserStatusUpdateRequest & { id: string }) =>
+    mutationFn: async ({ id, ...req }: StatusRequest & { id: string }) =>
       medical.userAccount.updateUserStatus(id, req),
     mutationKey: ['updateUserStatus'],
   })
@@ -48,7 +48,7 @@ export function useUpdateUserStatusMutation() {
 export function useAssignUserRoleMutation() {
   return useMutation({
     mutationFn: async ({ id, roleCode }: { id: string; roleCode: string }) =>
-      medical.userAccount.assignRoles(id, roleCode),
+      medical.userAccount.assignUserRole(id, roleCode),
     mutationKey: ['assignUserRole'],
   })
 }

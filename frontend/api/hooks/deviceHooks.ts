@@ -2,9 +2,9 @@ import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
 import type { DeviceBindRequest } from '../models/DeviceBindRequest'
 import type { DeviceUpdateRequest } from '../models/DeviceUpdateRequest'
-import type { ApiResponse_PageResult_DeviceResponse } from '../models/ApiResponse_PageResult_DeviceResponse'
+import type { ApiObjectPage } from '../models/ApiObjectPage'
 
-type LastPage = ApiResponse_PageResult_DeviceResponse
+type LastPage = ApiObjectPage
 
 export function useListDevicesQuery(params: { bindingStatus?: string; onlineStatus?: string; pageSize?: number } = {}) {
   const { pageSize = 10, bindingStatus, onlineStatus } = params
@@ -24,7 +24,7 @@ export function useListDevicesQuery(params: { bindingStatus?: string; onlineStat
 export function useGetDeviceQuery(id: string) {
   return useQuery({
     queryKey: ['getDevice', id],
-    queryFn: async () => medical.device.getDeviceById(id),
+    queryFn: async () => medical.device.getDevice(id),
     enabled: !!id,
   })
 }

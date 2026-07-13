@@ -2,8 +2,11 @@ import { Link, useLocation } from 'react-router-dom'
 import { Menu } from 'antd'
 import { type NavItem } from '../mock-data'
 import { ApartmentOutlined, TeamOutlined, AlertOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, RadarChartOutlined, CloudServerOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons'
+import { useGetCurrentUserQuery } from '../../api/hooks/authHooks'
+import { isElderly, ELDERLY_ALLOWED } from '../routes/const'
+import type { User } from '../../api/models/User'
 
-const navigationItems: NavItem[] = [
+const allNavigationItems: NavItem[] = [
   { key: 'dashboard', path: '/', label: '首页', icon: <ApartmentOutlined />, description: '总览、趋势、AI 建议与指挥席。' },
   { key: 'elderly', path: '/elderly-profiles', label: '老人档案', icon: <TeamOutlined />, description: '老人信息、标签、分组与关联业务视图。' },
   { key: 'warnings', path: '/health-warnings', label: '健康预警', icon: <AlertOutlined />, description: '设备异常、等级分层、转派与处置状态。' },
@@ -20,7 +23,14 @@ const navigationItems: NavItem[] = [
 
 export default function AppSidebar() {
   const location = useLocation()
-  const currentNav = navigationItems.find((item) => location.pathname === item.path) ?? navigationItems[0]
+  const { data } = useGetCurrentUserQuery()
+  const user = data?.data as User | undefined
+
+  const visibleItems = user && isElderly(user.roleCode || '')
+    ? allNavigationItems.filter(item => ELDERLY_ALLOWED.has(item.path))
+    : allNavigationItems
+
+  const currentNav = visibleItems.find((item) => location.pathname === item.path) ?? visibleItems[0]
 
   return (
     <aside className="row-span-2 flex h-full min-h-0 flex-col border-r border-slate-200/80 bg-white/95">
@@ -43,8 +53,8 @@ export default function AppSidebar() {
       <div className="min-h-0 flex-1 px-3 pb-4">
         <Menu
           mode="inline"
-          selectedKeys={[currentNav.key]}
-          items={navigationItems.map((item) => ({
+          selectedKeys={[currentNav?.key ?? '']}
+          items={visibleItems.map((item) => ({
             key: item.key,
             icon: item.icon,
             label: <Link to={item.path}>{item.label}</Link>,

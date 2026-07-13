@@ -5,6 +5,7 @@
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
+import { AiAnalysisService } from './services/AiAnalysisService';
 import { AssessmentReportService } from './services/AssessmentReportService';
 import { AuthService } from './services/AuthService';
 import { DashboardService } from './services/DashboardService';
@@ -14,10 +15,12 @@ import { ElderlyAccountService } from './services/ElderlyAccountService';
 import { ElderlyProfileService } from './services/ElderlyProfileService';
 import { HealthWarningService } from './services/HealthWarningService';
 import { KeyPopulationService } from './services/KeyPopulationService';
+import { ProfileService } from './services/ProfileService';
 import { ReportStatisticsService } from './services/ReportStatisticsService';
 import { UserAccountService } from './services/UserAccountService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class medical {
+    public readonly aiAnalysis: AiAnalysisService;
     public readonly assessmentReport: AssessmentReportService;
     public readonly auth: AuthService;
     public readonly dashboard: DashboardService;
@@ -27,6 +30,7 @@ export class medical {
     public readonly elderlyProfile: ElderlyProfileService;
     public readonly healthWarning: HealthWarningService;
     public readonly keyPopulation: KeyPopulationService;
+    public readonly profile: ProfileService;
     public readonly reportStatistics: ReportStatisticsService;
     public readonly userAccount: UserAccountService;
     public readonly request: BaseHttpRequest;
@@ -42,6 +46,7 @@ export class medical {
             HEADERS: config?.HEADERS,
             ENCODE_PATH: config?.ENCODE_PATH,
         });
+        this.aiAnalysis = new AiAnalysisService(this.request);
         this.assessmentReport = new AssessmentReportService(this.request);
         this.auth = new AuthService(this.request);
         this.dashboard = new DashboardService(this.request);
@@ -51,6 +56,7 @@ export class medical {
         this.elderlyProfile = new ElderlyProfileService(this.request);
         this.healthWarning = new HealthWarningService(this.request);
         this.keyPopulation = new KeyPopulationService(this.request);
+        this.profile = new ProfileService(this.request);
         this.reportStatistics = new ReportStatisticsService(this.request);
         this.userAccount = new UserAccountService(this.request);
     }

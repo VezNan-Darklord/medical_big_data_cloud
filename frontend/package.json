@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "openapi": "openapi --input ../openapi.json --output ./api --client fetch --name medical --useUnionTypes"
+    "openapi": "openapi --input ../openapi.yaml --output ./api --client fetch --name medical --useUnionTypes"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",

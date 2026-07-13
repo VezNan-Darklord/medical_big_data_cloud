@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type DeviceUpdateRequest = {
-    deviceName?: string | null;
-    deviceType?: string | null;
-    firmwareVersion?: string | null;
+    deviceName?: string;
+    deviceType?: string;
+    firmwareVersion?: string;
 };
 

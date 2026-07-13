@@ -2,10 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiResponse_LoginResponse } from '../models/ApiResponse_LoginResponse';
-import type { ApiResponse_LoginUserInfo } from '../models/ApiResponse_LoginUserInfo';
-import type { ApiResponse_UserResponse } from '../models/ApiResponse_UserResponse';
-import type { ApiResponse_Void } from '../models/ApiResponse_Void';
+import type { ApiEmpty } from '../models/ApiEmpty';
+import type { ApiLogin } from '../models/ApiLogin';
+import type { ApiUser } from '../models/ApiUser';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { RegisterRequest } from '../models/RegisterRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -13,59 +12,66 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AuthService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 用户登录
+     * 登录
      * @param requestBody
-     * @returns ApiResponse_LoginResponse 成功
+     * @returns ApiLogin 成功
      * @throws ApiError
      */
     public login(
         requestBody: LoginRequest,
-    ): CancelablePromise<ApiResponse_LoginResponse> {
+    ): CancelablePromise<ApiLogin> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/auth/login',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `业务错误`,
+                401: `业务错误`,
+            },
         });
     }
     /**
      * 统一用户注册
-     * 未登录用户只能注册 elderly 角色；已登录管理员可注册任意角色
+     * 未登录用户只能注册 elderly 角色；已登录管理员可注册 elderly 和 doctor 角色；返回JWT token
      * @param requestBody
-     * @returns ApiResponse_UserResponse 注册成功
+     * @returns ApiLogin 成功
      * @throws ApiError
      */
     public register(
         requestBody: RegisterRequest,
-    ): CancelablePromise<ApiResponse_UserResponse> {
+    ): CancelablePromise<ApiLogin> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/auth/register',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数错误、用户名或手机号已存在`,
-                403: `无权限注册该角色`,
+                400: `业务错误`,
+                403: `业务错误`,
             },
         });
     }
     /**
-     * 获取当前用户信息
-     * @returns ApiResponse_LoginUserInfo 成功
+     * 当前用户
+     * @returns ApiUser 成功
      * @throws ApiError
      */
-    public getCurrentUser(): CancelablePromise<ApiResponse_LoginUserInfo> {
+    public getCurrentUser(): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/auth/me',
+            errors: {
+                401: `业务错误`,
+            },
         });
     }
     /**
      * 退出登录
-     * @returns ApiResponse_Void 成功
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
-    public logout(): CancelablePromise<ApiResponse_Void> {
+    public logout(): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/auth/logout',

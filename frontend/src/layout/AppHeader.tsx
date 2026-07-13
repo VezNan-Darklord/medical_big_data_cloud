@@ -3,7 +3,7 @@ import { Button, Input, Form, message, Avatar, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import { CalendarOutlined, SearchOutlined, UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
 import { useUserContext } from '../store/userContext'
-import { useLoginMutation, useRegisterMutation, useGetCurrentUserQuery } from '../../api/hooks/authHooks'
+import { useLoginMutation, useRegisterMutation, useGetCurrentUserQuery, useLogoutMutation } from '../../api/hooks/authHooks'
 import { PopWindow } from '../components/common'
 
 
@@ -14,7 +14,7 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
   const handleSubmit = async (values: { username: string; password: string }) => {
       await loginMutation.mutateAsync({ username: values.username, password: values.password },
         {
-          onSuccess: (res: any) => {
+          onSuccess: (res) => {
             const token = res.data?.token;
             if (token) {
               onLoginSuccess(token)
@@ -52,7 +52,7 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
   )
 }
 
-function RegisterModal({ open, onClose, onSwitchToLogin }: { open: boolean; onClose: () => void; onSwitchToLogin: () => void }) {
+function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { open: boolean; onClose: () => void; onRegisterSuccess: (token: string) => void; onSwitchToLogin: () => void }) {
   const [form] = Form.useForm()
   const registerMutation = useRegisterMutation()
 
@@ -64,11 +64,11 @@ function RegisterModal({ open, onClose, onSwitchToLogin }: { open: boolean; onCl
         mobile: values.mobile,
         roleCode: 'elderly',
       }, {
-        onSuccess: () => {
-          message.success('注册成功，请登录')
+        onSuccess: (data) => {
+          message.success('注册成功')
           onClose()
           form.resetFields()
-          onSwitchToLogin()
+          onRegisterSuccess(data.data!.token!);
         },
         onError: (error) => {
           message.error(error?.message ?? '注册失败，请稍后重试')
@@ -116,7 +116,9 @@ export function AppHeader() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const { data: currentUserData } = useGetCurrentUserQuery();
-  const currentUser = (currentUserData as any)?.data;
+  const { mutate: logout } = useLogoutMutation();
+
+  const currentUser = currentUserData?.data;
   const displayName = currentUser?.realName ?? '未登录';
 
   const userMenuItems: MenuProps['items'] = [
@@ -128,6 +130,7 @@ export function AppHeader() {
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     setUserMenuOpen(false)
     if (key === 'logout') {
+      logout()
       clearAuth()
       message.success('已退出登录')
     }
@@ -162,7 +165,7 @@ export function AppHeader() {
       </div>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onLoginSuccess={setAuth} onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true) }} />
-      <RegisterModal open={registerOpen} onClose={() => setRegisterOpen(false)} onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true) }} />
+      <RegisterModal open={registerOpen} onClose={() => setRegisterOpen(false)} onRegisterSuccess={setAuth} onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true) }} />
     </header>
   )
 }

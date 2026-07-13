@@ -1,14 +1,13 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
-import type { ElderlyProfileCreateRequest } from '../models/ElderlyProfileCreateRequest'
-import type { ElderlyProfileUpdateRequest } from '../models/ElderlyProfileUpdateRequest'
-import type { ApiResponse_PageResult_ElderlyProfileResponse } from '../models/ApiResponse_PageResult_ElderlyProfileResponse'
+import type { ElderlyProfileInput } from '../models/ElderlyProfileInput'
+import type { ApiElderlyPage } from '../models/ApiElderlyPage'
 
-type LastPage = ApiResponse_PageResult_ElderlyProfileResponse
+type LastPage = ApiElderlyPage
 
 export type ElderlyListParams = {
   keyword?: string
-  gender?: string
+  gender?: 'male' | 'female'
   careLevel?: string
   status?: string
   regionCode?: string
@@ -35,7 +34,7 @@ export function useListElderlyProfilesQuery(params: ElderlyListParams = {}) {
 
 export function useCreateElderlyProfileMutation() {
   return useMutation({
-    mutationFn: async (req: ElderlyProfileCreateRequest) =>
+    mutationFn: async (req: ElderlyProfileInput) =>
       medical.elderlyProfile.createElderlyProfile(req),
     mutationKey: ['createElderlyProfile'],
   })
@@ -44,14 +43,14 @@ export function useCreateElderlyProfileMutation() {
 export function useGetElderlyProfileQuery(id: string) {
   return useQuery({
     queryKey: ['getElderlyProfile', id],
-    queryFn: async () => medical.elderlyProfile.getElderlyProfileById(id),
+    queryFn: async () => medical.elderlyProfile.getElderlyProfile(id),
     enabled: !!id,
   })
 }
 
 export function useUpdateElderlyProfileMutation() {
   return useMutation({
-    mutationFn: async ({ id, ...req }: ElderlyProfileUpdateRequest & { id: string }) =>
+    mutationFn: async ({ id, ...req }: ElderlyProfileInput & { id: string }) =>
       medical.elderlyProfile.updateElderlyProfile(id, req),
     mutationKey: ['updateElderlyProfile'],
   })

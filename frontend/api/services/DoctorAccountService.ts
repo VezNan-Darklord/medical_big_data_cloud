@@ -2,25 +2,25 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiResponse_PageResult_UserResponse } from '../models/ApiResponse_PageResult_UserResponse';
-import type { ApiResponse_UserResponse } from '../models/ApiResponse_UserResponse';
-import type { ApiResponse_Void } from '../models/ApiResponse_Void';
+import type { ApiEmpty } from '../models/ApiEmpty';
+import type { ApiObjectPage } from '../models/ApiObjectPage';
+import type { ApiUser } from '../models/ApiUser';
 import type { UserUpdateRequest } from '../models/UserUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class DoctorAccountService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 医生账号列表
+     * 医生账户列表
      * @param pageNo
      * @param pageSize
-     * @returns ApiResponse_PageResult_UserResponse 成功
+     * @returns ApiObjectPage 成功
      * @throws ApiError
      */
     public listDoctorAccounts(
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiResponse_PageResult_UserResponse> {
+    ): CancelablePromise<ApiObjectPage> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/doctor-accounts',
@@ -31,16 +31,16 @@ export class DoctorAccountService {
         });
     }
     /**
-     * 编辑医生账号
+     * 更新医生账户
      * @param id
      * @param requestBody
-     * @returns ApiResponse_UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
     public updateDoctorAccount(
         id: string,
         requestBody: UserUpdateRequest,
-    ): CancelablePromise<ApiResponse_UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/doctor-accounts/{id}',
@@ -52,16 +52,16 @@ export class DoctorAccountService {
         });
     }
     /**
-     * 重置医生账号密码
+     * 重置医生密码
      * @param id
      * @param requestBody
-     * @returns ApiResponse_Void 成功
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
-    public resetDoctorAccountPassword(
+    public resetDoctorPassword(
         id: string,
         requestBody: string,
-    ): CancelablePromise<ApiResponse_Void> {
+    ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/doctor-accounts/{id}/reset-password',
@@ -69,7 +69,7 @@ export class DoctorAccountService {
                 'id': id,
             },
             body: requestBody,
-            mediaType: 'application/json',
+            mediaType: 'text/plain',
         });
     }
 }

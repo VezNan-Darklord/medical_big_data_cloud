@@ -3,12 +3,13 @@ import { Route, Routes } from 'react-router-dom'
 import { Spin } from 'antd'
 import { AppShell } from '../layout/AppShell'
 import { workspaceConfigs } from '../pages/workspace-config'
+import { RoleGuard } from './guards'
 
-// 路由懒加载
 const DashboardPage = lazy(() => import('../components/dashboard/DashboardPage'))
 const DecisionAnalysisPage = lazy(() => import('../components/decision/DecisionAnalysisPage'))
 const ProfilePage = lazy(() => import('../components/profile/ProfilePage'))
 const WorkspacePage = lazy(() => import('../components/common/WorkspacePage'))
+import NotFoundPage from '../components/common/NotFoundPage'
 
 function RouteFallback() {
   return (
@@ -23,12 +24,15 @@ export function AppRouter() {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route element={<AppShell />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/decision-analysis" element={<DecisionAnalysisPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          {Object.entries(workspaceConfigs).map(([path, config]) => (
-            <Route key={path} path={path} element={<WorkspacePage config={config} />} />
-          ))}
+          <Route element={<RoleGuard />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/decision-analysis" element={<DecisionAnalysisPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            {Object.entries(workspaceConfigs).map(([path, config]) => (
+              <Route key={path} path={path} element={<WorkspacePage config={config} />} />
+            ))}
+          </Route>
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </Suspense>
