@@ -31,10 +31,4 @@ public class ElderlyAccountController {
         userService.resetPassword(id, newPassword);
         return ApiResponse.success();
     }
-
-    @PostMapping("/{id}/status")
-    public ApiResponse<Void> updateStatus(@PathVariable String id, @Valid @RequestBody UserStatusUpdateRequest request) {
-        userService.updateStatus(id, request);
-        return ApiResponse.success();
-    }
 }

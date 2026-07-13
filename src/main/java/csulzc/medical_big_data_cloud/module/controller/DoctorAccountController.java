@@ -26,11 +26,6 @@ public class DoctorAccountController {
         return ApiResponse.success(userService.listUsers(null, "doctor", null, pageNo, pageSize));
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<UserResponse> update(@PathVariable String id, @Valid @RequestBody UserUpdateRequest request) {
-        return ApiResponse.success(userService.updateUser(id, request));
-    }
-
     @PostMapping("/{id}/reset-password")
     public ApiResponse<Void> resetPassword(@PathVariable String id, @RequestBody String newPassword) {
         userService.resetPassword(id, newPassword);

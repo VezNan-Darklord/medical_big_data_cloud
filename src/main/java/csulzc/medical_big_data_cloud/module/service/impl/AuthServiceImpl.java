@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -35,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public LoginResponse register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request, HttpServletRequest httpRequest) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "用户名已存在");
         }
@@ -45,18 +47,38 @@ public class AuthServiceImpl implements AuthService {
 
         String roleCode = request.getRoleCode();
 
-        // 权限控制：未登录用户只能注册 elderly；已登录的管理员可以注册任意角色
+        // 判断请求来源（APIFox 的 User-Agent 通常包含 "Apifox"）
+        String userAgent = httpRequest != null ? httpRequest.getHeader("User-Agent") : null;
+        boolean isApifox = userAgent != null && userAgent.toLowerCase().contains("apifox");
+
+        // 获取当前认证信息
         Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         boolean isAnonymous = authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal());
         boolean isAdmin = !isAnonymous && authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_admin"));
 
-        if (isAnonymous && !"elderly".equals(roleCode)) {
-            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
-        }
-        if (!isAnonymous && !isAdmin) {
-            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
+        // 1. admin 角色只能通过 APIFox 注册
+        if ("admin".equals(roleCode)) {
+            if (!isApifox) {
+                throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "管理员账号只能通过APIFox注册");
+            }
+        } else if (!isApifox) {
+            // 2. 浏览器端注册限制
+            if (isAnonymous) {
+                // 未登录用户只能注册 elderly
+                if (!"elderly".equals(roleCode)) {
+                    throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
+                }
+            } else if (isAdmin) {
+                // 管理员在浏览器内只能注册 doctor
+                if (!"doctor".equals(roleCode)) {
+                    throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "管理员在浏览器内只能注册医生账号");
+                }
+            } else {
+                // 其他已登录用户在浏览器内不能注册任何角色
+                throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
+            }
         }
 
         User user = new User();
@@ -92,8 +114,6 @@ public class AuthServiceImpl implements AuthService {
 
         return response;
     }
-
-
 
     @Override
     @Transactional

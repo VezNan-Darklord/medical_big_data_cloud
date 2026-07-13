@@ -35,7 +35,7 @@ paths:
     post:
       tags: [Auth]
       summary: 统一用户注册
-      description: 未登录用户只能注册 elderly 角色；已登录管理员可注册 elderly 和 doctor 角色；返回JWT token
+      description: 未登录用户只能注册 elderly 角色；已登录管理员可注册 doctor 角色；管理员只能在 APIFox 中注册；返回 JWT token
       operationId: register
       security: []
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/RegisterRequest' } } } }
@@ -188,11 +188,9 @@ paths:
   /elderly-accounts/{id}/reset-password: { post: { tags: [ElderlyAccount], summary: 重置老人密码, operationId: resetElderlyPassword, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/PasswordText' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /elderly-accounts/{id}/status: { post: { tags: [ElderlyAccount], summary: 修改老人账户状态, operationId: updateElderlyAccountStatus, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/Status' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /doctor-accounts: { get: { tags: [DoctorAccount], summary: 医生账户列表, operationId: listDoctorAccounts, parameters: [{ $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } } }
-  /doctor-accounts/{id}: { put: { tags: [DoctorAccount], summary: 更新医生账户, operationId: updateDoctorAccount, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/UserUpdate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
   /doctor-accounts/{id}/reset-password: { post: { tags: [DoctorAccount], summary: 重置医生密码, operationId: resetDoctorPassword, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/PasswordText' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /users: { get: { tags: [UserAccount], summary: 系统账户列表, operationId: listUsers, parameters: [{ $ref: '#/components/parameters/Keyword' }, { name: roleCode, in: query, schema: { type: string } }, { name: status, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } } }
   /users/{id}: { get: { tags: [UserAccount], summary: 系统账户详情, operationId: getUser, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/UserResponse' } } }, put: { tags: [UserAccount], summary: 更新系统账户, operationId: updateUser, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/UserUpdate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
-  /users/{id}/status: { post: { tags: [UserAccount], summary: 修改账户状态, operationId: updateUserStatus, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/Status' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /users/{id}/roles: { post: { tags: [UserAccount], summary: 分配角色, operationId: assignUserRole, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { type: string } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /profile/change-password: { post: { tags: [Profile], summary: 修改密码, operationId: changePassword, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/PasswordChangeRequest' } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /profile/todos: { get: { tags: [Profile], summary: 我的待办, operationId: getTodos, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
@@ -218,7 +216,7 @@ components:
     ObjectResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiObject' } } } }
     ObjectListResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiObjectList' } } } }
     ObjectPageResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiObjectPage' } } } }
-    UserResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiUser' } } } }
+    UserResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/UserResponse' } } } }
     LoginResponse: { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiLogin' } } } }
     Error: { description: 业务错误, content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } } }
   schemas:
@@ -262,6 +260,7 @@ components:
       required: [username, password, roleCode]
       properties: { username: { type: string, maxLength: 50 }, password: { type: string, minLength: 6, maxLength: 20, writeOnly: true }, realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string } }
     UserUpdateRequest: { type: object, properties: { realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string } } }
+    UserResponse: { type: object, properties: { user: { $ref: '#/components/schemas/User' }}}
     StatusRequest: { type: object, required: [status], properties: { status: { type: string } } }
     PasswordChangeRequest: { type: object, required: [oldPassword, newPassword], properties: { oldPassword: { type: string, writeOnly: true }, newPassword: { type: string, minLength: 6, maxLength: 20, writeOnly: true } } }
     ElderlyProfileInput:
