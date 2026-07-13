@@ -25,9 +25,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ApiResponse<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ApiResponse<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ApiResponse.success(authService.register(request));
     }
+
 
     @GetMapping("/me")
     public ApiResponse<LoginResponse.UserInfo> getCurrentUser() {
@@ -39,4 +40,11 @@ public class AuthController {
         authService.logout();
         return ApiResponse.success();
     }
+
+    @PostMapping("/refresh")
+    public ApiResponse<LoginResponse> refreshToken(@RequestHeader("Authorization") String authorization) {
+        String token = authorization != null && authorization.startsWith("Bearer ") ? authorization.substring(7) : authorization;
+        return ApiResponse.success(authService.refreshToken(token));
+    }
+
 }

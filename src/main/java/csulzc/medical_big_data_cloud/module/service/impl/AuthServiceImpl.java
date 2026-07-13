@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public UserResponse register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "用户名已存在");
         }
@@ -66,8 +66,33 @@ public class AuthServiceImpl implements AuthService {
         user.setMobile(request.getMobile());
         user.setRoleCode(roleCode);
         user.setStatus("enabled");
-        return userMapper.toResponse(userRepository.save(user));
+        userRepository.save(user);
+
+        // 注册成功后自动生成JWT Token
+        CustomUserDetails userDetails = new CustomUserDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getPasswordHash(),
+                user.getRealName(),
+                user.getRoleCode(),
+                "enabled".equals(user.getStatus())
+        );
+
+        String token = jwtUtil.generateToken(userDetails);
+
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        response.setExpireAt(LocalDateTime.now().plusHours(24).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
+        userInfo.setId(user.getId());
+        userInfo.setRealName(user.getRealName());
+        userInfo.setRoleCode(user.getRoleCode());
+        response.setUser(userInfo);
+
+        return response;
     }
+
 
 
     @Override
@@ -127,4 +152,40 @@ public class AuthServiceImpl implements AuthService {
     public void logout() {
         org.springframework.security.core.context.SecurityContextHolder.clearContext();
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public LoginResponse refreshToken(String oldToken) {
+        if (!jwtUtil.validateToken(oldToken)) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED.getCode(), "Token无效，无法刷新");
+        }
+
+        String username = jwtUtil.getUsernameFromToken(oldToken);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
+
+        CustomUserDetails userDetails = new CustomUserDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getPasswordHash(),
+                user.getRealName(),
+                user.getRoleCode(),
+                "enabled".equals(user.getStatus())
+        );
+
+        String token = jwtUtil.generateToken(userDetails);
+
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        response.setExpireAt(LocalDateTime.now().plusHours(24).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
+        userInfo.setId(user.getId());
+        userInfo.setRealName(user.getRealName());
+        userInfo.setRoleCode(user.getRoleCode());
+        response.setUser(userInfo);
+
+        return response;
+    }
+
 }
