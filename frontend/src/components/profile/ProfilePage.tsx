@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, FireOutlined, LoginOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons'
 import { Avatar, Button } from 'antd'
-import { PanelCard } from '../components/common'
-import { todoItems } from '../mock-data'
+import { PanelCard } from '../common'
+import { todoItems } from '../../mock-data'
 
 export default function ProfilePage() {
   return (

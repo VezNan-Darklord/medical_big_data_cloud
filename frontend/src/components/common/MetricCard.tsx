@@ -14,7 +14,7 @@ const toneClasses: Record<MetricCardProps['tone'], string> = {
 
 export function MetricCard({ label, value, delta, tone }: MetricCardProps) {
   return (
-    <div className={`overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${toneClasses[tone]} p-5 shadow-[0_20px_60px_rgba(15,23,42,0.28)] backdrop-blur`}>
+    <div className={`overflow-hidden rounded-2xl border border-white/10 bg-linear-to-br ${toneClasses[tone]} p-5 shadow-[0_20px_60px_rgba(15,23,42,0.28)] backdrop-blur`}>
       <div className="text-xs text-slate-300">{label}</div>
       <div className="mt-4 flex items-end justify-between gap-3">
         <div className="text-3xl font-semibold tracking-tight text-white">{value}</div>

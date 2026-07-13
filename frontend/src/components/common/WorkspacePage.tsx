@@ -1,7 +1,8 @@
 import { DashboardOutlined, MenuFoldOutlined } from '@ant-design/icons'
 import { Button, DatePicker, Select, Space, Table } from 'antd'
-import type { WorkspaceConfig } from './workspace-config'
-import { MiniProgress, PanelCard } from '../components/common'
+import type { WorkspaceConfig } from '../../pages/workspace-config'
+import { PanelCard } from './PanelCard'
+import { MiniProgress } from './MiniProgress'
 
 export default function WorkspacePage({ config }: { config: WorkspaceConfig }) {
   return (

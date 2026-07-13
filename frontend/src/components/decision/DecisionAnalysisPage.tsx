@@ -1,9 +1,9 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Button } from 'antd'
 import gsap from 'gsap'
-import EChart from '../components/charts/ECharts'
-import { PanelCard } from '../components/common'
-import { actionItems, insightItems } from '../mock-data'
+import EChart from '../charts/ECharts'
+import { PanelCard } from '../common'
+import { actionItems, insightItems } from '../../mock-data'
 
 export default function DecisionAnalysisPage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
