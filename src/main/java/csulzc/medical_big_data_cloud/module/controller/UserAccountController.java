@@ -26,11 +26,6 @@ public class UserAccountController {
         return ApiResponse.success(userService.listUsers(keyword, null, null, pageNo, pageSize));
     }
 
-    @PostMapping
-    public ApiResponse<UserResponse> create(@Valid @RequestBody UserCreateRequest request) {
-        return ApiResponse.success(userService.createUser(request));
-    }
-
     @GetMapping("/{id}")
     public ApiResponse<UserResponse> getById(@PathVariable String id) {
         return ApiResponse.success(userService.getUserById(id));

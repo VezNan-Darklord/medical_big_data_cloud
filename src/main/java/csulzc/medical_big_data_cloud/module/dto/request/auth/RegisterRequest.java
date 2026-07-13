@@ -23,4 +23,8 @@ public class RegisterRequest {
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String mobile;
+
+    @NotBlank(message = "角色不能为空")
+    @Pattern(regexp = "^(admin|doctor|elderly)$", message = "角色只能是 admin、doctor 或 elderly")
+    private String roleCode;
 }

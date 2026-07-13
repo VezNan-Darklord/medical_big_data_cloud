@@ -26,11 +26,6 @@ public class DoctorAccountController {
         return ApiResponse.success(userService.listUsers(null, "doctor", null, pageNo, pageSize));
     }
 
-    @PostMapping
-    public ApiResponse<UserResponse> create(@Valid @RequestBody UserCreateRequest request) {
-        return ApiResponse.success(userService.createUser(request));
-    }
-
     @PutMapping("/{id}")
     public ApiResponse<UserResponse> update(@PathVariable String id, @Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.success(userService.updateUser(id, request));

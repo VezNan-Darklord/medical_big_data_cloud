@@ -43,16 +43,32 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "手机号已注册");
         }
 
+        String roleCode = request.getRoleCode();
+
+        // 权限控制：未登录用户只能注册 elderly；已登录的管理员可以注册任意角色
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        boolean isAnonymous = authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal());
+        boolean isAdmin = !isAnonymous && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_admin"));
+
+        if (isAnonymous && !"elderly".equals(roleCode)) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
+        }
+        if (!isAnonymous && !isAdmin) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRealName(request.getRealName());
         user.setMobile(request.getMobile());
-        // Public registration is intentionally restricted to elderly accounts.
-        user.setRoleCode("elderly");
+        user.setRoleCode(roleCode);
         user.setStatus("enabled");
         return userMapper.toResponse(userRepository.save(user));
     }
+
 
     @Override
     @Transactional

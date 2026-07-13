@@ -26,11 +26,6 @@ public class ElderlyAccountController {
         return ApiResponse.success(userService.listUsers(null, "elderly", null, pageNo, pageSize));
     }
 
-    @PostMapping
-    public ApiResponse<UserResponse> create(@Valid @RequestBody UserCreateRequest request) {
-        return ApiResponse.success(userService.createUser(request));
-    }
-
     @PostMapping("/{id}/reset-password")
     public ApiResponse<Void> resetPassword(@PathVariable String id, @RequestBody String newPassword) {
         userService.resetPassword(id, newPassword);
