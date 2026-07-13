@@ -22,11 +22,6 @@ import java.util.Map;
 public class ProfileController {
     private final UserService userService;
 
-    @GetMapping
-    public ApiResponse<UserResponse> getProfile(@AuthenticationPrincipal CustomUserDetails user) {
-        return ApiResponse.success(userService.getUserById(user.getId()));
-    }
-
     @PutMapping
     public ApiResponse<UserResponse> updateProfile(@AuthenticationPrincipal CustomUserDetails user,
                                                    @Valid @RequestBody UserUpdateRequest request) {
