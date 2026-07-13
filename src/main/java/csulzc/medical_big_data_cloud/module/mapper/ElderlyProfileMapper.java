@@ -15,7 +15,6 @@ public interface ElderlyProfileMapper {
 
     ElderlyProfileResponse toResponse(ElderlyProfile entity);
 
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     ElderlyProfile toEntity(ElderlyProfileCreateRequest request);

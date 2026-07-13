@@ -4,6 +4,7 @@ import csulzc.medical_big_data_cloud.common.constant.ResultCode;
 import csulzc.medical_big_data_cloud.common.exception.BusinessException;
 import csulzc.medical_big_data_cloud.common.result.PageResult;
 import csulzc.medical_big_data_cloud.module.dto.request.device.DeviceBindRequest;
+import csulzc.medical_big_data_cloud.module.dto.request.device.DeviceCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.device.DeviceUpdateRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.device.DeviceResponse;
 import csulzc.medical_big_data_cloud.module.entity.Device;
@@ -25,6 +26,23 @@ public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final DeviceMapper deviceMapper;
+
+    @Override
+    @Transactional
+    public DeviceResponse create(DeviceCreateRequest request) {
+        if (deviceRepository.findByDeviceSn(request.getDeviceSn()).isPresent()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "设备序列号已存在");
+        }
+        Device device = new Device();
+        device.setDeviceName(request.getDeviceName());
+        device.setDeviceType(request.getDeviceType());
+        device.setDeviceSn(request.getDeviceSn());
+        device.setFirmwareVersion(request.getFirmwareVersion());
+        device.setBindingStatus("unbound");
+        device.setOnlineStatus("offline");
+        Device saved = deviceRepository.save(device);
+        return deviceMapper.toResponse(saved);
+    }
 
     @Override
     @Transactional(readOnly = true)

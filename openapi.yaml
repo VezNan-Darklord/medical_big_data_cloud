@@ -178,6 +178,7 @@ paths:
   /reports/statistics/export: { get: { tags: [ReportStatistics], summary: 导出统计报表, operationId: exportStatistics, responses: { '200': { $ref: '#/components/responses/StringResponse' } } } }
   /devices:
     get: { tags: [Device], summary: 设备列表, operationId: listDevices, parameters: [{ name: bindingStatus, in: query, schema: { type: string } }, { name: onlineStatus, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }
+    post: { tags: [Device], summary: 新增设备, operationId: createDevice, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceCreateRequest' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
   /devices/{id}:
     get: { tags: [Device], summary: 设备详情, operationId: getDevice, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
     put: { tags: [Device], summary: 更新设备, operationId: updateDevice, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceUpdateRequest' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
@@ -266,7 +267,7 @@ components:
     ElderlyProfileInput:
       type: object
       required: [name, gender]
-      properties: { name: { type: string }, gender: { type: string }, birthday: { type: string, format: date }, age: { type: integer }, phone: { type: string }, address: { type: string }, institutionId: { type: string }, medicalHistory: { type: string }, careLevel: { type: string }, tags: { type: array, items: { type: string } }, status: { type: string } }
+      properties: { id: { type: string, maxLength: 64 }, name: { type: string }, gender: { type: string }, birthday: { type: string, format: date }, age: { type: integer }, phone: { type: string }, address: { type: string }, institutionId: { type: string }, medicalHistory: { type: string }, careLevel: { type: string }, tags: { type: array, items: { type: string } }, status: { type: string } }
     ElderlyProfile: { allOf: [{ $ref: '#/components/schemas/ElderlyProfileInput' }, { type: object, properties: { id: { type: string }, createdAt: { type: string, format: date-time }, updatedAt: { type: string, format: date-time } } }] }
     ApiElderly: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/ElderlyProfile' } } }] }
     ElderlyPage: { allOf: [{ $ref: '#/components/schemas/ObjectPage' }, { type: object, properties: { list: { type: array, items: { $ref: '#/components/schemas/ElderlyProfile' } } } }] }
@@ -292,6 +293,7 @@ components:
         occurredAt: { type: string, format: date-time }
         remark: { type: string, maxLength: 500 }
     KeyPopulationInput: { type: object, required: [elderlyId, category], properties: { elderlyId: { type: string }, category: { type: string }, reason: { type: string }, level: { type: string }, ownerDoctorId: { type: string }, followUpCycleDays: { type: integer }, status: { type: string } } }
+    DeviceCreateRequest: { type: object, required: [deviceName, deviceType, deviceSn,  firmwareVersion], properties: { deviceName: { type: string }, deviceType: { type: string }, deviceSn: { type: string}, firmwareVersion: { type: string } } }
     DeviceBindRequest: { type: object, required: [deviceId, elderlyId], properties: { deviceId: { type: string }, elderlyId: { type: string } } }
     DeviceUpdateRequest: { type: object, properties: { deviceName: { type: string }, deviceType: { type: string }, firmwareVersion: { type: string } } }
     DashboardOverview: { type: object, properties: { totalElderlyCount: { type: integer, format: int64 }, warningCount: { type: integer, format: int64 }, unhandledWarningCount: { type: integer, format: int64 }, keyPopulationCount: { type: integer, format: int64 }, deviceOnlineRate: { type: number }, recentTrend: { type: array, items: { type: object, properties: { date: { type: string, format: date }, value: { type: integer } } } } } }

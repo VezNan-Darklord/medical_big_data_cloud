@@ -3,9 +3,11 @@ package csulzc.medical_big_data_cloud.module.controller;
 import csulzc.medical_big_data_cloud.common.result.ApiResponse;
 import csulzc.medical_big_data_cloud.common.result.PageResult;
 import csulzc.medical_big_data_cloud.module.dto.request.device.DeviceBindRequest;
+import csulzc.medical_big_data_cloud.module.dto.request.device.DeviceCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.device.DeviceUpdateRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.device.DeviceResponse;
 import csulzc.medical_big_data_cloud.module.service.DeviceService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,12 @@ import org.springframework.web.bind.annotation.*;
 public class DeviceController {
 
     private final DeviceService deviceService;
+
+    @PostMapping
+    @Operation(summary = "创建设备", description = "创建一个新的设备记录，初始状态为未绑定、离线")
+    public ApiResponse<DeviceResponse> create(@Valid @RequestBody DeviceCreateRequest request) {
+        return ApiResponse.success(deviceService.create(request));
+    }
 
     @GetMapping
     public ApiResponse<PageResult<DeviceResponse>> list(

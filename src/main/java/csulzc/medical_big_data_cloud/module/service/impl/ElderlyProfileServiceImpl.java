@@ -34,6 +34,10 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional
     public ElderlyProfileResponse create(ElderlyProfileCreateRequest request) {
+        // 若传入自定义id，校验唯一性
+        if (StringUtils.hasText(request.getId()) && elderlyProfileRepository.existsById(request.getId())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "该ID已存在");
+        }
         ElderlyProfile entity = elderlyProfileMapper.toEntity(request);
         ElderlyProfile saved = elderlyProfileRepository.save(entity);
         return elderlyProfileMapper.toResponse(saved);
