@@ -261,7 +261,7 @@ components:
       required: [username, password, roleCode]
       properties: { username: { type: string, maxLength: 50 }, password: { type: string, minLength: 6, maxLength: 20, writeOnly: true }, realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string } }
     UserUpdateRequest: { type: object, properties: { realName: { type: string }, roleCode: { type: string }, mobile: { type: string }, status: { type: string } } }
-    UserResponse: { type: object, properties: { user: { $ref: '#/components/schemas/User' }}}
+    UserResponse: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }] }
     StatusRequest: { type: object, required: [status], properties: { status: { type: string } } }
     PasswordChangeRequest: { type: object, required: [oldPassword, newPassword], properties: { oldPassword: { type: string, writeOnly: true }, newPassword: { type: string, minLength: 6, maxLength: 20, writeOnly: true } } }
     ElderlyProfileInput:
