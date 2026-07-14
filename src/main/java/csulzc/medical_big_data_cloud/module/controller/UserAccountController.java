@@ -8,6 +8,7 @@ import csulzc.medical_big_data_cloud.module.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,6 +45,13 @@ public class UserAccountController {
 
     @PostMapping("/{id}/roles")
     public ApiResponse<Void> assignRoles(@PathVariable String id, @RequestBody String roleCode) {
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('admin')")
+    public ApiResponse<Void> delete(@PathVariable String id) {
+        userService.delete(id);
         return ApiResponse.success();
     }
 }

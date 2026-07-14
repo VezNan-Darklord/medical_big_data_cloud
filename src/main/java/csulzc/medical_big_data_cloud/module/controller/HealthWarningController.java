@@ -6,9 +6,11 @@ import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningHan
 import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningQueryRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.warning.HealthWarningResponse;
 import csulzc.medical_big_data_cloud.module.service.HealthWarningService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import csulzc.medical_big_data_cloud.module.dto.request.warning.HealthWarningCreateRequest;
 
@@ -43,6 +45,13 @@ public class HealthWarningController {
 
     @PostMapping("/{id}/assign")
     public ApiResponse<Void> assign(@PathVariable String id, @RequestBody String targetHandlerId) {
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
+    public ApiResponse<Void> delete(@PathVariable String id) {
+        healthWarningService.delete(id);
         return ApiResponse.success();
     }
 }

@@ -9,6 +9,7 @@ import csulzc.medical_big_data_cloud.module.service.KeyPopulationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,6 +41,13 @@ public class KeyPopulationController {
     @PostMapping("/{id}/close")
     public ApiResponse<Void> close(@PathVariable String id) {
         keyPopulationService.close(id);
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
+    public ApiResponse<Void> delete(@PathVariable String id) {
+        keyPopulationService.delete(id);
         return ApiResponse.success();
     }
 }

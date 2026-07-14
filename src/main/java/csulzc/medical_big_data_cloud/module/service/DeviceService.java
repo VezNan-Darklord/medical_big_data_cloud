@@ -18,4 +18,6 @@ public interface DeviceService {
     void unbind(String id);
 
     DeviceResponse update(String id, DeviceUpdateRequest request);
+
+    void delete(String id);
 }

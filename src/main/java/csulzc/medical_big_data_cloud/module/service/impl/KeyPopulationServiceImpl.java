@@ -75,4 +75,11 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
                 page.getTotalElements()
         );
     }
+
+    @Override
+    @Transactional
+    public void delete(String id)
+    {
+        keyPopulationRepository.delete(id);
+    }
 }

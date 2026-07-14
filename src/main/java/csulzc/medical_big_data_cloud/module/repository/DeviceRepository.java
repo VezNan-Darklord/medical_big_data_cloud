@@ -31,4 +31,6 @@ public interface DeviceRepository
     @Modifying
     @Query("UPDATE Device d SET d.elderlyId = ?2, d.bindingStatus = ?3 WHERE d.id = ?1")
     void updateBinding(String id, String elderlyId, String bindingStatus);
+
+    void delete(String id);
 }

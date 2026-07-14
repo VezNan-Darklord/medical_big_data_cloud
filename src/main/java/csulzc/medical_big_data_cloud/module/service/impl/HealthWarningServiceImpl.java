@@ -100,4 +100,10 @@ public class HealthWarningServiceImpl implements HealthWarningService {
         warning.setHandledAt(LocalDateTime.now());
         healthWarningRepository.save(warning);
     }
+
+    @Override
+    @Transactional
+    public void delete(String id) {
+        healthWarningRepository.delete(id);
+    }
 }

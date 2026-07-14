@@ -16,4 +16,6 @@ public interface KeyPopulationService {
     KeyPopulationResponse getById(String id);
 
     PageResult<KeyPopulationResponse> list(String status, int pageNo, int pageSize);
+
+    void delete(String id);
 }

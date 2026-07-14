@@ -5,9 +5,11 @@ import csulzc.medical_big_data_cloud.common.result.PageResult;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.report.AssessmentReportResponse;
 import csulzc.medical_big_data_cloud.module.service.AssessmentReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,5 +46,12 @@ public class AssessmentReportController {
     @GetMapping("/{id}/export")
     public ApiResponse<String> export(@PathVariable String id) {
         return ApiResponse.success("导出链接"); // 实际生成并返回导出URL
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
+    public ApiResponse<Void> delete(@PathVariable String id) {
+        assessmentReportService.delete(id);
+        return ApiResponse.success();
     }
 }

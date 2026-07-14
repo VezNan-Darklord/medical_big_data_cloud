@@ -20,4 +20,6 @@ public interface KeyPopulationRepository
     Page<KeyPopulation> findByStatus(String status, Pageable pageable);
 
     long countByCategoryAndStatus(String category, String status);
+
+    void delete(String id);
 }

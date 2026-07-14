@@ -104,4 +104,10 @@ public class DeviceServiceImpl implements DeviceService {
         Device updated = deviceRepository.save(device);
         return deviceMapper.toResponse(updated);
     }
+
+    @Override
+    @Transactional
+    public void delete(String id) {
+        deviceRepository.delete(id);
+    }
 }

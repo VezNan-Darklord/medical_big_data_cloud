@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -61,5 +62,13 @@ public class DeviceController {
     @GetMapping("/{id}/reports")
     public ApiResponse<String> getReports(@PathVariable String id) {
         return ApiResponse.success("设备上报记录");
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
+    @Operation(summary = "删除XXX")
+    public ApiResponse<Void> delete(@PathVariable String id) {
+        deviceService.delete(id);
+        return ApiResponse.success();
     }
 }

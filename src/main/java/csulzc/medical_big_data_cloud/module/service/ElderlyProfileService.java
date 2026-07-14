@@ -17,4 +17,6 @@ public interface ElderlyProfileService {
     void delete(String id);
 
     PageResult<ElderlyProfileResponse> list(ElderlyProfileQueryRequest request);
+
+    ElderlyProfileResponse getMyProfile(String userId);
 }
