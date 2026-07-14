@@ -14,6 +14,9 @@ import java.util.List;
 @Entity
 @Table(name = "elderly_profile")
 public class ElderlyProfile extends BaseEntity {
+    @Column(nullable = false, length = 64)
+    private String elderlyId;
+
     @Column(nullable = false, length = 100)
     private String name;
 

@@ -11,4 +11,6 @@ public interface AssessmentReportService {
     AssessmentReportResponse getById(String id);
 
     PageResult<AssessmentReportResponse> listByElderlyId(String elderlyId, int pageNo, int pageSize);
+
+    void delete(String id);
 }

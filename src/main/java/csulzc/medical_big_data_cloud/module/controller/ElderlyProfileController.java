@@ -11,6 +11,7 @@ import csulzc.medical_big_data_cloud.module.dto.response.elderly.ElderlyProfileR
 import csulzc.medical_big_data_cloud.module.dto.response.keypop.KeyPopulationResponse;
 import csulzc.medical_big_data_cloud.module.dto.response.warning.HealthWarningResponse;
 import csulzc.medical_big_data_cloud.module.service.ElderlyProfileService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

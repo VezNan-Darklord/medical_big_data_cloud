@@ -17,4 +17,6 @@ public interface HealthWarningService {
     PageResult<HealthWarningResponse> list(HealthWarningQueryRequest request);
 
     void handle(String id, HealthWarningHandleRequest request);
+
+    void delete(String id);
 }

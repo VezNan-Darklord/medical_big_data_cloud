@@ -64,10 +64,7 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional
     public void delete(String id) {
-        ElderlyProfile entity = elderlyProfileRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
-        entity.setStatus("deleted");
-        elderlyProfileRepository.save(entity);
+        elderlyProfileRepository.delete(id);
     }
 
     @Override
@@ -103,5 +100,13 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
                 request.getPageSize(),
                 page.getTotalElements()
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ElderlyProfileResponse getMyProfile(String userId) {
+        return elderlyProfileRepository.findById(userId)
+                .map(elderlyProfileMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
     }
 }

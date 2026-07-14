@@ -139,10 +139,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
-        user.setStatus("deleted"); // 软删除
-        userRepository.save(user);
+    public void delete(String id) {
+        userRepository.delete(id);
     }
 }

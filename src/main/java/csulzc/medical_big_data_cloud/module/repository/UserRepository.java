@@ -38,6 +38,8 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     long countByRoleCode(String roleCode);
 
+    void delete(String id);
+
     // ================== 登录相关更新（由 Service 调用） ==================
 
     /**

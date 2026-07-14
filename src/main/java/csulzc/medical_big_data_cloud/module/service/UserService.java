@@ -22,5 +22,5 @@ public interface UserService {
 
     PageResult<UserResponse> listUsers(String keyword, String roleCode, String status, int pageNo, int pageSize);
 
-    void deleteUser(String id);
+    void delete(String id);
 }

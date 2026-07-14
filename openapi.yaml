@@ -99,10 +99,11 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ElderlyProfileInput' } } } }
       responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiElderly' } } } } }
     delete:
-      tags: [ElderlyProfile]
-      summary: 软删除老人档案
+      tags: [ ElderlyProfile ]
+      summary: 删除老人档案
       operationId: deleteElderlyProfile
-      responses: { '200': { $ref: '#/components/responses/EmptyResponse' } }
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /elderly-profiles/{id}/warnings: { get: { tags: [ElderlyProfile], summary: 老人关联预警, operationId: getElderlyWarnings, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
   /elderly-profiles/{id}/reports: { get: { tags: [ElderlyProfile], summary: 老人关联报告, operationId: getElderlyReports, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
   /elderly-profiles/{id}/devices: { get: { tags: [ElderlyProfile], summary: 老人关联设备, operationId: getElderlyDevices, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
@@ -136,6 +137,12 @@ paths:
       operationId: getHealthWarning
       parameters: [{ $ref: '#/components/parameters/Id' }]
       responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiWarning' } } } } }
+    delete:
+      tags: [ HealthWarning ]
+      summary: 删除预警
+      operationId: deleteHealthWarning
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /health-warnings/{id}/handle:
     post:
       tags: [HealthWarning]
@@ -165,12 +172,37 @@ paths:
       operationId: createAssessmentReport
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AssessmentReportInput' } } } }
       responses: { '200': { $ref: '#/components/responses/ObjectResponse' } }
-  /assessment-reports/{id}: { get: { tags: [AssessmentReport], summary: 报告详情, operationId: getAssessmentReport, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /assessment-reports/{id}:
+    get:
+      tags: [AssessmentReport]
+      summary: 报告详情
+      operationId: getAssessmentReport
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses: { '200': { $ref: '#/components/responses/ObjectResponse' } }
+    delete:
+      tags: [ AssessmentReport ]
+      summary: 删除报告
+      operationId: deleteAssessmentReport
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /assessment-reports/{id}/export: { get: { tags: [AssessmentReport], summary: 导出报告, operationId: exportAssessmentReport, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/StringResponse' } } } }
   /key-populations:
     get: { tags: [KeyPopulation], summary: 重点人群列表, operationId: listKeyPopulations, parameters: [{ name: status, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } }
     post: { tags: [KeyPopulation], summary: 新增重点人群, operationId: createKeyPopulation, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/KeyPopulationInput' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
-  /key-populations/{id}: { put: { tags: [KeyPopulation], summary: 更新重点人群, operationId: updateKeyPopulation, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/KeyPopulationInput' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
+  /key-populations/{id}:
+    put:
+      tags: [KeyPopulation]
+      summary: 更新重点人群
+      operationId: updateKeyPopulation
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/KeyPopulationInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/ObjectResponse' } }
+    delete:
+      tags: [KeyPopulation]
+      summary: 删除重点人群
+      operationId: deleteKeyPopulation
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /key-populations/{id}/close: { post: { tags: [KeyPopulation], summary: 关闭重点人群, operationId: closeKeyPopulation, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /reports/statistics/overview: { get: { tags: [ReportStatistics], summary: 统计总览, operationId: getStatisticsOverview, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
   /reports/statistics/trends: { get: { tags: [ReportStatistics], summary: 趋势统计, operationId: getStatisticsTrends, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } } }
@@ -182,6 +214,12 @@ paths:
   /devices/{id}:
     get: { tags: [Device], summary: 设备详情, operationId: getDevice, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
     put: { tags: [Device], summary: 更新设备, operationId: updateDevice, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceUpdateRequest' } } } }, responses: { '200': { $ref: '#/components/responses/ObjectResponse' } } }
+    delete:
+      tags: [ Device ]
+      summary: 删除设备
+      operationId: deleteDevice
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /devices/bind: { post: { tags: [Device], summary: 绑定设备, operationId: bindDevice, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceBindRequest' } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /devices/{id}/unbind: { post: { tags: [Device], summary: 解绑设备, operationId: unbindDevice, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /devices/{id}/reports: { get: { tags: [Device], summary: 设备上报记录, operationId: getDeviceReports, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
@@ -191,7 +229,26 @@ paths:
   /doctor-accounts: { get: { tags: [DoctorAccount], summary: 医生账户列表, operationId: listDoctorAccounts, parameters: [{ $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } } }
   /doctor-accounts/{id}/reset-password: { post: { tags: [DoctorAccount], summary: 重置医生密码, operationId: resetDoctorPassword, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/PasswordText' }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /users: { get: { tags: [UserAccount], summary: 系统账户列表, operationId: listUsers, parameters: [{ $ref: '#/components/parameters/Keyword' }, { name: roleCode, in: query, schema: { type: string } }, { name: status, in: query, schema: { type: string } }, { $ref: '#/components/parameters/PageNo' }, { $ref: '#/components/parameters/PageSize' }], responses: { '200': { $ref: '#/components/responses/ObjectPageResponse' } } } }
-  /users/{id}: { get: { tags: [UserAccount], summary: 系统账户详情, operationId: getUser, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/UserResponse' } } }, put: { tags: [UserAccount], summary: 更新系统账户, operationId: updateUser, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { $ref: '#/components/requestBodies/UserUpdate' }, responses: { '200': { $ref: '#/components/responses/UserResponse' } } } }
+  /users/{id}:
+    get:
+      tags: [UserAccount]
+      summary: 系统账户详情
+      operationId: getUser
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses: { '200': { $ref: '#/components/responses/UserResponse' } }
+    put:
+      tags: [UserAccount]
+      summary: 更新系统账户
+      operationId: updateUser
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody: { $ref: '#/components/requestBodies/UserUpdate' }
+      responses: { '200': { $ref: '#/components/responses/UserResponse' } }
+    delete:
+      tags: [ UserAccount ]
+      summary: 删除账户
+      operationId: deleteUser
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /users/{id}/roles: { post: { tags: [UserAccount], summary: 分配角色, operationId: assignUserRole, parameters: [{ $ref: '#/components/parameters/Id' }], requestBody: { required: true, content: { application/json: { schema: { type: string } } } }, responses: { '200': { $ref: '#/components/responses/EmptyResponse' } } } }
   /profile:
     put:
@@ -201,6 +258,13 @@ paths:
       operationId: updateProfile
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ProfileUpdateRequest' } } } }
       responses: { '200': { $ref: '#/components/responses/UserResponse' }, '400': { $ref: '#/components/responses/Error' } }
+  /profile/elderly:
+    get:
+      tags: [ Profile ]
+      summary: 我的健康档案
+      description: 当前登录老人查看自己的健康档案。基于JWT Token自动识别身份，仅 elderly 角色可调用。
+      operationId: getMyElderlyProfile
+      responses: { '200': { $ref: '#/components/schemas/ApiElderly' }, '401': { $ref: '#/components/responses/Error' }, '403': { $ref: '#/components/responses/Error' }, '404': { $ref: '#/components/responses/Error' } }
   /profile/todos: { get: { tags: [Profile], summary: 我的待办, operationId: getTodos, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
   /ai/analysis/care-decision: { post: { tags: [AIAnalysis], summary: 生成照护决策分析, description: 仅限 admin 和 doctor 角色调用, operationId: createCareDecisionAnalysis, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AnalysisRequest' } } } }, responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiAnalysisResult' } } } } } } }
   /ai/analysis/care-decision/history: { get: { tags: [AIAnalysis], summary: 分析历史, operationId: listCareDecisionHistory, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }

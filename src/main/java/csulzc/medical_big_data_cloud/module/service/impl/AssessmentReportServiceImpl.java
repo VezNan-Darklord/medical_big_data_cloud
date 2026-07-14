@@ -52,4 +52,11 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
                 page.getTotalElements()
         );
     }
+
+    @Override
+    @Transactional
+    public void delete(String id)
+    {
+        assessmentReportRepository.delete(id);
+    }
 }
