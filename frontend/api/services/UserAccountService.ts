@@ -78,6 +78,26 @@ export class UserAccountService {
         });
     }
     /**
+     * 删除账户
+     * @param id
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public deleteUser(
+        id: string,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/users/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `业务错误`,
+            },
+        });
+    }
+    /**
      * 分配角色
      * @param id
      * @param requestBody

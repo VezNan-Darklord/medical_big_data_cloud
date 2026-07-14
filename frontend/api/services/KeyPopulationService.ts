@@ -71,6 +71,26 @@ export class KeyPopulationService {
         });
     }
     /**
+     * 删除重点人群
+     * @param id
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public deleteKeyPopulation(
+        id: string,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/key-populations/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `业务错误`,
+            },
+        });
+    }
+    /**
      * 关闭重点人群
      * @param id
      * @returns ApiEmpty 成功

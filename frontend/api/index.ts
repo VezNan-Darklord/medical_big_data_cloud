@@ -47,7 +47,7 @@ export type { LoginResult } from './models/LoginResult';
 export type { ObjectPage } from './models/ObjectPage';
 export type { PageNo } from './models/PageNo';
 export type { PageSize } from './models/PageSize';
-export type { PasswordChangeRequest } from './models/PasswordChangeRequest';
+export type { ProfileUpdateRequest } from './models/ProfileUpdateRequest';
 export type { RegisterRequest } from './models/RegisterRequest';
 export type { StatusRequest } from './models/StatusRequest';
 export type { User } from './models/User';

@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ApiEmpty } from '../models/ApiEmpty';
 import type { ApiObject } from '../models/ApiObject';
 import type { ApiObjectPage } from '../models/ApiObjectPage';
 import type { ApiString } from '../models/ApiString';
@@ -63,6 +64,26 @@ export class AssessmentReportService {
             url: '/assessment-reports/{id}',
             path: {
                 'id': id,
+            },
+        });
+    }
+    /**
+     * 删除报告
+     * @param id
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public deleteAssessmentReport(
+        id: string,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/assessment-reports/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `业务错误`,
             },
         });
     }

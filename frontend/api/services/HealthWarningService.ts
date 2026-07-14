@@ -89,6 +89,26 @@ export class HealthWarningService {
         });
     }
     /**
+     * 删除预警
+     * @param id
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public deleteHealthWarning(
+        id: string,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/health-warnings/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `业务错误`,
+            },
+        });
+    }
+    /**
      * 处理预警
      * @param id
      * @param requestBody

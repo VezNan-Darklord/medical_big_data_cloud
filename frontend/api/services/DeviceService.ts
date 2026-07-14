@@ -94,6 +94,26 @@ export class DeviceService {
         });
     }
     /**
+     * 删除设备
+     * @param id
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public deleteDevice(
+        id: string,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/devices/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `业务错误`,
+            },
+        });
+    }
+    /**
      * 绑定设备
      * @param requestBody
      * @returns ApiEmpty 成功

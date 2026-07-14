@@ -108,12 +108,14 @@ export class ElderlyProfileService {
         });
     }
     /**
-     * 软删除老人档案
+     * 删除老人档案
+     * @param id
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
      */
     public deleteElderlyProfile(
+        id: string,
         id: string,
     ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
@@ -121,6 +123,10 @@ export class ElderlyProfileService {
             url: '/elderly-profiles/{id}',
             path: {
                 'id': id,
+                'id': id,
+            },
+            errors: {
+                404: `业务错误`,
             },
         });
     }
