@@ -153,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse.UserInfo getCurrentUser() {
+    public UserResponse getCurrentUser() {
         Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new BusinessException(ResultCode.UNAUTHORIZED);
@@ -161,11 +161,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
 
-        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
-        userInfo.setId(user.getId());
-        userInfo.setRealName(user.getRealName());
-        userInfo.setRoleCode(user.getRoleCode());
-        return userInfo;
+        return userMapper.toResponse(user);
     }
 
     @Override

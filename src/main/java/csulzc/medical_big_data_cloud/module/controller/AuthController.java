@@ -4,6 +4,7 @@ import csulzc.medical_big_data_cloud.common.result.ApiResponse;
 import csulzc.medical_big_data_cloud.module.dto.request.auth.LoginRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.auth.RegisterRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.auth.LoginResponse;
+import csulzc.medical_big_data_cloud.module.dto.response.user.UserResponse;
 import csulzc.medical_big_data_cloud.module.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ApiResponse<LoginResponse.UserInfo> getCurrentUser() {
+    public ApiResponse<UserResponse> getCurrentUser() {
         return ApiResponse.success(authService.getCurrentUser());
     }
 
