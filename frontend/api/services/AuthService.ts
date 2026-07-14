@@ -4,9 +4,9 @@
 /* eslint-disable */
 import type { ApiEmpty } from '../models/ApiEmpty';
 import type { ApiLogin } from '../models/ApiLogin';
-import type { ApiUser } from '../models/ApiUser';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { RegisterRequest } from '../models/RegisterRequest';
+import type { UserResponse } from '../models/UserResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AuthService {
@@ -33,7 +33,7 @@ export class AuthService {
     }
     /**
      * 统一用户注册
-     * 未登录用户只能注册 elderly 角色；已登录管理员可注册 elderly 和 doctor 角色；返回JWT token
+     * 未登录用户只能注册 elderly 角色；已登录管理员可注册 doctor 角色；管理员只能在 APIFox 中注册；返回 JWT token
      * @param requestBody
      * @returns ApiLogin 成功
      * @throws ApiError
@@ -54,10 +54,10 @@ export class AuthService {
     }
     /**
      * 当前用户
-     * @returns ApiUser 成功
+     * @returns UserResponse 成功
      * @throws ApiError
      */
-    public getCurrentUser(): CancelablePromise<ApiUser> {
+    public getCurrentUser(): CancelablePromise<UserResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/auth/me',

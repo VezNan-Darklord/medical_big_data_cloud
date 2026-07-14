@@ -3,7 +3,7 @@ import { Menu } from 'antd'
 import { type NavItem } from '../mock-data'
 import { ApartmentOutlined, TeamOutlined, AlertOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, RadarChartOutlined, CloudServerOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons'
 import { useGetCurrentUserQuery } from '../../api/hooks/authHooks'
-import { isElderly, ELDERLY_ALLOWED } from '../routes/const'
+import { isElderly, ELDERLY_ALLOWED, isDoctor, DOCTOR_SIDEBAR_EXCLUDED } from '../routes/const'
 import type { User } from '../../api/models/User'
 
 const allNavigationItems: NavItem[] = [
@@ -26,8 +26,11 @@ export default function AppSidebar() {
   const { data } = useGetCurrentUserQuery()
   const user = data?.data as User | undefined
 
-  const visibleItems = user && isElderly(user.roleCode || '')
+  const roleCode = user?.roleCode ?? ''
+  const visibleItems = isElderly(roleCode)
     ? allNavigationItems.filter(item => ELDERLY_ALLOWED.has(item.path))
+    : isDoctor(roleCode)
+    ? allNavigationItems.filter(item => !DOCTOR_SIDEBAR_EXCLUDED.has(item.key))
     : allNavigationItems
 
   const currentNav = visibleItems.find((item) => location.pathname === item.path) ?? visibleItems[0]

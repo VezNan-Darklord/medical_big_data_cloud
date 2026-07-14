@@ -5,10 +5,12 @@ import { CalendarOutlined, SearchOutlined, UserOutlined, LogoutOutlined, Setting
 import { useUserContext } from '../store/userContext'
 import { useLoginMutation, useRegisterMutation, useGetCurrentUserQuery, useLogoutMutation } from '../../api/hooks/authHooks'
 import { PopWindow } from '../components/common'
+import { useQueryClient } from '@tanstack/react-query'
 
 
 function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { open: boolean; onClose: () => void; onLoginSuccess: (token: string) => void; onSwitchToRegister: () => void }) {
   const [form] = Form.useForm()
+  const queryClient = useQueryClient()
   const loginMutation = useLoginMutation()
 
   const handleSubmit = async (values: { username: string; password: string }) => {
@@ -19,6 +21,7 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
             if (token) {
               onLoginSuccess(token)
               message.success('登录成功')
+              queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] })
               onClose()
               form.resetFields()
             }
@@ -54,6 +57,7 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
 
 function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { open: boolean; onClose: () => void; onRegisterSuccess: (token: string) => void; onSwitchToLogin: () => void }) {
   const [form] = Form.useForm()
+  const queryClient = useQueryClient()
   const registerMutation = useRegisterMutation()
 
   const handleSubmit = async (values: { username: string; password: string; realName: string; mobile: string }) => {
@@ -69,6 +73,7 @@ function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { 
           onClose()
           form.resetFields()
           onRegisterSuccess(data.data!.token!);
+          queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
         },
         onError: (error) => {
           message.error(error?.message ?? '注册失败，请稍后重试')
@@ -114,6 +119,7 @@ export function AppHeader() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: currentUserData } = useGetCurrentUserQuery();
   const { mutate: logout } = useLogoutMutation();
@@ -132,7 +138,8 @@ export function AppHeader() {
     if (key === 'logout') {
       logout()
       clearAuth()
-      message.success('已退出登录')
+      message.success('已退出登录');
+      queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
     }
   };
 

@@ -4,8 +4,7 @@
 /* eslint-disable */
 import type { ApiEmpty } from '../models/ApiEmpty';
 import type { ApiObjectPage } from '../models/ApiObjectPage';
-import type { ApiUser } from '../models/ApiUser';
-import type { StatusRequest } from '../models/StatusRequest';
+import type { UserResponse } from '../models/UserResponse';
 import type { UserUpdateRequest } from '../models/UserUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -43,12 +42,12 @@ export class UserAccountService {
     /**
      * 系统账户详情
      * @param id
-     * @returns ApiUser 成功
+     * @returns UserResponse 成功
      * @throws ApiError
      */
     public getUser(
         id: string,
-    ): CancelablePromise<ApiUser> {
+    ): CancelablePromise<UserResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/users/{id}',
@@ -61,37 +60,16 @@ export class UserAccountService {
      * 更新系统账户
      * @param id
      * @param requestBody
-     * @returns ApiUser 成功
+     * @returns UserResponse 成功
      * @throws ApiError
      */
     public updateUser(
         id: string,
         requestBody: UserUpdateRequest,
-    ): CancelablePromise<ApiUser> {
+    ): CancelablePromise<UserResponse> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/users/{id}',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * 修改账户状态
-     * @param id
-     * @param requestBody
-     * @returns ApiEmpty 成功
-     * @throws ApiError
-     */
-    public updateUserStatus(
-        id: string,
-        requestBody: StatusRequest,
-    ): CancelablePromise<ApiEmpty> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/users/{id}/status',
             path: {
                 'id': id,
             },
