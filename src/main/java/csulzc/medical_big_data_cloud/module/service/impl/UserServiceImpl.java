@@ -41,6 +41,37 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public UserResponse updateProfile(String userId, ProfileUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
+
+        // 1. 手机号唯一性校验（仅在变更时校验）
+        if (request.getMobile() != null && !request.getMobile().equals(user.getMobile())) {
+            if (userRepository.existsByMobile(request.getMobile())) {
+                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "手机号已被其他账号使用");
+            }
+        }
+
+        // 2. 处理密码修改（oldPassword + newPassword 成对出现时触发）
+        if (request.getNewPassword() != null) {
+            if (request.getOldPassword() == null) {
+                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "修改密码需要提供旧密码");
+            }
+            if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+                throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "旧密码不正确");
+            }
+            user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        }
+
+        // 3. 更新对外展示信息和个人隐私信息（仅覆盖非空字段）
+        userMapper.updateProfile(request, user);
+
+        User updated = userRepository.save(user);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    @Transactional
     public UserResponse updateUser(String id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
@@ -58,17 +89,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @Override
-    @Transactional
-    public void changePassword(String id, PasswordChangeRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "旧密码不正确");
-        }
-        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
-    }
 
     @Override
     @Transactional

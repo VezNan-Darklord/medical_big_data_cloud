@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 public class ElderlyProfileCreateRequest {
+    @NotBlank(message = "ID不能为空")
     @Size(max = 64, message = "ID长度不能超过64")
     private String id;
 

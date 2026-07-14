@@ -8,11 +8,11 @@ public interface UserService {
 
     UserResponse createUser(UserCreateRequest request);
 
+    UserResponse updateProfile(String id, ProfileUpdateRequest request);
+
     UserResponse updateUser(String id, UserUpdateRequest request);
 
     void updateStatus(String id, UserStatusUpdateRequest request);
-
-    void changePassword(String id, PasswordChangeRequest request);
 
     void resetPassword(String id, String newPassword);
 
