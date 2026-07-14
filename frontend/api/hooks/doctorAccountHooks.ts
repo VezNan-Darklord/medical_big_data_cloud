@@ -1,6 +1,5 @@
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
 import medical from '../instance'
-import type { UserUpdateRequest } from '../models/UserUpdateRequest'
 import type { ApiObjectPage } from '../models/ApiObjectPage'
 
 type LastPage = ApiObjectPage
@@ -17,14 +16,6 @@ export function useListDoctorAccountsQuery(params: { pageSize?: number } = {}) {
       return undefined
     },
     initialPageParam: 1,
-  })
-}
-
-export function useUpdateDoctorAccountMutation() {
-  return useMutation({
-    mutationFn: async ({ id, ...req }: UserUpdateRequest & { id: string }) =>
-      medical.doctorAccount.updateDoctorAccount(id, req),
-    mutationKey: ['updateDoctorAccount'],
   })
 }
 

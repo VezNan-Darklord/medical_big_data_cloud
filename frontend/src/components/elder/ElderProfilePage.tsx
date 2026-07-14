@@ -8,7 +8,7 @@ import { PanelCard } from '../common'
 
 export default function ElderProfilePage() {
   const { data: userData } = useGetCurrentUserQuery()
-  const userId = userData?.user?.id ?? ''
+  const userId = userData?.data?.id ?? ''
 
   const { data: profileData, isLoading, error } = useGetElderlyProfileQuery(userId)
   const profile = profileData?.data

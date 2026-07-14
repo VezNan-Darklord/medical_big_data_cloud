@@ -40,7 +40,7 @@ export function useUpdateUserMutation() {
 export function useUpdateUserStatusMutation() {
   return useMutation({
     mutationFn: async ({ id, ...req }: StatusRequest & { id: string }) =>
-      medical.userAccount.updateUserStatus(id, req),
+      medical.userAccount.updateUser(id, req),
     mutationKey: ['updateUserStatus'],
   })
 }

@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ApiBase } from './ApiBase';
 import type { User } from './User';
-export type UserResponse = {
-    user?: User;
-};
+export type UserResponse = (ApiBase & {
+    data?: User;
+});
 

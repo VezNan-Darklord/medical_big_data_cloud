@@ -1,8 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
 import type { DeviceBindRequest } from '../models/DeviceBindRequest'
 import type { DeviceUpdateRequest } from '../models/DeviceUpdateRequest'
 import type { ApiObjectPage } from '../models/ApiObjectPage'
+import type { DeviceCreateRequest } from '../models/DeviceCreateRequest'
 
 type LastPage = ApiObjectPage
 
@@ -29,25 +30,48 @@ export function useGetDeviceQuery(id: string) {
   })
 }
 
+export function useCreateDeviceMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (req: DeviceCreateRequest) => medical.device.createDevice(req),
+    mutationKey: ['createDevice'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listDevices'] })
+    }
+  });
+}
+
 export function useUpdateDeviceMutation() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...req }: DeviceUpdateRequest & { id: string }) =>
       medical.device.updateDevice(id, req),
     mutationKey: ['updateDevice'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listDevices'] })
+    },
   })
 }
 
 export function useBindDeviceMutation() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (req: DeviceBindRequest) => medical.device.bindDevice(req),
     mutationKey: ['bindDevice'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listDevices'] })
+    },
   })
 }
 
 export function useUnbindDeviceMutation() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => medical.device.unbindDevice(id),
     mutationKey: ['unbindDevice'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listDevices'] })
+    },
   })
 }
 

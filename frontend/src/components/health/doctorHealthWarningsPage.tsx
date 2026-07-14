@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Button, Card, Form, Input, Select, DatePicker, Tag, message, Skeleton, InputNumber } from 'antd'
+import { Button, Card, Form, Input, Select, DatePicker, Tag, message, Skeleton, InputNumber, Spin } from 'antd'
 import { PlusOutlined, SendOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { useListHealthWarningsQuery, useCreateHealthWarningMutation, useHandleHealthWarningMutation, useAssignHealthWarningMutation } from '../../../api/hooks/healthWarningHooks'
 import { useListElderlyProfilesQuery } from '../../../api/hooks/elderlyProfileHooks'
 import { StatusTag, PopWindow } from '../common'
+import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { HealthWarningCreateRequest } from '../../../api/models/HealthWarningCreateRequest'
 import dayjs from 'dayjs'
 import type { HealthWarning } from '../../../api/models/HealthWarning'
@@ -107,6 +108,11 @@ export default function HealthWarningsPage() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListHealthWarningsQuery({ pageSize: 20 })
   const allWarnings = data?.pages.flatMap(p => (p.data)?.list ?? []) ?? []
 
+  const sentinelRef = useIntersectionObserver(
+    () => { if (hasNextPage && !isFetchingNextPage) fetchNextPage() },
+    !isLoading,
+  )
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-slate-200/80 bg-white px-6 py-5 shadow-sm">
@@ -114,11 +120,14 @@ export default function HealthWarningsPage() {
         <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>创建预警</Button>
       </div>
       {isLoading ? <Skeleton active paragraph={{ rows: 6 }} /> : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {allWarnings.map((w: HealthWarning) => <WarningCard key={w.id} warning={w} onHandle={setHandleId} onAssign={setAssignId} />)}
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {allWarnings.map((w: HealthWarning) => <WarningCard key={w.id} warning={w} onHandle={setHandleId} onAssign={setAssignId} />)}
+          </div>
+          <div ref={sentinelRef} className="h-px" />
+          {isFetchingNextPage && <div className="text-center"><Spin /></div>}
+        </>
       )}
-      {hasNextPage && <div className="text-center"><Button loading={isFetchingNextPage} onClick={() => fetchNextPage()}>加载更多</Button></div>}
       <CreateWarningModal open={createOpen} onClose={() => setCreateOpen(false)} />
       {handleId && <HandleModal open={!!handleId} warningId={handleId} onClose={() => setHandleId('')} />}
       {assignId && <AssignModal open={!!assignId} warningId={assignId} onClose={() => setAssignId('')} />}
