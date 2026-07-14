@@ -4,8 +4,6 @@
 /* eslint-disable */
 import type { ApiEmpty } from '../models/ApiEmpty';
 import type { ApiObjectPage } from '../models/ApiObjectPage';
-import type { ApiUser } from '../models/ApiUser';
-import type { UserUpdateRequest } from '../models/UserUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class DoctorAccountService {
@@ -28,27 +26,6 @@ export class DoctorAccountService {
                 'pageNo': pageNo,
                 'pageSize': pageSize,
             },
-        });
-    }
-    /**
-     * 更新医生账户
-     * @param id
-     * @param requestBody
-     * @returns ApiUser 成功
-     * @throws ApiError
-     */
-    public updateDoctorAccount(
-        id: string,
-        requestBody: UserUpdateRequest,
-    ): CancelablePromise<ApiUser> {
-        return this.httpRequest.request({
-            method: 'PUT',
-            url: '/doctor-accounts/{id}',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
         });
     }
     /**

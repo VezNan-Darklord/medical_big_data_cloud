@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ElderlyProfileInput = {
+    id?: string;
     name: string;
     gender: string;
     birthday?: string;

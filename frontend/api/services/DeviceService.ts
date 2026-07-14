@@ -7,6 +7,7 @@ import type { ApiObject } from '../models/ApiObject';
 import type { ApiObjectList } from '../models/ApiObjectList';
 import type { ApiObjectPage } from '../models/ApiObjectPage';
 import type { DeviceBindRequest } from '../models/DeviceBindRequest';
+import type { DeviceCreateRequest } from '../models/DeviceCreateRequest';
 import type { DeviceUpdateRequest } from '../models/DeviceUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -36,6 +37,22 @@ export class DeviceService {
                 'pageNo': pageNo,
                 'pageSize': pageSize,
             },
+        });
+    }
+    /**
+     * 新增设备
+     * @param requestBody
+     * @returns ApiObject 成功
+     * @throws ApiError
+     */
+    public createDevice(
+        requestBody: DeviceCreateRequest,
+    ): CancelablePromise<ApiObject> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/devices',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
     /**

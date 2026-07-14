@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
       BASE: '/api/v1',
       WITH_CREDENTIALS: false,
       CREDENTIALS: 'include',
-      TOKEN: getAccessToken() || undefined,
+      TOKEN: async () => getAccessToken() ?? '',
     },
     AuthFetchHttpRequest,
   );

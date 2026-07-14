@@ -4,6 +4,8 @@ import { Spin } from 'antd'
 import { AppShell } from '../layout/AppShell'
 import { workspaceConfigs } from '../pages/workspace-config'
 import { RoleGuard } from './guards'
+import { useGetCurrentUserQuery } from '../../api/hooks/authHooks'
+import type { User } from '../../api/models/User'
 
 const DashboardPage = lazy(() => import('../components/dashboard/DashboardPage'))
 const DecisionAnalysisPage = lazy(() => import('../components/decision/DecisionAnalysisPage'))
@@ -11,12 +13,30 @@ const ProfilePage = lazy(() => import('../components/profile/ProfilePage'))
 const WorkspacePage = lazy(() => import('../components/common/WorkspacePage'))
 import NotFoundPage from '../components/common/NotFoundPage'
 
+const ElderProfilePage = lazy(() => import('../components/elder/ElderProfilePage'))
+const ElderlyHealthPage = lazy(() => import('../components/health/ElderlyHealthPage'))
+
+const DoctorElderlyProfilesPage = lazy(() => import('../components/elder/doctorElderlyProfilesPage'))
+const DoctorHealthWarningsPage = lazy(() => import('../components/health/doctorHealthWarningsPage'))
+const DoctorDevicesPage = lazy(() => import('../components/device/DevicesPage'))
+const DoctorKeyPopulationsPage = lazy(() => import('../components/keyPopulation/KeyPopulationsPage'))
+
 function RouteFallback() {
   return (
     <div className="flex min-h-70 items-center justify-center rounded-[28px] border border-slate-200 bg-white">
       <Spin size="large" />
     </div>
   )
+}
+
+function RoleSwitch({ elderly, doctor, admin }: { elderly: React.ReactNode; doctor: React.ReactNode; admin: React.ReactNode }) {
+  const { data } = useGetCurrentUserQuery();
+  const user = data?.data as User | undefined
+  const role = user?.roleCode ?? ''
+
+  if (role === 'elderly') return <>{elderly}</>
+  if (role === 'doctor') return <>{doctor}</>
+  return <>{admin}</>
 }
 
 export function AppRouter() {
@@ -28,7 +48,42 @@ export function AppRouter() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/decision-analysis" element={<DecisionAnalysisPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            {Object.entries(workspaceConfigs).map(([path, config]) => (
+
+            <Route path="/elderly-profiles" element={
+              <RoleSwitch
+                elderly={<ElderProfilePage />}
+                doctor={<DoctorElderlyProfilesPage />}
+                admin={<WorkspacePage config={workspaceConfigs['/elderly-profiles']} />}
+              />
+            } />
+
+            <Route path="/health-warnings" element={
+              <RoleSwitch
+                elderly={<ElderlyHealthPage />}
+                doctor={<DoctorHealthWarningsPage />}
+                admin={<WorkspacePage config={workspaceConfigs['/health-warnings']} />}
+              />
+            } />
+
+            <Route path="/devices" element={
+              <RoleSwitch
+                elderly={<NotFoundPage />}
+                doctor={<DoctorDevicesPage />}
+                admin={<WorkspacePage config={workspaceConfigs['/devices']} />}
+              />
+            } />
+
+            <Route path="/key-populations" element={
+              <RoleSwitch
+                elderly={<NotFoundPage />}
+                doctor={<DoctorKeyPopulationsPage />}
+                admin={<WorkspacePage config={workspaceConfigs['/key-populations']} />}
+              />
+            } />
+
+            {Object.entries(workspaceConfigs).filter(([p]) =>
+              !['/elderly-profiles','/health-warnings','/devices','/key-populations'].includes(p)
+            ).map(([path, config]) => (
               <Route key={path} path={path} element={<WorkspacePage config={config} />} />
             ))}
           </Route>
