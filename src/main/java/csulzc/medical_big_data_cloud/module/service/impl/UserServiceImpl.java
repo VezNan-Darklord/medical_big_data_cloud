@@ -140,6 +140,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void delete(String id) {
-        userRepository.delete(id);
+        userRepository.deleteById(id);
     }
 }

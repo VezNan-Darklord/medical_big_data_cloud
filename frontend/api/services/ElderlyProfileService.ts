@@ -110,19 +110,16 @@ export class ElderlyProfileService {
     /**
      * 删除老人档案
      * @param id
-     * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
      */
     public deleteElderlyProfile(
-        id: string,
         id: string,
     ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'DELETE',
             url: '/elderly-profiles/{id}',
             path: {
-                'id': id,
                 'id': id,
             },
             errors: {

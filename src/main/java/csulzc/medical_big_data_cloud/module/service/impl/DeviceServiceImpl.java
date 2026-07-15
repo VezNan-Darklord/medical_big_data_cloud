@@ -108,6 +108,6 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional
     public void delete(String id) {
-        deviceRepository.delete(id);
+        deviceRepository.deleteById(id);
     }
 }

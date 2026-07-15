@@ -30,6 +30,4 @@ public interface ElderlyProfileRepository extends JpaRepository<ElderlyProfile, 
     Page<ElderlyProfile> findByStatusOrderByCreatedAtDesc(String status, Pageable pageable);
 
     long countByStatus(String status);
-
-    void delete(String id);
 }

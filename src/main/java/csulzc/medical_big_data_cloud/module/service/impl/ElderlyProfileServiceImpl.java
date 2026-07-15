@@ -64,7 +64,7 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional
     public void delete(String id) {
-        elderlyProfileRepository.delete(id);
+        elderlyProfileRepository.deleteById(id);
     }
 
     @Override

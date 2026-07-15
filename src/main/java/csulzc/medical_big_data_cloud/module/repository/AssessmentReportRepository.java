@@ -18,6 +18,4 @@ public interface AssessmentReportRepository
     Page<AssessmentReport> findByAssessorId(String assessorId, Pageable pageable);
 
     List<AssessmentReport> findByElderlyIdOrderByAssessedAtDesc(String elderlyId);
-
-    void delete(String id);
 }

@@ -104,6 +104,6 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     @Override
     @Transactional
     public void delete(String id) {
-        healthWarningRepository.delete(id);
+        healthWarningRepository.deleteById(id);
     }
 }
