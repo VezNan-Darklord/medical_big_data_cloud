@@ -102,7 +102,6 @@ paths:
       tags: [ ElderlyProfile ]
       summary: 删除老人档案
       operationId: deleteElderlyProfile
-      parameters: [ { $ref: '#/components/parameters/Id' } ]
       responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
   /health-warnings:
     get:

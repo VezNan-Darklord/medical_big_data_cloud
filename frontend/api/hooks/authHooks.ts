@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
 import type { LoginRequest } from '../models/LoginRequest'
 import type { RegisterRequest } from '../models/RegisterRequest'
+import { getAccessToken } from '../instance'
 
 export function useLoginMutation() {
   return useMutation({
@@ -21,12 +22,13 @@ export function useGetCurrentUserQuery() {
   return useQuery({
     queryKey: ['getCurrentUser'],
     queryFn: async () => medical.auth.getCurrentUser(),
+    enabled: !!getAccessToken(),
   })
 }
 
 export function useLogoutMutation() {
   return useMutation({
     mutationFn: async () => medical.auth.logout(),
-    mutationKey: ['logout']
+    mutationKey: ['logout'],
   })
 }
