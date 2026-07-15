@@ -6,15 +6,20 @@ export type HealthWarning = {
     id?: string;
     elderlyId?: string;
     warningType?: string;
-    severity?: string;
+    severity?: 'low' | 'medium' | 'high' | 'critical';
     source?: string;
-    metricName?: string;
-    metricValue?: number;
-    thresholdValue?: number;
-    status?: string;
+    metricName?: string | null;
+    metricValue?: number | null;
+    thresholdValue?: number | null;
+    status?: 'unprocessed' | 'processing' | 'processed' | 'closed';
     occurredAt?: string;
     handledAt?: string | null;
     handlerId?: string | null;
-    remark?: string;
+    handlerName?: string | null;
+    handleResult?: string | null;
+    nextAction?: string | null;
+    remark?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
 };
 

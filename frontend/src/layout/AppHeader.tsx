@@ -66,7 +66,6 @@ function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { 
         password: values.password,
         realName: values.realName,
         mobile: values.mobile,
-        roleCode: 'elderly',
       }, {
         onSuccess: (data) => {
           message.success('注册成功')

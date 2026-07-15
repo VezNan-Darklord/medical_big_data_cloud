@@ -4,7 +4,8 @@ import { PlusOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons'
 import { useListKeyPopulationsQuery, useCreateKeyPopulationMutation, useCloseKeyPopulationMutation, useUpdateKeyPopulationMutation } from '../../../api/hooks/keyPopulationHooks'
 import { StatusTag, PopWindow, ElderlyAccountSelect } from '../common'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
-import type { KeyPopulationInput } from '../../../api/models/KeyPopulationInput'
+import type { KeyPopulationCreateRequest } from '../../../api/models/KeyPopulationCreateRequest'
+import type { KeyPopulationUpdateRequest } from '../../../api/models/KeyPopulationUpdateRequest'
 
 function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [form] = Form.useForm()
@@ -12,7 +13,7 @@ function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) 
 
   return (
     <PopWindow open={open} onClose={onClose} title="添加重点人群" width={500}>
-      <Form form={form} layout="vertical" onFinish={(v: KeyPopulationInput) => {
+      <Form form={form} layout="vertical" onFinish={(v: KeyPopulationCreateRequest) => {
         createMutation.mutate(v, { onSuccess: () => { message.success('添加成功'); form.resetFields(); onClose() }, onError: (err: Error) => message.error(err?.message ?? '失败') })
       }}>
         <Form.Item name="elderlyId" label="老人" rules={[{ required: true }]}><ElderlyAccountSelect /></Form.Item>
@@ -41,7 +42,7 @@ function EditModal({ open, item, onClose }: { open: boolean; item: PopulationIte
 
   return (
     <PopWindow open={open} onClose={onClose} title="编辑重点人群" width={500}>
-      <Form form={form} layout="vertical" initialValues={item} onFinish={(v: KeyPopulationInput) => {
+      <Form form={form} layout="vertical" initialValues={item} onFinish={(v: KeyPopulationUpdateRequest) => {
         updateMutation.mutate({ id: item.id, ...v }, { onSuccess: () => { message.success('更新成功'); onClose() }, onError: (err: Error) => message.error(err?.message ?? '失败') })
       }}>
         <Form.Item name="elderlyId" label="老人" rules={[{ required: true }]}><ElderlyAccountSelect /></Form.Item>

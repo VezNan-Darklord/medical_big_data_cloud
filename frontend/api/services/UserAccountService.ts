@@ -3,8 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ApiEmpty } from '../models/ApiEmpty';
-import type { ApiObjectPage } from '../models/ApiObjectPage';
-import type { UserResponse } from '../models/UserResponse';
+import type { ApiUser } from '../models/ApiUser';
+import type { ApiUserPage } from '../models/ApiUserPage';
+import type { RoleAssignRequest } from '../models/RoleAssignRequest';
+import type { RoleCode } from '../models/RoleCode';
+import type { UserCreateRequest } from '../models/UserCreateRequest';
+import type { UserStatusUpdateRequest } from '../models/UserStatusUpdateRequest';
 import type { UserUpdateRequest } from '../models/UserUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -17,16 +21,16 @@ export class UserAccountService {
      * @param status
      * @param pageNo
      * @param pageSize
-     * @returns ApiObjectPage 成功
+     * @returns ApiUserPage 成功
      * @throws ApiError
      */
     public listUsers(
         keyword?: string,
-        roleCode?: string,
-        status?: string,
+        roleCode?: RoleCode,
+        status?: 'enabled' | 'disabled',
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiObjectPage> {
+    ): CancelablePromise<ApiUserPage> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/users',
@@ -37,22 +41,50 @@ export class UserAccountService {
                 'pageNo': pageNo,
                 'pageSize': pageSize,
             },
+            errors: {
+                403: `当前角色无权访问`,
+            },
+        });
+    }
+    /**
+     * 创建系统账户
+     * @param requestBody
+     * @returns ApiUser 成功
+     * @throws ApiError
+     */
+    public createUser(
+        requestBody: UserCreateRequest,
+    ): CancelablePromise<ApiUser> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/users',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                409: `数据冲突或仍被引用`,
+            },
         });
     }
     /**
      * 系统账户详情
      * @param id
-     * @returns UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
     public getUser(
         id: string,
-    ): CancelablePromise<UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/users/{id}',
             path: {
                 'id': id,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }
@@ -60,13 +92,13 @@ export class UserAccountService {
      * 更新系统账户
      * @param id
      * @param requestBody
-     * @returns UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
     public updateUser(
         id: string,
         requestBody: UserUpdateRequest,
-    ): CancelablePromise<UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/users/{id}',
@@ -75,10 +107,14 @@ export class UserAccountService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
         });
     }
     /**
-     * 删除账户
+     * 软删除系统账户
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -93,12 +129,38 @@ export class UserAccountService {
                 'id': id,
             },
             errors: {
-                404: `业务错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }
     /**
-     * 分配角色
+     * 修改系统账户状态
+     * @param id
+     * @param requestBody
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public updateUserStatus(
+        id: string,
+        requestBody: UserStatusUpdateRequest,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/users/{id}/status',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 分配单一系统角色
      * @param id
      * @param requestBody
      * @returns ApiEmpty 成功
@@ -106,7 +168,7 @@ export class UserAccountService {
      */
     public assignUserRole(
         id: string,
-        requestBody: string,
+        requestBody: RoleAssignRequest,
     ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'POST',
@@ -116,6 +178,11 @@ export class UserAccountService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
         });
     }
 }

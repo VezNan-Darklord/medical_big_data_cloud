@@ -6,7 +6,8 @@ import { useResetElderlyPasswordMutation } from '../../../api/hooks/elderlyAccou
 import { PanelCard, PopWindow } from '../common'
 import { ElderlyAccountSelect } from '../common/ElderlyAccountSelect'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
-import type { ElderlyProfileInput } from '../../../api/models/ElderlyProfileInput'
+import type { ElderlyProfileCreateRequest } from '../../../api/models/ElderlyProfileCreateRequest'
+import type { ElderlyProfileUpdateRequest } from '../../../api/models/ElderlyProfileUpdateRequest'
 import type { ElderlyProfile } from '../../../api/models/ElderlyProfile'
 import dayjs from 'dayjs'
 
@@ -16,14 +17,14 @@ function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <PopWindow open={open} onClose={onClose} title="新建老人档案" width={600}>
-      <Form form={form} layout="vertical" onFinish={(values: ElderlyProfileInput) => {
+      <Form form={form} layout="vertical" onFinish={(values: ElderlyProfileCreateRequest) => {
         createMutation.mutate(values, {
           onSuccess: () => { message.success('档案创建成功'); form.resetFields(); onClose() },
           onError: (err: Error) => message.error(err?.message ?? '创建失败'),
         })
       }}>
         <div className="grid gap-0 md:grid-cols-2 md:gap-x-4">
-          <Form.Item name="id" label="关联老人账户" rules={[{ required: true }]}>
+          <Form.Item name="userId" label="关联老人账户" rules={[{ required: true }]}>
             <ElderlyAccountSelect setRealName={(name) => { form.setFieldsValue({ name }); }} setMobile={(phone) => { form.setFieldsValue({ phone }); }} />
           </Form.Item>
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
@@ -42,7 +43,7 @@ function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => v
             <Select options={['A1','A2','A3','B1','B2','C1','C2'].map(v => ({ value: v, label: v }))} />
           </Form.Item>
           <Form.Item name="status" label="状态">
-            <Select options={[{ value: 'active', label: '在档' }, { value: 'paused', label: '暂停' }]} />
+            <Select options={[{ value: 'active', label: '在档' }, { value: 'inactive', label: '停用' }]} />
           </Form.Item>
         </div>
         <Form.Item name="medicalHistory" label="既往病史"><Input.TextArea rows={3} /></Form.Item>
@@ -80,7 +81,7 @@ function ProfileCard({ profile, onResetPassword, onViewDetail, onEdit }: { profi
         <span className="text-xs text-slate-400">{profile.updatedAt?.slice(0, 10) ?? ''}</span>
         <div className="flex gap-1">
           <Button size="small" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation(); onEdit(profile) }}>编辑</Button>
-          <Button size="small" icon={<ReloadOutlined />} onClick={(e) => { e.stopPropagation(); onResetPassword(profile.id!, profile.name) }}>重置密码</Button>
+          <Button size="small" icon={<ReloadOutlined />} onClick={(e) => { e.stopPropagation(); onResetPassword(profile.id!, profile.name ?? '-') }}>重置密码</Button>
           <Button size="small" danger icon={<DeleteOutlined />} onClick={handleDelete} loading={deleteMutation.isPending} />
         </div>
       </div>
@@ -125,7 +126,7 @@ function EditProfileModal({ open, profile, onClose }: { open: boolean; profile: 
 
   return (
     <PopWindow open={open} onClose={onClose} title="编辑老人档案" width={600}>
-      <Form form={form} layout="vertical" initialValues={{ ...profile, birthday: profile.birthday ? dayjs(profile.birthday) : undefined }} onFinish={(values: ElderlyProfileInput) => {
+      <Form form={form} layout="vertical" initialValues={{ ...profile, birthday: profile.birthday ? dayjs(profile.birthday) : undefined }} onFinish={(values: ElderlyProfileUpdateRequest) => {
         updateMutation.mutate({ id: profile.id!, ...values }, {
           onSuccess: () => { message.success('档案更新成功'); onClose() },
           onError: (err: Error) => message.error(err?.message ?? '更新失败'),
@@ -148,7 +149,7 @@ function EditProfileModal({ open, profile, onClose }: { open: boolean; profile: 
             <Select options={['A1','A2','A3','B1','B2','C1','C2'].map(v => ({ value: v, label: v }))} />
           </Form.Item>
           <Form.Item name="status" label="状态">
-            <Select options={[{ value: 'active', label: '在档' }, { value: 'paused', label: '暂停' }]} />
+            <Select options={[{ value: 'active', label: '在档' }, { value: 'inactive', label: '停用' }]} />
           </Form.Item>
         </div>
         <Form.Item name="medicalHistory" label="既往病史"><Input.TextArea rows={3} /></Form.Item>

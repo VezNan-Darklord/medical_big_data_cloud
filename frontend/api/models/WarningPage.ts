@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { HealthWarning } from './HealthWarning';
-import type { ObjectPage } from './ObjectPage';
-export type WarningPage = (ObjectPage & {
+export type WarningPage = {
     list?: Array<HealthWarning>;
-});
+    pageNo?: number;
+    pageSize?: number;
+    total?: number;
+};
 

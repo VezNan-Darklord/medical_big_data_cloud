@@ -3,7 +3,7 @@ package csulzc.medical_big_data_cloud.module.controller;
 import csulzc.medical_big_data_cloud.common.result.ApiResponse;
 import csulzc.medical_big_data_cloud.common.result.FilePayload;
 import csulzc.medical_big_data_cloud.module.dto.response.dashboard.DashboardChartResponse;
-import csulzc.medical_big_data_cloud.module.dto.response.dashboard.DashboardOverviewResponse;
+import csulzc.medical_big_data_cloud.module.dto.response.report.StatisticsOverviewResponse;
 import csulzc.medical_big_data_cloud.module.service.ReportStatisticsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +22,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/reports/statistics")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('admin', 'operator', 'analyst')")
+@PreAuthorize("hasRole('admin')")
 @Tag(name = "ReportStatistics", description = "报表统计")
 public class ReportStatisticsController {
 
     private final ReportStatisticsService reportStatisticsService;
 
     @GetMapping("/overview")
-    public ApiResponse<DashboardOverviewResponse> getOverview() {
+    public ApiResponse<StatisticsOverviewResponse> getOverview() {
         return ApiResponse.success(reportStatisticsService.getOverview());
     }
 

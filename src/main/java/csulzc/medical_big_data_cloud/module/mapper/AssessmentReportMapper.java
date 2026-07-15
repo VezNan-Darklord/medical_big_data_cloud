@@ -12,6 +12,7 @@ public interface AssessmentReportMapper {
     AssessmentReportResponse toResponse(AssessmentReport entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "assessorId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "reviewStatus", ignore = true)

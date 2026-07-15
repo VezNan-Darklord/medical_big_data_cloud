@@ -2,10 +2,21 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { User } from './User';
+import type { LoginUserInfo } from './LoginUserInfo';
 export type LoginResult = {
-    token?: string;
-    expireAt?: string;
-    user?: User;
+    /**
+     * 兼容旧前端的 accessToken 别名
+     */
+    token: string;
+    accessToken: string;
+    refreshToken: string;
+    tokenType: string;
+    /**
+     * 兼容旧前端的 accessExpireAt 别名
+     */
+    expireAt: string;
+    accessExpireAt: string;
+    refreshExpireAt: string;
+    user: LoginUserInfo;
 };
 

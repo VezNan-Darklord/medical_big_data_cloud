@@ -38,7 +38,7 @@ export default function ElderProfilePage() {
 
   const ageText = profile.age ? `${profile.age} 岁` : '-'
   const birthdayText = profile.birthday ?? '-'
-  const statusColor = profile.status === 'active' ? 'green' : profile.status === 'paused' ? 'orange' : 'default'
+  const statusColor = profile.status === 'active' ? 'green' : profile.status === 'inactive' ? 'orange' : 'default'
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -54,7 +54,7 @@ export default function ElderProfilePage() {
                 <span className="text-2xl font-semibold text-slate-900">{profile.name}</span>
                 {genderIcon}
                 <Tag color="blue">{ageText}</Tag>
-                <Tag color={statusColor}>{profile.status === 'active' ? '在档' : profile.status === 'paused' ? '暂停' : profile.status}</Tag>
+                <Tag color={statusColor}>{profile.status === 'active' ? '在档' : profile.status === 'inactive' ? '停用' : profile.status}</Tag>
               </div>
               <div className="mt-1 text-sm text-slate-500">ID: {profile.id}</div>
             </div>

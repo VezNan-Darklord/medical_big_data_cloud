@@ -4,6 +4,8 @@ import type { LoginRequest } from '../models/LoginRequest'
 import type { RegisterRequest } from '../models/RegisterRequest'
 import { getAccessToken } from '../instance'
 
+export type ElderlyRegisterRequest = Omit<RegisterRequest, 'roleCode'>
+
 export function useLoginMutation() {
   return useMutation({
     mutationFn: async (req: LoginRequest) => medical.auth.login(req),
@@ -13,7 +15,8 @@ export function useLoginMutation() {
 
 export function useRegisterMutation() {
   return useMutation({
-    mutationFn: async (req: RegisterRequest) => medical.auth.register(req),
+    mutationFn: async (req: ElderlyRegisterRequest) =>
+      medical.auth.register({ ...req, roleCode: 'elderly' }),
     mutationKey: ['register'],
   })
 }

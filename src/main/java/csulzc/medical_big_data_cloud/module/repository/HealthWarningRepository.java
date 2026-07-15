@@ -24,6 +24,8 @@ public interface HealthWarningRepository
 
     long countByStatus(String status);
 
+    long countByStatusIn(List<String> statuses);
+
     long countBySeverityAndStatus(String severity, String status);
 
     @Query("SELECT w.severity AS label, COUNT(w) AS count FROM HealthWarning w GROUP BY w.severity")

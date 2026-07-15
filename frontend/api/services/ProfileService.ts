@@ -2,56 +2,113 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiObjectList } from '../models/ApiObjectList';
+import type { ApiAssessmentReportPage } from '../models/ApiAssessmentReportPage';
+import type { ApiElderly } from '../models/ApiElderly';
+import type { ApiEmpty } from '../models/ApiEmpty';
+import type { ApiTodoList } from '../models/ApiTodoList';
+import type { ApiUser } from '../models/ApiUser';
+import type { ChangePasswordRequest } from '../models/ChangePasswordRequest';
 import type { ProfileUpdateRequest } from '../models/ProfileUpdateRequest';
-import type { UserResponse } from '../models/UserResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class ProfileService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 统一个人资料更新
-     * 用户修改自己的账户信息，涵盖：对外展示信息(realName)、个人隐私信息(mobile)、密码修改(oldPassword+newPassword)。所有字段为可选，仅传入非空字段会被更新。
+     * 获取个人资料
+     * @returns ApiUser 成功
+     * @throws ApiError
+     */
+    public getProfile(): CancelablePromise<ApiUser> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/profile',
+        });
+    }
+    /**
+     * 更新个人资料
      * @param requestBody
-     * @returns UserResponse 成功
+     * @returns ApiUser 成功
      * @throws ApiError
      */
     public updateProfile(
         requestBody: ProfileUpdateRequest,
-    ): CancelablePromise<UserResponse> {
+    ): CancelablePromise<ApiUser> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/profile',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `业务错误`,
+                400: `参数或业务输入错误`,
+                409: `数据冲突或仍被引用`,
             },
         });
     }
     /**
-     * 我的健康档案
-     * 当前登录老人查看自己的健康档案。基于JWT Token自动识别身份，仅 elderly 角色可调用。
-     * @returns any
+     * 修改当前用户密码
+     * @param requestBody
+     * @returns ApiEmpty 成功
      * @throws ApiError
      */
-    public getMyElderlyProfile(): CancelablePromise<any> {
+    public changePassword(
+        requestBody: ChangePasswordRequest,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/profile/change-password',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+            },
+        });
+    }
+    /**
+     * 当前老人账号的关联档案
+     * @returns ApiElderly 成功
+     * @throws ApiError
+     */
+    public getMyElderlyProfile(): CancelablePromise<ApiElderly> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/profile/elderly',
             errors: {
-                401: `业务错误`,
-                403: `业务错误`,
-                404: `业务错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }
     /**
-     * 我的待办
-     * @returns ApiObjectList 成功
+     * 当前老人账号的评估报告
+     * 仅老人账号可访问，只返回其关联档案下的报告。
+     * @param pageNo
+     * @param pageSize
+     * @returns ApiAssessmentReportPage 成功
      * @throws ApiError
      */
-    public getTodos(): CancelablePromise<ApiObjectList> {
+    public getMyAssessmentReports(
+        pageNo: number = 1,
+        pageSize: number = 10,
+    ): CancelablePromise<ApiAssessmentReportPage> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/profile/reports',
+            query: {
+                'pageNo': pageNo,
+                'pageSize': pageSize,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 当前用户待办
+     * @returns ApiTodoList 成功
+     * @throws ApiError
+     */
+    public getTodos(): CancelablePromise<ApiTodoList> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/profile/todos',

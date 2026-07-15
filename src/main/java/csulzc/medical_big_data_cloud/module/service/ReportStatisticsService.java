@@ -2,12 +2,12 @@ package csulzc.medical_big_data_cloud.module.service;
 
 import csulzc.medical_big_data_cloud.common.result.FilePayload;
 import csulzc.medical_big_data_cloud.module.dto.response.dashboard.DashboardChartResponse;
-import csulzc.medical_big_data_cloud.module.dto.response.dashboard.DashboardOverviewResponse;
+import csulzc.medical_big_data_cloud.module.dto.response.report.StatisticsOverviewResponse;
 
 import java.util.List;
 
 public interface ReportStatisticsService {
-    DashboardOverviewResponse getOverview();
+    StatisticsOverviewResponse getOverview();
 
     List<DashboardChartResponse> getTrends();
 

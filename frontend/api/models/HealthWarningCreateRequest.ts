@@ -5,12 +5,12 @@
 export type HealthWarningCreateRequest = {
     elderlyId: string;
     warningType: string;
-    severity: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
     source: string;
     metricName?: string;
     metricValue?: number;
     thresholdValue?: number;
-    status: string;
+    status?: 'unprocessed' | 'processing' | 'processed' | 'closed';
     occurredAt: string;
     remark?: string;
 };

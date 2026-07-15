@@ -6,5 +6,6 @@ export type DeviceUpdateRequest = {
     deviceName?: string;
     deviceType?: string;
     firmwareVersion?: string;
+    onlineStatus?: 'online' | 'offline';
 };
 

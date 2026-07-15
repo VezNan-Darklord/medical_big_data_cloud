@@ -3,16 +3,16 @@ import medical from '../instance'
 import type { DeviceBindRequest } from '../models/DeviceBindRequest'
 import type { DeviceCreateRequest } from '../models/DeviceCreateRequest'
 import type { DeviceUpdateRequest } from '../models/DeviceUpdateRequest'
-import type { ApiObjectPage } from '../models/ApiObjectPage'
+import type { ApiDevicePage } from '../models/ApiDevicePage'
 
-type LastPage = ApiObjectPage
+type LastPage = ApiDevicePage
 
-export function useListDevicesQuery(params: { bindingStatus?: string; onlineStatus?: string; pageSize?: number } = {}) {
+export function useListDevicesQuery(params: { bindingStatus?: 'bound' | 'unbound'; onlineStatus?: 'online' | 'offline'; pageSize?: number } = {}) {
   const { pageSize = 10, bindingStatus, onlineStatus } = params
   return useInfiniteQuery({
     queryKey: ['listDevices', { bindingStatus, onlineStatus }],
     queryFn: async ({ pageParam = 1 }) => medical.device.listDevices(bindingStatus, onlineStatus, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
     initialPageParam: 1,
   })
 }

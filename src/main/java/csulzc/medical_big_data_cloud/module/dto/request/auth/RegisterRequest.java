@@ -23,6 +23,8 @@ public class RegisterRequest {
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String mobile;
 
-    @Pattern(regexp = "^elderly$", message = "公开注册只允许 elderly 角色")
+    @Pattern(
+            regexp = "^(elderly|doctor|admin)$",
+            message = "注册角色只支持 elderly、doctor 或 admin")
     private String roleCode;
 }

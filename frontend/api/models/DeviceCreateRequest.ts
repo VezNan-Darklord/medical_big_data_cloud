@@ -6,6 +6,6 @@ export type DeviceCreateRequest = {
     deviceName: string;
     deviceType: string;
     deviceSn: string;
-    firmwareVersion: string;
+    firmwareVersion?: string;
 };
 

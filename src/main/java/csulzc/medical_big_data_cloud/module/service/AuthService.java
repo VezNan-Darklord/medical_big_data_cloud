@@ -8,7 +8,7 @@ import csulzc.medical_big_data_cloud.module.dto.response.user.UserResponse;
 public interface AuthService {
     LoginResponse login(LoginRequest request);
 
-    LoginResponse register(RegisterRequest request);
+    LoginResponse register(RegisterRequest request, String userAgent);
 
     UserResponse getCurrentUser();
 

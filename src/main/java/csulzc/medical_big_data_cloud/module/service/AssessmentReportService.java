@@ -13,6 +13,8 @@ public interface AssessmentReportService {
 
     PageResult<AssessmentReportResponse> list(String elderlyId, int pageNo, int pageSize);
 
+    PageResult<AssessmentReportResponse> listForElderlyUser(String userId, int pageNo, int pageSize);
+
     AssessmentReportResponse review(String id, AssessmentReportReviewRequest request);
 
     FilePayload export(String id);

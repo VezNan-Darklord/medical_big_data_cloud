@@ -1,13 +1,13 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
 import type { HealthWarningCreateRequest } from '../models/HealthWarningCreateRequest'
-import type { WarningHandleRequest } from '../models/WarningHandleRequest'
+import type { HealthWarningHandleRequest } from '../models/HealthWarningHandleRequest'
 import type { ApiWarningPage } from '../models/ApiWarningPage'
 
 type LastPage = ApiWarningPage
 
 export type WarningListParams = {
-  elderlyId?: string; warningType?: string; severity?: 'low' | 'medium' | 'high' | 'critical'; status?: string; source?: string
+  elderlyId?: string; warningType?: string; severity?: 'low' | 'medium' | 'high' | 'critical'; status?: 'unprocessed' | 'processing' | 'processed' | 'closed'; source?: string
   startTime?: string; endTime?: string; pageSize?: number
 }
 
@@ -16,7 +16,7 @@ export function useListHealthWarningsQuery(params: WarningListParams = {}) {
   return useInfiniteQuery({
     queryKey: ['listHealthWarnings', filters],
     queryFn: async ({ pageParam = 1 }) => medical.healthWarning.listHealthWarnings(filters.elderlyId, filters.warningType, filters.severity, filters.status, filters.source, filters.startTime, filters.endTime, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
     initialPageParam: 1,
   })
 }
@@ -34,9 +34,9 @@ export function useDeleteHealthWarningMutation() {
 }
 
 export function useHandleHealthWarningMutation() {
-  return useMutation({ mutationFn: async ({ id, ...req }: WarningHandleRequest & { id: string }) => medical.healthWarning.handleHealthWarning(id, req), mutationKey: ['handleHealthWarning'] })
+  return useMutation({ mutationFn: async ({ id, ...req }: HealthWarningHandleRequest & { id: string }) => medical.healthWarning.handleHealthWarning(id, req), mutationKey: ['handleHealthWarning'] })
 }
 
 export function useAssignHealthWarningMutation() {
-  return useMutation({ mutationFn: async ({ id, targetDoctorId }: { id: string; targetDoctorId: string }) => medical.healthWarning.assignHealthWarning(id, targetDoctorId), mutationKey: ['assignHealthWarning'] })
+  return useMutation({ mutationFn: async ({ id, targetDoctorId }: { id: string; targetDoctorId: string }) => medical.healthWarning.assignHealthWarning(id, { handlerId: targetDoctorId }), mutationKey: ['assignHealthWarning'] })
 }

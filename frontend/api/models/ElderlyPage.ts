@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ElderlyProfile } from './ElderlyProfile';
-import type { ObjectPage } from './ObjectPage';
-export type ElderlyPage = (ObjectPage & {
-    list?: Array<ElderlyProfile>;
-});
+export type ElderlyPage = {
+    list: Array<ElderlyProfile>;
+    pageNo: number;
+    pageSize: number;
+    total: number;
+};
 

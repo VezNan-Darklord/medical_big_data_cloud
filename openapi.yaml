@@ -41,15 +41,22 @@ paths:
   /auth/register:
     post:
       tags: [Auth]
-      summary: 公开注册老人账号
-      description: 公开注册固定创建 elderly 角色账号，并返回 access token 与可轮换 refresh token。
+      summary: 注册账号并直接登录
+      description: 浏览器前端仅允许注册 elderly；User-Agent 包含 Apifox 时可注册 admin、doctor 或 elderly。成功后直接返回 access token 与可轮换 refresh token。该来源区分仅用于本地数据库开发环境。
       operationId: register
       security: []
+      parameters:
+        - name: User-Agent
+          in: header
+          required: false
+          description: 浏览器使用默认 User-Agent；Apifox 创建管理员或医生时必须包含 Apifox。
+          schema: { type: string }
       requestBody:
         $ref: "#/components/requestBodies/Register"
       responses:
         "201": { $ref: "#/components/responses/LoginResponse" }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "409": { $ref: "#/components/responses/Conflict" }
   /auth/refresh:
     post:
@@ -329,6 +336,7 @@ paths:
     get:
       tags: [AssessmentReport]
       summary: 评估报告列表
+      description: 仅管理员和医生可访问。
       operationId: listAssessmentReports
       parameters:
         - { name: elderlyId, in: query, schema: { type: string } }
@@ -340,10 +348,11 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ApiAssessmentReportPage" }
+        "403": { $ref: "#/components/responses/Forbidden" }
     post:
       tags: [AssessmentReport]
-      summary: 生成评估报告
-      description: 未提供评分、等级、摘要、风险项或建议时，后端根据有效预警计算生成。
+      summary: 创建评估报告
+      description: 管理员或医生创建。评估人固定取当前登录用户，报告必须包含病症/风险评估和用药或后续动作建议。
       operationId: createAssessmentReport
       requestBody:
         required: true
@@ -362,9 +371,11 @@ paths:
     get:
       tags: [AssessmentReport]
       summary: 报告详情
+      description: 仅管理员和医生可访问。
       operationId: getAssessmentReport
       responses:
         "200": { $ref: "#/components/responses/AssessmentReportResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [AssessmentReport]
@@ -394,6 +405,7 @@ paths:
     get:
       tags: [AssessmentReport]
       summary: 导出 Markdown 报告文件
+      description: 仅管理员和医生可访问。
       operationId: exportAssessmentReport
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
@@ -405,6 +417,7 @@ paths:
           content:
             text/markdown:
               schema: { type: string, format: binary }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
 
   /key-populations:
@@ -486,31 +499,38 @@ paths:
     get:
       tags: [ReportStatistics]
       summary: 报表统计总览
+      description: 仅管理员可访问，返回顶部统计卡片所需的业务指标。
       operationId: getStatisticsOverview
       responses:
         "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ApiDashboardOverview" }
+              schema: { $ref: "#/components/schemas/ApiStatisticsOverview" }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /reports/statistics/trends:
     get:
       tags: [ReportStatistics]
       summary: 趋势统计图表
+      description: 仅管理员可访问。固定返回重点人群变化趋势、老人档案变化趋势和设备关联统计。
       operationId: getStatisticsTrends
       responses:
         "200": { $ref: "#/components/responses/ChartListResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /reports/statistics/distributions:
     get:
       tags: [ReportStatistics]
       summary: 分布统计图表
+      description: 仅管理员可访问。
       operationId: getStatisticsDistributions
       responses:
         "200": { $ref: "#/components/responses/ChartListResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /reports/statistics/export:
     get:
       tags: [ReportStatistics]
       summary: 导出统计 CSV
+      description: 仅管理员可访问。
       operationId: exportStatistics
       responses:
         "200":
@@ -521,6 +541,7 @@ paths:
           content:
             text/csv:
               schema: { type: string, format: binary }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
   /devices:
     get:
@@ -905,6 +926,23 @@ paths:
         "200": { $ref: "#/components/responses/ElderlyResponse" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
+  /profile/reports:
+    get:
+      tags: [Profile]
+      summary: 当前老人账号的评估报告
+      description: 仅老人账号可访问，只返回其关联档案下的报告。
+      operationId: getMyAssessmentReports
+      parameters:
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiAssessmentReportPage" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /profile/todos:
     get:
       tags: [Profile]
@@ -1149,7 +1187,11 @@ components:
         password: { type: string, minLength: 8, maxLength: 64, writeOnly: true }
         realName: { type: string, maxLength: 50 }
         mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
-        roleCode: { type: string, enum: [elderly], default: elderly }
+        roleCode:
+          type: string
+          enum: [elderly, doctor, admin]
+          default: elderly
+          description: 浏览器前端只能传 elderly；Apifox 可传 doctor 或 admin。
     RefreshTokenRequest:
       type: object
       required: [refreshToken]
@@ -1480,16 +1522,19 @@ components:
 
     AssessmentReport:
       type: object
+      required:
+        [id, elderlyId, reportType, score, grade, summary, riskItems, recommendations, assessorId, assessedAt, reviewStatus]
       properties:
         id: { type: string }
         elderlyId: { type: string }
-        reportType: { type: string }
+        reportType:
+          { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
         score: { type: integer, minimum: 0, maximum: 100 }
-        grade: { type: string }
+        grade: { type: string, enum: [A, B, C, D] }
         summary: { type: string }
         riskItems: { type: array, items: { type: string } }
         recommendations: { type: array, items: { type: string } }
-        assessorId: { type: string, nullable: true }
+        assessorId: { type: string }
         assessedAt: { type: string, format: date-time }
         reviewStatus: { type: string, enum: [draft, approved, rejected] }
         reviewerId: { type: string, nullable: true }
@@ -1498,17 +1543,25 @@ components:
         updatedAt: { type: string, format: date-time }
     AssessmentReportCreateRequest:
       type: object
-      required: [elderlyId, reportType]
+      required:
+        [elderlyId, reportType, score, grade, summary, riskItems, recommendations, assessedAt]
       properties:
         elderlyId: { type: string, maxLength: 64 }
-        reportType: { type: string, maxLength: 50 }
+        reportType:
+          { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
         score: { type: integer, minimum: 0, maximum: 100 }
-        grade: { type: string, maxLength: 10 }
-        summary: { type: string, maxLength: 2000 }
-        riskItems: { type: array, items: { type: string, maxLength: 200 } }
+        grade: { type: string, enum: [A, B, C, D] }
+        summary: { type: string, minLength: 1, maxLength: 2000 }
+        riskItems:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items: { type: string, minLength: 1, maxLength: 200 }
         recommendations:
-          { type: array, items: { type: string, maxLength: 200 } }
-        assessorId: { type: string, maxLength: 64 }
+          type: array
+          minItems: 1
+          maxItems: 30
+          items: { type: string, minLength: 1, maxLength: 200 }
         assessedAt: { type: string, format: date-time }
     AssessmentReportReviewRequest:
       type: object
@@ -1731,8 +1784,9 @@ components:
             data: { $ref: "#/components/schemas/DashboardOverview" }
     DashboardChart:
       type: object
+      required: [chartType, title, xAxis, series]
       properties:
-        chartType: { type: string }
+        chartType: { type: string, enum: [line, bar, pie] }
         title: { type: string }
         xAxis: { type: array, items: { type: string } }
         series:
@@ -1742,6 +1796,25 @@ components:
             properties:
               name: { type: string }
               data: { type: array, items: { type: number } }
+    StatisticsOverview:
+      type: object
+      required:
+        [totalElderlyCount, totalDoctorCount, totalDeviceCount, unboundDeviceCount, deviceOnlineRate, totalWarningCount, unhandledWarningCount]
+      properties:
+        totalElderlyCount: { type: integer, format: int64, minimum: 0 }
+        totalDoctorCount: { type: integer, format: int64, minimum: 0 }
+        totalDeviceCount: { type: integer, format: int64, minimum: 0 }
+        unboundDeviceCount: { type: integer, format: int64, minimum: 0 }
+        deviceOnlineRate:
+          { type: number, format: double, minimum: 0, maximum: 1 }
+        totalWarningCount: { type: integer, format: int64, minimum: 0 }
+        unhandledWarningCount: { type: integer, format: int64, minimum: 0 }
+    ApiStatisticsOverview:
+      allOf:
+        - { $ref: "#/components/schemas/ApiBase" }
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/StatisticsOverview" }
     ApiChartList:
       allOf:
         - { $ref: "#/components/schemas/ApiBase" }

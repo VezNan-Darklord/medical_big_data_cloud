@@ -2,28 +2,29 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ApiAssessmentReport } from '../models/ApiAssessmentReport';
+import type { ApiAssessmentReportPage } from '../models/ApiAssessmentReportPage';
 import type { ApiEmpty } from '../models/ApiEmpty';
-import type { ApiObject } from '../models/ApiObject';
-import type { ApiObjectPage } from '../models/ApiObjectPage';
-import type { ApiString } from '../models/ApiString';
-import type { AssessmentReportInput } from '../models/AssessmentReportInput';
+import type { AssessmentReportCreateRequest } from '../models/AssessmentReportCreateRequest';
+import type { AssessmentReportReviewRequest } from '../models/AssessmentReportReviewRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AssessmentReportService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 报告列表
+     * 评估报告列表
+     * 仅管理员和医生可访问。
      * @param elderlyId
      * @param pageNo
      * @param pageSize
-     * @returns ApiObjectPage 成功
+     * @returns ApiAssessmentReportPage 成功
      * @throws ApiError
      */
     public listAssessmentReports(
         elderlyId?: string,
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiObjectPage> {
+    ): CancelablePromise<ApiAssessmentReportPage> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/assessment-reports',
@@ -32,43 +33,57 @@ export class AssessmentReportService {
                 'pageNo': pageNo,
                 'pageSize': pageSize,
             },
+            errors: {
+                403: `当前角色无权访问`,
+            },
         });
     }
     /**
-     * 生成评估报告
+     * 创建评估报告
+     * 管理员或医生创建。评估人固定取当前登录用户，报告必须包含病症/风险评估和用药或后续动作建议。
      * @param requestBody
-     * @returns ApiObject 成功
+     * @returns ApiAssessmentReport 成功
      * @throws ApiError
      */
     public createAssessmentReport(
-        requestBody: AssessmentReportInput,
-    ): CancelablePromise<ApiObject> {
+        requestBody: AssessmentReportCreateRequest,
+    ): CancelablePromise<ApiAssessmentReport> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/assessment-reports',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
         });
     }
     /**
      * 报告详情
+     * 仅管理员和医生可访问。
      * @param id
-     * @returns ApiObject 成功
+     * @returns ApiAssessmentReport 成功
      * @throws ApiError
      */
     public getAssessmentReport(
         id: string,
-    ): CancelablePromise<ApiObject> {
+    ): CancelablePromise<ApiAssessmentReport> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/assessment-reports/{id}',
             path: {
                 'id': id,
             },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
         });
     }
     /**
-     * 删除报告
+     * 软删除报告
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -83,24 +98,55 @@ export class AssessmentReportService {
                 'id': id,
             },
             errors: {
-                404: `业务错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }
     /**
-     * 导出报告
+     * 复核评估报告
      * @param id
-     * @returns ApiString 成功
+     * @param requestBody
+     * @returns ApiAssessmentReport 成功
+     * @throws ApiError
+     */
+    public reviewAssessmentReport(
+        id: string,
+        requestBody: AssessmentReportReviewRequest,
+    ): CancelablePromise<ApiAssessmentReport> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/assessment-reports/{id}/review',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 导出 Markdown 报告文件
+     * 仅管理员和医生可访问。
+     * @param id
+     * @returns binary UTF-8 Markdown 文件
      * @throws ApiError
      */
     public exportAssessmentReport(
         id: string,
-    ): CancelablePromise<ApiString> {
+    ): CancelablePromise<Blob> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/assessment-reports/{id}/export',
             path: {
                 'id': id,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }

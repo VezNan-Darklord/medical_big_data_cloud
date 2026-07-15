@@ -58,9 +58,84 @@ class BackendWorkflowIntegrationTests {
 
         String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
         String doctorUsername = "doctor_" + suffix;
-        createDoctor(doctorUsername, "DoctorPass123");
+        User doctor = createUser(doctorUsername, "DoctorPass123", "doctor");
         String doctorToken = login(doctorUsername, "DoctorPass123")
                 .at("/data/accessToken").asString();
+        String adminUsername = "admin_" + suffix;
+        createUser(adminUsername, "AdminPass123", "admin");
+        String adminToken = login(adminUsername, "AdminPass123")
+                .at("/data/accessToken").asString();
+
+        mockMvc.perform(post("/auth/register")
+                        .header("User-Agent", "Mozilla/5.0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "browser_doctor_%s",
+                                  "password": "BrowserDoctor123",
+                                  "realName": "Browser Doctor",
+                                  "roleCode": "doctor"
+                                }
+                                """.formatted(suffix)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+
+        MvcResult apifoxDoctorResult = mockMvc.perform(post("/auth/register")
+                        .header("User-Agent", "Apifox/2.7.0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "apifox_doctor_%s",
+                                  "password": "ApifoxDoctor123",
+                                  "realName": "Apifox Doctor",
+                                  "roleCode": "doctor"
+                                }
+                                """.formatted(suffix)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.user.roleCode").value("doctor"))
+                .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())))
+                .andReturn();
+        String apifoxDoctorToken = readBody(apifoxDoctorResult).at("/data/accessToken").asString();
+
+        mockMvc.perform(get("/auth/me")
+                        .header("Authorization", "Bearer " + apifoxDoctorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.roleCode").value("doctor"))
+                .andExpect(jsonPath("$.data.lastLoginAt", not(blankOrNullString())));
+
+        mockMvc.perform(post("/auth/register")
+                        .header("User-Agent", "Apifox/2.7.0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "apifox_admin_%s",
+                                  "password": "ApifoxAdmin123",
+                                  "realName": "Apifox Admin",
+                                  "roleCode": "admin"
+                                }
+                                """.formatted(suffix)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.user.roleCode").value("admin"))
+                .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())));
+
+        String managedDoctorUsername = "managed_doctor_" + suffix;
+        mockMvc.perform(post("/doctor-accounts")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "%s",
+                                  "password": "ManagedDoctor123",
+                                  "realName": "Managed Doctor",
+                                  "status": "enabled"
+                                }
+                                """.formatted(managedDoctorUsername)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.roleCode").value("doctor"));
+        login(managedDoctorUsername, "ManagedDoctor123");
 
         mockMvc.perform(get("/dashboard/charts")
                         .header("Authorization", "Bearer " + doctorToken))
@@ -177,23 +252,57 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(403));
 
+        mockMvc.perform(post("/assessment-reports")
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "elderlyId": "%s",
+                                  "reportType": "健康评估"
+                                }
+                                """.formatted(elderlyId)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
         MvcResult reportResult = mockMvc.perform(post("/assessment-reports")
                         .header("Authorization", "Bearer " + doctorToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "elderlyId": "%s",
-                                  "reportType": "health_assessment"
+                                  "reportType": "健康评估",
+                                  "score": 82,
+                                  "grade": "B",
+                                  "summary": "血压偏高，需要持续监测并按计划随访。",
+                                  "riskItems": ["血压偏高", "心率异常"],
+                                  "recommendations": [
+                                    "硝苯地平 30mg qd 口服，遵医嘱调整",
+                                    "每周复测血压两次并在两周后复诊"
+                                  ],
+                                  "assessedAt": "%s"
                                 }
-                                """.formatted(elderlyId)))
+                                """.formatted(elderlyId, LocalDateTime.now())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data.score").value(88))
+                .andExpect(jsonPath("$.data.score").value(82))
                 .andExpect(jsonPath("$.data.grade").value("B"))
+                .andExpect(jsonPath("$.data.assessorId").value(doctor.getId()))
                 .andExpect(jsonPath("$.data.reviewStatus").value("draft"))
-                .andExpect(jsonPath("$.data.riskItems[0]", containsString("abnormal_heart_rate")))
+                .andExpect(jsonPath("$.data.riskItems[0]").value("血压偏高"))
                 .andReturn();
         String reportId = readBody(reportResult).at("/data/id").asString();
+
+        mockMvc.perform(get("/assessment-reports")
+                        .header("Authorization", "Bearer " + elderlyAccessToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+
+        mockMvc.perform(get("/profile/reports")
+                        .header("Authorization", "Bearer " + elderlyAccessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.list[0].id").value(reportId));
 
         mockMvc.perform(get("/assessment-reports/{id}/export", reportId)
                         .header("Authorization", "Bearer " + doctorToken))
@@ -201,13 +310,37 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(content().contentTypeCompatibleWith("text/markdown"))
                 .andExpect(header().string("Content-Disposition", containsString(".md")))
                 .andExpect(content().string(containsString("# 健康评估报告")))
-                .andExpect(content().string(containsString("abnormal_heart_rate")));
+                .andExpect(content().string(containsString("血压偏高")));
 
         mockMvc.perform(get("/assessment-reports/{id}", "missing-report")
                         .header("Authorization", "Bearer " + doctorToken))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.traceId", not(blankOrNullString())));
+
+        mockMvc.perform(get("/reports/statistics/overview")
+                        .header("Authorization", "Bearer " + doctorToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+
+        mockMvc.perform(get("/reports/statistics/overview")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.totalElderlyCount").value(1))
+                .andExpect(jsonPath("$.data.totalDoctorCount").value(3))
+                .andExpect(jsonPath("$.data.totalDeviceCount").value(0))
+                .andExpect(jsonPath("$.data.unboundDeviceCount").value(0))
+                .andExpect(jsonPath("$.data.totalWarningCount").value(1))
+                .andExpect(jsonPath("$.data.unhandledWarningCount").value(1));
+
+        mockMvc.perform(get("/reports/statistics/trends")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(3))
+                .andExpect(jsonPath("$.data[0].title").value("重点人群变化趋势"))
+                .andExpect(jsonPath("$.data[1].title").value("老人档案变化趋势"))
+                .andExpect(jsonPath("$.data[2].title").value("未关联设备数量统计"));
     }
 
     private JsonNode login(String username, String password) throws Exception {
@@ -225,13 +358,13 @@ class BackendWorkflowIntegrationTests {
         return objectMapper.readTree(result.getResponse().getContentAsByteArray());
     }
 
-    private void createDoctor(String username, String password) {
+    private User createUser(String username, String password, String roleCode) {
         User user = new User();
         user.setUsername(username);
         user.setPasswordHash(passwordEncoder.encode(password));
-        user.setRealName("测试医生");
-        user.setRoleCode("doctor");
+        user.setRealName("测试" + roleCode);
+        user.setRoleCode(roleCode);
         user.setStatus("enabled");
-        userRepository.saveAndFlush(user);
+        return userRepository.saveAndFlush(user);
     }
 }

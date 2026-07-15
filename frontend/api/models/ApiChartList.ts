@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ApiBase } from './ApiBase';
-import type { Chart } from './Chart';
+import type { DashboardChart } from './DashboardChart';
 export type ApiChartList = (ApiBase & {
-    data?: Array<Chart>;
+    data?: Array<DashboardChart>;
 });
 

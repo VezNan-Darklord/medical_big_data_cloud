@@ -2,10 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ApiAssessmentReportList } from '../models/ApiAssessmentReportList';
+import type { ApiDeviceList } from '../models/ApiDeviceList';
 import type { ApiElderly } from '../models/ApiElderly';
 import type { ApiElderlyPage } from '../models/ApiElderlyPage';
 import type { ApiEmpty } from '../models/ApiEmpty';
-import type { ElderlyProfileInput } from '../models/ElderlyProfileInput';
+import type { ApiKeyPopulationList } from '../models/ApiKeyPopulationList';
+import type { ApiWarningList } from '../models/ApiWarningList';
+import type { ElderlyProfileCreateRequest } from '../models/ElderlyProfileCreateRequest';
+import type { ElderlyProfileUpdateRequest } from '../models/ElderlyProfileUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class ElderlyProfileService {
@@ -24,9 +29,9 @@ export class ElderlyProfileService {
      */
     public listElderlyProfiles(
         keyword?: string,
-        gender?: 'male' | 'female',
+        gender?: 'male' | 'female' | 'unknown',
         careLevel?: string,
-        status?: string,
+        status?: 'active' | 'inactive',
         regionCode?: string,
         pageNo: number = 1,
         pageSize: number = 10,
@@ -47,13 +52,12 @@ export class ElderlyProfileService {
     }
     /**
      * 新增老人档案
-     * 仅限 admin 和 doctor 角色调用
      * @param requestBody
      * @returns ApiElderly 成功
      * @throws ApiError
      */
     public createElderlyProfile(
-        requestBody: ElderlyProfileInput,
+        requestBody: ElderlyProfileCreateRequest,
     ): CancelablePromise<ApiElderly> {
         return this.httpRequest.request({
             method: 'POST',
@@ -61,7 +65,9 @@ export class ElderlyProfileService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `业务错误`,
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                409: `数据冲突或仍被引用`,
             },
         });
     }
@@ -81,7 +87,7 @@ export class ElderlyProfileService {
                 'id': id,
             },
             errors: {
-                404: `业务错误`,
+                404: `数据不存在`,
             },
         });
     }
@@ -94,7 +100,7 @@ export class ElderlyProfileService {
      */
     public updateElderlyProfile(
         id: string,
-        requestBody: ElderlyProfileInput,
+        requestBody: ElderlyProfileUpdateRequest,
     ): CancelablePromise<ApiElderly> {
         return this.httpRequest.request({
             method: 'PUT',
@@ -104,10 +110,15 @@ export class ElderlyProfileService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+                409: `数据冲突或仍被引用`,
+            },
         });
     }
     /**
-     * 删除老人档案
+     * 软删除老人档案
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -122,7 +133,89 @@ export class ElderlyProfileService {
                 'id': id,
             },
             errors: {
-                404: `业务错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+                409: `数据冲突或仍被引用`,
+            },
+        });
+    }
+    /**
+     * 查询老人关联预警
+     * @param id
+     * @returns ApiWarningList 成功
+     * @throws ApiError
+     */
+    public getElderlyWarnings(
+        id: string,
+    ): CancelablePromise<ApiWarningList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/elderly-profiles/{id}/warnings',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 查询老人关联报告
+     * @param id
+     * @returns ApiAssessmentReportList 成功
+     * @throws ApiError
+     */
+    public getElderlyReports(
+        id: string,
+    ): CancelablePromise<ApiAssessmentReportList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/elderly-profiles/{id}/reports',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 查询老人关联设备
+     * @param id
+     * @returns ApiDeviceList 成功
+     * @throws ApiError
+     */
+    public getElderlyDevices(
+        id: string,
+    ): CancelablePromise<ApiDeviceList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/elderly-profiles/{id}/devices',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 查询老人重点人群记录
+     * @param id
+     * @returns ApiKeyPopulationList 成功
+     * @throws ApiError
+     */
+    public getElderlyKeyPopulations(
+        id: string,
+    ): CancelablePromise<ApiKeyPopulationList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/elderly-profiles/{id}/key-populations',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `数据不存在`,
             },
         });
     }

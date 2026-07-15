@@ -2,12 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { RoleCode } from './RoleCode';
 export type UserCreateRequest = {
     username: string;
     password: string;
-    realName?: string;
-    roleCode: string;
+    realName: string;
+    roleCode: RoleCode;
     mobile?: string;
-    status?: string;
+    institutionId?: string;
+    regionCode?: string;
+    status?: 'enabled' | 'disabled';
 };
 

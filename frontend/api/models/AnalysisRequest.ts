@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AnalysisRequest = {
-    scene: string;
+    scene: 'care_decision_analysis';
     tenantId?: string;
     regionCode?: string;
     timeRange?: {

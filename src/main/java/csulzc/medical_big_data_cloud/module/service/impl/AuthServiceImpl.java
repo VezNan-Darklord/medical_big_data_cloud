@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -54,16 +55,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public LoginResponse register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request, String userAgent) {
         checkUniqueIdentity(request.getUsername(), request.getMobile(), null);
+        String roleCode = resolveRegistrationRole(request.getRoleCode(), userAgent);
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRealName(request.getRealName());
         user.setMobile(request.getMobile());
-        user.setRoleCode("elderly");
+        user.setRoleCode(roleCode);
         user.setStatus("enabled");
+        user.setLastLoginAt(LocalDateTime.now());
         user = userRepository.save(user);
         return issueTokenPair(user);
     }
@@ -150,6 +153,18 @@ public class AuthServiceImpl implements AuthService {
         userInfo.setMobile(user.getMobile());
         response.setUser(userInfo);
         return response;
+    }
+
+    private String resolveRegistrationRole(String requestedRole, String userAgent) {
+        String roleCode = StringUtils.hasText(requestedRole) ? requestedRole : "elderly";
+        boolean isApifox = StringUtils.hasText(userAgent)
+                && userAgent.toLowerCase(Locale.ROOT).contains("apifox");
+        if (!"elderly".equals(roleCode) && !isApifox) {
+            throw new BusinessException(
+                    ResultCode.FORBIDDEN,
+                    "前端注册仅允许创建老人账号，管理员和医生账号请使用 Apifox 或管理员功能创建");
+        }
+        return roleCode;
     }
 
     private User findCurrentUser() {

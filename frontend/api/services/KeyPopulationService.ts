@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ApiEmpty } from '../models/ApiEmpty';
-import type { ApiObject } from '../models/ApiObject';
-import type { ApiObjectPage } from '../models/ApiObjectPage';
-import type { KeyPopulationInput } from '../models/KeyPopulationInput';
+import type { ApiKeyPopulation } from '../models/ApiKeyPopulation';
+import type { ApiKeyPopulationPage } from '../models/ApiKeyPopulationPage';
+import type { KeyPopulationCreateRequest } from '../models/KeyPopulationCreateRequest';
+import type { KeyPopulationUpdateRequest } from '../models/KeyPopulationUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class KeyPopulationService {
@@ -15,14 +16,14 @@ export class KeyPopulationService {
      * @param status
      * @param pageNo
      * @param pageSize
-     * @returns ApiObjectPage 成功
+     * @returns ApiKeyPopulationPage 成功
      * @throws ApiError
      */
     public listKeyPopulations(
-        status?: string,
+        status?: 'active' | 'closed',
         pageNo: number = 1,
         pageSize: number = 10,
-    ): CancelablePromise<ApiObjectPage> {
+    ): CancelablePromise<ApiKeyPopulationPage> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/key-populations',
@@ -36,30 +37,55 @@ export class KeyPopulationService {
     /**
      * 新增重点人群
      * @param requestBody
-     * @returns ApiObject 成功
+     * @returns ApiKeyPopulation 成功
      * @throws ApiError
      */
     public createKeyPopulation(
-        requestBody: KeyPopulationInput,
-    ): CancelablePromise<ApiObject> {
+        requestBody: KeyPopulationCreateRequest,
+    ): CancelablePromise<ApiKeyPopulation> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/key-populations',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                409: `数据冲突或仍被引用`,
+            },
+        });
+    }
+    /**
+     * 重点人群详情
+     * @param id
+     * @returns ApiKeyPopulation 成功
+     * @throws ApiError
+     */
+    public getKeyPopulation(
+        id: string,
+    ): CancelablePromise<ApiKeyPopulation> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/key-populations/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `数据不存在`,
+            },
         });
     }
     /**
      * 更新重点人群
      * @param id
      * @param requestBody
-     * @returns ApiObject 成功
+     * @returns ApiKeyPopulation 成功
      * @throws ApiError
      */
     public updateKeyPopulation(
         id: string,
-        requestBody: KeyPopulationInput,
-    ): CancelablePromise<ApiObject> {
+        requestBody: KeyPopulationUpdateRequest,
+    ): CancelablePromise<ApiKeyPopulation> {
         return this.httpRequest.request({
             method: 'PUT',
             url: '/key-populations/{id}',
@@ -68,10 +94,14 @@ export class KeyPopulationService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
         });
     }
     /**
-     * 删除重点人群
+     * 软删除重点人群记录
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -86,12 +116,13 @@ export class KeyPopulationService {
                 'id': id,
             },
             errors: {
-                404: `业务错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }
     /**
-     * 关闭重点人群
+     * 关闭重点人群记录
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -104,6 +135,10 @@ export class KeyPopulationService {
             url: '/key-populations/{id}/close',
             path: {
                 'id': id,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }

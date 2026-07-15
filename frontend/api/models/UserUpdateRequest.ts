@@ -2,10 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { RoleCode } from './RoleCode';
 export type UserUpdateRequest = {
     realName?: string;
-    roleCode?: string;
+    roleCode?: RoleCode;
     mobile?: string;
-    status?: string;
+    institutionId?: string;
+    regionCode?: string;
+    status?: 'enabled' | 'disabled';
 };
 

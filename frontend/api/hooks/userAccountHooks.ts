@@ -1,17 +1,17 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import medical from '../instance'
 import type { UserUpdateRequest } from '../models/UserUpdateRequest'
-import type { StatusRequest } from '../models/StatusRequest'
-import type { ApiObjectPage } from '../models/ApiObjectPage'
+import type { ApiUserPage } from '../models/ApiUserPage'
+import type { RoleCode } from '../models/RoleCode'
 
-type LastPage = ApiObjectPage
+type LastPage = ApiUserPage
 
-export function useListUsersQuery(params: { keyword?: string; roleCode?: string; status?: string; pageSize?: number } = {}) {
+export function useListUsersQuery(params: { keyword?: string; roleCode?: RoleCode; status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
   const { pageSize = 10, ...filters } = params
   return useInfiniteQuery({
     queryKey: ['listUsers', filters],
     queryFn: async ({ pageParam = 1 }) => medical.userAccount.listUsers(filters.keyword, filters.roleCode, filters.status, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
     initialPageParam: 1,
   })
 }
@@ -29,5 +29,5 @@ export function useDeleteUserMutation() {
 }
 
 export function useAssignUserRoleMutation() {
-  return useMutation({ mutationFn: async ({ id, roleCode }: { id: string; roleCode: string }) => medical.userAccount.assignUserRole(id, roleCode), mutationKey: ['assignUserRole'] })
+  return useMutation({ mutationFn: async ({ id, roleCode }: { id: string; roleCode: RoleCode }) => medical.userAccount.assignUserRole(id, { roleCode }), mutationKey: ['assignUserRole'] })
 }

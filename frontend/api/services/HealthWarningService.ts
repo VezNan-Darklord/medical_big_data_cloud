@@ -5,14 +5,15 @@
 import type { ApiEmpty } from '../models/ApiEmpty';
 import type { ApiWarning } from '../models/ApiWarning';
 import type { ApiWarningPage } from '../models/ApiWarningPage';
+import type { HealthWarningAssignRequest } from '../models/HealthWarningAssignRequest';
 import type { HealthWarningCreateRequest } from '../models/HealthWarningCreateRequest';
-import type { WarningHandleRequest } from '../models/WarningHandleRequest';
+import type { HealthWarningHandleRequest } from '../models/HealthWarningHandleRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class HealthWarningService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 预警列表
+     * 健康预警列表
      * @param elderlyId
      * @param warningType
      * @param severity
@@ -29,7 +30,7 @@ export class HealthWarningService {
         elderlyId?: string,
         warningType?: string,
         severity?: 'low' | 'medium' | 'high' | 'critical',
-        status?: string,
+        status?: 'unprocessed' | 'processing' | 'processed' | 'closed',
         source?: string,
         startTime?: string,
         endTime?: string,
@@ -50,6 +51,9 @@ export class HealthWarningService {
                 'pageNo': pageNo,
                 'pageSize': pageSize,
             },
+            errors: {
+                400: `参数或业务输入错误`,
+            },
         });
     }
     /**
@@ -67,7 +71,8 @@ export class HealthWarningService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `业务错误`,
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
             },
         });
     }
@@ -86,10 +91,13 @@ export class HealthWarningService {
             path: {
                 'id': id,
             },
+            errors: {
+                404: `数据不存在`,
+            },
         });
     }
     /**
-     * 删除预警
+     * 软删除预警
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -104,21 +112,22 @@ export class HealthWarningService {
                 'id': id,
             },
             errors: {
-                404: `业务错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
             },
         });
     }
     /**
-     * 处理预警
+     * 处理或关闭预警
      * @param id
      * @param requestBody
-     * @returns ApiEmpty 成功
+     * @returns ApiWarning 成功
      * @throws ApiError
      */
     public handleHealthWarning(
         id: string,
-        requestBody: WarningHandleRequest,
-    ): CancelablePromise<ApiEmpty> {
+        requestBody: HealthWarningHandleRequest,
+    ): CancelablePromise<ApiWarning> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/health-warnings/{id}/handle',
@@ -127,19 +136,25 @@ export class HealthWarningService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+                409: `数据冲突或仍被引用`,
+            },
         });
     }
     /**
-     * 转派预警
+     * 转派预警给医生
      * @param id
      * @param requestBody
-     * @returns ApiEmpty 成功
+     * @returns ApiWarning 成功
      * @throws ApiError
      */
     public assignHealthWarning(
         id: string,
-        requestBody: string,
-    ): CancelablePromise<ApiEmpty> {
+        requestBody: HealthWarningAssignRequest,
+    ): CancelablePromise<ApiWarning> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/health-warnings/{id}/assign',
@@ -148,6 +163,11 @@ export class HealthWarningService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
         });
     }
 }

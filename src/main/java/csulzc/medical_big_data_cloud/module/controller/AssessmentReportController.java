@@ -40,7 +40,7 @@ public class AssessmentReportController {
     private final AssessmentReportService assessmentReportService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator', 'analyst')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ApiResponse<PageResult<AssessmentReportResponse>> list(
             @RequestParam(required = false) String elderlyId,
             @RequestParam(defaultValue = "1") @Min(1) int pageNo,
@@ -49,7 +49,7 @@ public class AssessmentReportController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator', 'analyst')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ApiResponse<AssessmentReportResponse> getById(@PathVariable String id) {
         return ApiResponse.success(assessmentReportService.getById(id));
     }
@@ -70,7 +70,7 @@ public class AssessmentReportController {
     }
 
     @GetMapping("/{id}/export")
-    @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator', 'analyst')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ResponseEntity<byte[]> export(@PathVariable String id) {
         FilePayload file = assessmentReportService.export(id);
         return ResponseEntity.ok()
@@ -83,7 +83,7 @@ public class AssessmentReportController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ApiResponse<Void> delete(@PathVariable String id) {
         assessmentReportService.delete(id);
         return ApiResponse.success();

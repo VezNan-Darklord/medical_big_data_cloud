@@ -9,7 +9,7 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class DashboardService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * 首页总览
+     * 首页真实指标总览
      * @returns ApiDashboardOverview 成功
      * @throws ApiError
      */
@@ -20,7 +20,7 @@ export class DashboardService {
         });
     }
     /**
-     * 首页图表
+     * 首页聚合图表
      * @returns ApiChartList 成功
      * @throws ApiError
      */

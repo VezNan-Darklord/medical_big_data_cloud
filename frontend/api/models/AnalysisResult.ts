@@ -13,8 +13,17 @@ export type AnalysisResult = {
         confidence?: number;
         suggestion?: string;
     }>;
-    actions?: Array<Record<string, any>>;
-    charts?: Array<Record<string, any>>;
+    actions?: Array<{
+        actionType?: string;
+        target?: string;
+        priority?: string;
+        expectedEffect?: string;
+    }>;
+    charts?: Array<{
+        chartType?: string;
+        title?: string;
+        optionKey?: string;
+    }>;
     createdAt?: string;
 };
 

@@ -8,7 +8,7 @@ import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { HealthWarningCreateRequest } from '../../../api/models/HealthWarningCreateRequest'
 import dayjs from 'dayjs'
 import type { HealthWarning } from '../../../api/models/HealthWarning'
-import type { WarningHandleRequest } from '../../../api/models/WarningHandleRequest'
+import type { HealthWarningHandleRequest } from '../../../api/models/HealthWarningHandleRequest'
 
 const severityColors: Record<string, string> = { low: 'blue', medium: 'orange', high: 'red', critical: '#7c0221' }
 const severityBg: Record<string, string> = { low: 'bg-blue-50 border-blue-200', medium: 'bg-orange-50 border-orange-200', high: 'bg-red-50 border-red-200', critical: 'bg-rose-100 border-rose-300' }
@@ -67,7 +67,7 @@ function HandleModal({ open, warningId, onClose }: { open: boolean; warningId: s
 
   return (
     <PopWindow open={open} onClose={onClose} title="处理预警" width={440}>
-      <Form form={form} layout="vertical" onFinish={(v: WarningHandleRequest & { id: string }) => {
+      <Form form={form} layout="vertical" onFinish={(v: HealthWarningHandleRequest) => {
         handleMutation.mutate({ id: warningId, status: v.status, result: v.result, nextAction: v.nextAction, remark: v.remark } , {
           onSuccess: () => { message.success('处理完成'); form.resetFields(); onClose() },
           onError: (err: Error) => message.error(err?.message ?? '处理失败'),
