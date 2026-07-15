@@ -17,6 +17,9 @@ public class AssessmentReportResponse {
     private List<String> recommendations;
     private String assessorId;
     private LocalDateTime assessedAt;
+    private String reviewStatus;
+    private String reviewerId;
+    private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

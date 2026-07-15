@@ -1,9 +1,8 @@
 package csulzc.medical_big_data_cloud.common.result;
 
 import csulzc.medical_big_data_cloud.common.constant.ResultCode;
+import csulzc.medical_big_data_cloud.common.web.TraceIdFilter;
 import lombok.Data;
-
-import java.util.UUID;
 
 @Data
 public class ApiResponse<T> {
@@ -13,7 +12,7 @@ public class ApiResponse<T> {
     private String traceId;
 
     public ApiResponse() {
-        this.traceId = UUID.randomUUID().toString().replace("-", "");
+        this.traceId = TraceIdFilter.currentTraceId();
     }
 
     public static <T> ApiResponse<T> success(T data) {
@@ -33,9 +32,5 @@ public class ApiResponse<T> {
         response.setCode(code);
         response.setMessage(message);
         return response;
-    }
-
-    public static <T> ApiResponse<T> error(String message) {
-        return error(ResultCode.INTERNAL_ERROR.getCode(), message);
     }
 }

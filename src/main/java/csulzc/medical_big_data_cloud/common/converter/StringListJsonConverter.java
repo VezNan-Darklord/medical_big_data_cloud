@@ -1,10 +1,10 @@
 package csulzc.medical_big_data_cloud.common.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class StringListJsonConverter implements AttributeConverter<List<String>,
         }
         try {
             return mapper.writeValueAsString(attribute);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Error converting list to JSON string", e);
         }
     }
@@ -33,7 +33,7 @@ public class StringListJsonConverter implements AttributeConverter<List<String>,
         }
         try {
             return mapper.readValue(dbData, new TypeReference<List<String>>() {});
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Error converting JSON string to list", e);
         }
     }

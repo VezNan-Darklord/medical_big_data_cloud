@@ -20,10 +20,12 @@ public interface UserMapper {
     // CreateRequest -> Entity（password 不映射，由 Service 层加密后设置）
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
-    @Mapping(target = "plainPassword", ignore = true)
     @Mapping(target = "lastLoginAt", ignore = true)
+    @Mapping(target = "tokenVersion", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     User toEntity(UserCreateRequest request);
 
     // UpdateRequest -> Entity（空值不覆盖，实现部分更新）
@@ -31,10 +33,12 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
-    @Mapping(target = "plainPassword", ignore = true)
     @Mapping(target = "lastLoginAt", ignore = true)
+    @Mapping(target = "tokenVersion", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     void updateEntity(UserUpdateRequest request, @MappingTarget User user);
 
     // ProfileUpdateRequest -> Entity（仅更新展示信息与隐私信息，密码由Service层处理）
@@ -42,11 +46,15 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
-    @Mapping(target = "plainPassword", ignore = true)
     @Mapping(target = "roleCode", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "institutionId", ignore = true)
+    @Mapping(target = "regionCode", ignore = true)
     @Mapping(target = "lastLoginAt", ignore = true)
+    @Mapping(target = "tokenVersion", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     void updateProfile(ProfileUpdateRequest request, @MappingTarget User user);
 }

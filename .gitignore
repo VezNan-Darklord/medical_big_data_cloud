@@ -1,5 +1,6 @@
 HELP.md
 target/
+data/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -12,10 +13,6 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
-### application ###
-**/src/main/resources/application.yml
-**/src/main/resources/application-dev.yml
 
 ### IntelliJ IDEA ###
 .idea
@@ -60,4 +57,3 @@ build/
 hs_err_pid*
 replay_pid*
 /train (1).md
-/src/main/resources/

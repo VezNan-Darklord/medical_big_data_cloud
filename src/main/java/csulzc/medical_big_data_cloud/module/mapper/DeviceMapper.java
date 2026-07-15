@@ -19,5 +19,11 @@ public interface DeviceMapper {
     @Mapping(target = "deviceSn", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "elderlyId", ignore = true)
+    @Mapping(target = "bindingStatus", ignore = true)
+    @Mapping(target = "onlineStatus", ignore = true)
+    @Mapping(target = "lastReportAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     void updateEntity(DeviceUpdateRequest request, @MappingTarget Device entity);
 }

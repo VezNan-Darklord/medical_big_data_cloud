@@ -11,6 +11,8 @@ public class UserResponse {
     private String realName;
     private String roleCode;
     private String mobile;
+    private String institutionId;
+    private String regionCode;
     private String status;
     private LocalDateTime lastLoginAt;
     private LocalDateTime createdAt;

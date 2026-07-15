@@ -17,14 +17,18 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("用户不存在"));
+        return fromUser(user);
+    }
 
+    public CustomUserDetails fromUser(User user) {
         return new CustomUserDetails(
                 user.getId(),
                 user.getUsername(),
                 user.getPasswordHash(),
                 user.getRealName(),
                 user.getRoleCode(),
+                user.getTokenVersion(),
                 "enabled".equals(user.getStatus())
         );
     }

@@ -1,6 +1,7 @@
 package csulzc.medical_big_data_cloud.module.repository;
 
 import csulzc.medical_big_data_cloud.module.entity.Device;
+import csulzc.medical_big_data_cloud.module.repository.projection.LabelCount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,7 @@ public interface DeviceRepository
 
     Optional<Device> findByDeviceSn(String deviceSn);
 
-    List<Device> findByElderlyId(String elderlyId);
+    List<Device> findByElderlyIdOrderByCreatedAtDesc(String elderlyId);
 
     Page<Device> findByBindingStatus(String bindingStatus, Pageable pageable);
 
@@ -28,7 +29,6 @@ public interface DeviceRepository
 
     long countByBindingStatus(String bindingStatus);
 
-    @Modifying
-    @Query("UPDATE Device d SET d.elderlyId = ?2, d.bindingStatus = ?3 WHERE d.id = ?1")
-    void updateBinding(String id, String elderlyId, String bindingStatus);
+    @Query("SELECT d.onlineStatus AS label, COUNT(d) AS count FROM Device d GROUP BY d.onlineStatus")
+    List<LabelCount> countGroupedByOnlineStatus();
 }

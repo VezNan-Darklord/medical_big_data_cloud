@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface ElderlyProfileRepository extends JpaRepository<ElderlyProfile, String>, JpaSpecificationExecutor<ElderlyProfile> {
 
-    Optional<ElderlyProfile> findByName(String name);
+    Optional<ElderlyProfile> findByUserId(String userId);
 
     List<ElderlyProfile> findByStatus(String status);
 
@@ -30,4 +30,6 @@ public interface ElderlyProfileRepository extends JpaRepository<ElderlyProfile, 
     Page<ElderlyProfile> findByStatusOrderByCreatedAtDesc(String status, Pageable pageable);
 
     long countByStatus(String status);
+
+    long countByRegionCode(String regionCode);
 }

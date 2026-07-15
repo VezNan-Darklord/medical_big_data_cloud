@@ -2,25 +2,28 @@ server:
   port: 8080
   servlet:
     context-path: /api/v1
+  error:
+    include-message: never
 
 spring:
   application:
     name: medical-big-data-cloud
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
-    show-sql: true
+    open-in-view: false
+  flyway:
+    enabled: true
 
 jwt:
-  secret: medical-big-data-cloud-jwt-secret-key-change-in-production
-  expiration: 86400000  # 24小时，单位毫秒
-
+  secret: ${JWT_SECRET:medical-big-data-cloud-development-secret-key-change-before-production}
+  access-expiration: ${JWT_ACCESS_EXPIRATION:900000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
 springdoc:
   api-docs:
@@ -34,7 +37,13 @@ springdoc:
     try-it-out-enabled: true
     default-models-expand-depth: -1
 
+app:
+  bootstrap-admin:
+    enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
+    username: ${BOOTSTRAP_ADMIN_USERNAME:admin}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+    real-name: ${BOOTSTRAP_ADMIN_REAL_NAME:系统管理员}
+
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: INFO

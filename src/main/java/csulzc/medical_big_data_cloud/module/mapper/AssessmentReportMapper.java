@@ -14,5 +14,10 @@ public interface AssessmentReportMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "reviewStatus", ignore = true)
+    @Mapping(target = "reviewerId", ignore = true)
+    @Mapping(target = "reviewedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     AssessmentReport toEntity(AssessmentReportCreateRequest request);
 }

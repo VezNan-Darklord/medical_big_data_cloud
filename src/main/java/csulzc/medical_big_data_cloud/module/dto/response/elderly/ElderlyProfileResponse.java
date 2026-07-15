@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class ElderlyProfileResponse {
     private String id;
+    private String userId;
     private String name;
     private String gender;
     private LocalDate birthday;
@@ -16,6 +17,7 @@ public class ElderlyProfileResponse {
     private String phone;
     private String address;
     private String institutionId;
+    private String regionCode;
     private String medicalHistory;
     private String careLevel;
     private List<String> tags;

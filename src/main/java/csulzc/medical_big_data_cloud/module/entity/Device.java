@@ -1,18 +1,28 @@
-// Device.java
-// 路径: src/main/java/csulzc/medical_big_data_cloud/module/device/entity/Device.java
 package csulzc.medical_big_data_cloud.module.entity;
 
 import csulzc.medical_big_data_cloud.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "device")
+@Table(name = "device", indexes = {
+        @Index(name = "idx_device_sn", columnList = "device_sn", unique = true),
+        @Index(name = "idx_device_elderly", columnList = "elderly_id"),
+        @Index(name = "idx_device_binding", columnList = "binding_status"),
+        @Index(name = "idx_device_online", columnList = "online_status")
+})
+@SQLDelete(sql = "UPDATE device SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 public class Device extends BaseEntity {
 
     @Column(nullable = false, length = 100)
@@ -21,17 +31,17 @@ public class Device extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String deviceType;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String deviceSn;
 
     @Column(length = 64)
     private String elderlyId;
 
-    @Column(length = 20)
-    private String bindingStatus;
+    @Column(nullable = false, length = 20)
+    private String bindingStatus = "unbound";
 
-    @Column(length = 20)
-    private String onlineStatus;
+    @Column(nullable = false, length = 20)
+    private String onlineStatus = "offline";
 
     private LocalDateTime lastReportAt;
 

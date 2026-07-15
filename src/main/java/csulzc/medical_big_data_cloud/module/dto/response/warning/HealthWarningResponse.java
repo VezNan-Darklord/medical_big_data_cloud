@@ -18,6 +18,9 @@ public class HealthWarningResponse {
     private LocalDateTime occurredAt;
     private LocalDateTime handledAt;
     private String handlerId;
+    private String handlerName;
+    private String handleResult;
+    private String nextAction;
     private String remark;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

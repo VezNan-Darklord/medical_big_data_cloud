@@ -14,17 +14,17 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
-    private static final String SECURITY_SCHEME_NAME = "BearerAuth";
+    private static final String SECURITY_SCHEME_NAME = "bearerAuth";
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("医养结合云端后台管理系统 API")
-                        .version("1.0.0")
+                        .version("2.0.0")
                         .description("前后端分离的医养结合管理平台 RESTful API 文档"))
                 .servers(List.of(
-                        new Server().url("http://localhost:8080/api/v1").description("本地开发服务器")
+                        new Server().url("/api/v1").description("当前服务器")
                 ))
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
                 .components(new Components()

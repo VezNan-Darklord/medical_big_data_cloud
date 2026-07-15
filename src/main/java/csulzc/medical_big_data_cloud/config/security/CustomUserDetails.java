@@ -6,7 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Data
 public class CustomUserDetails implements UserDetails {
@@ -16,11 +16,12 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final String realName;
     private final String roleCode;
+    private final int tokenVersion;
     private final boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + roleCode));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roleCode));
     }
 
     @Override
@@ -36,10 +37,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 }

@@ -2,117 +2,70 @@ package csulzc.medical_big_data_cloud.module.service.impl;
 
 import csulzc.medical_big_data_cloud.common.constant.ResultCode;
 import csulzc.medical_big_data_cloud.common.exception.BusinessException;
+import csulzc.medical_big_data_cloud.common.util.SecurityUtil;
 import csulzc.medical_big_data_cloud.config.security.CustomUserDetails;
+import csulzc.medical_big_data_cloud.config.security.CustomUserDetailsService;
 import csulzc.medical_big_data_cloud.config.security.JwtUtil;
 import csulzc.medical_big_data_cloud.module.dto.request.auth.LoginRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.auth.RegisterRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.auth.LoginResponse;
 import csulzc.medical_big_data_cloud.module.dto.response.user.UserResponse;
+import csulzc.medical_big_data_cloud.module.entity.RefreshToken;
 import csulzc.medical_big_data_cloud.module.entity.User;
 import csulzc.medical_big_data_cloud.module.mapper.UserMapper;
+import csulzc.medical_big_data_cloud.module.repository.RefreshTokenRepository;
 import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
-
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final CustomUserDetailsService userDetailsService;
+
+    @Value("${jwt.refresh-expiration:604800000}")
+    private long refreshExpiration;
 
     @Override
     @Transactional
-    public LoginResponse register(RegisterRequest request, HttpServletRequest httpRequest) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "用户名已存在");
-        }
-        if (userRepository.existsByMobile(request.getMobile())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "手机号已注册");
-        }
-
-        String roleCode = request.getRoleCode();
-
-        // 判断请求来源（APIFox 的 User-Agent 通常包含 "Apifox"）
-        String userAgent = httpRequest != null ? httpRequest.getHeader("User-Agent") : null;
-        boolean isApifox = userAgent != null && userAgent.toLowerCase().contains("apifox");
-
-        // 获取当前认证信息
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        boolean isAnonymous = authentication == null || !authentication.isAuthenticated()
-                || "anonymousUser".equals(authentication.getPrincipal());
-        boolean isAdmin = !isAnonymous && authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_admin"));
-
-        // 1. admin 角色只能通过 APIFox 注册
-        if ("admin".equals(roleCode)) {
-            if (!isApifox) {
-                throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "管理员账号只能通过APIFox注册");
-            }
-        } else if (!isApifox) {
-            // 2. 浏览器端注册限制
-            if (isAnonymous) {
-                // 未登录用户只能注册 elderly
-                if (!"elderly".equals(roleCode)) {
-                    throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
-                }
-            } else if (isAdmin) {
-                // 管理员在浏览器内只能注册 doctor
-                if (!"doctor".equals(roleCode)) {
-                    throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "管理员在浏览器内只能注册医生账号");
-                }
-            } else {
-                // 其他已登录用户在浏览器内不能注册任何角色
-                throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权限注册该角色");
-            }
-        }
+    public LoginResponse register(RegisterRequest request) {
+        checkUniqueIdentity(request.getUsername(), request.getMobile(), null);
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRealName(request.getRealName());
         user.setMobile(request.getMobile());
-        user.setRoleCode(roleCode);
+        user.setRoleCode("elderly");
         user.setStatus("enabled");
-        userRepository.save(user);
-
-        // 注册成功后自动生成JWT Token
-        CustomUserDetails userDetails = new CustomUserDetails(
-                user.getId(),
-                user.getUsername(),
-                user.getPasswordHash(),
-                user.getRealName(),
-                user.getRoleCode(),
-                "enabled".equals(user.getStatus())
-        );
-
-        String token = jwtUtil.generateToken(userDetails);
-
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        response.setExpireAt(LocalDateTime.now().plusHours(24).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
-        userInfo.setId(user.getId());
-        userInfo.setRealName(user.getRealName());
-        userInfo.setRoleCode(user.getRoleCode());
-        response.setUser(userInfo);
-
-        return response;
+        user = userRepository.save(user);
+        return issueTokenPair(user);
     }
 
     @Override
@@ -121,87 +74,122 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
-
+                .orElseThrow(() -> new BusinessException(ResultCode.UNAUTHORIZED, "用户名或密码错误"));
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
-
-        CustomUserDetails userDetails = new CustomUserDetails(
-                user.getId(),
-                user.getUsername(),
-                user.getPasswordHash(),
-                user.getRealName(),
-                user.getRoleCode(),
-                "enabled".equals(user.getStatus())
-        );
-
-        String token = jwtUtil.generateToken(userDetails);
-
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        response.setExpireAt(LocalDateTime.now().plusHours(24).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
-        userInfo.setId(user.getId());
-        userInfo.setRealName(user.getRealName());
-        userInfo.setRoleCode(user.getRoleCode());
-        response.setUser(userInfo);
-
-        return response;
+        return issueTokenPair(user);
     }
 
     @Override
-    public UserResponse getCurrentUser() {
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new BusinessException(ResultCode.UNAUTHORIZED);
-        }
-        User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
-
-        return userMapper.toResponse(user);
-    }
-
-    @Override
-    public void logout() {
-        org.springframework.security.core.context.SecurityContextHolder.clearContext();
-    }
-
     @Transactional(readOnly = true)
+    public UserResponse getCurrentUser() {
+        return userMapper.toResponse(findCurrentUser());
+    }
+
     @Override
-    public LoginResponse refreshToken(String oldToken) {
-        if (!jwtUtil.validateToken(oldToken)) {
-            throw new BusinessException(ResultCode.UNAUTHORIZED.getCode(), "Token无效，无法刷新");
+    @Transactional
+    public void logout(String refreshToken) {
+        User user = findCurrentUser();
+        user.setTokenVersion(user.getTokenVersion() + 1);
+        userRepository.save(user);
+
+        if (StringUtils.hasText(refreshToken)) {
+            refreshTokenRepository.findByTokenHash(hash(refreshToken))
+                    .filter(token -> token.getUserId().equals(user.getId()))
+                    .ifPresent(this::revoke);
+        } else {
+            refreshTokenRepository.findByUserIdAndRevokedAtIsNull(user.getId()).forEach(this::revoke);
+        }
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse refreshToken(String rawRefreshToken) {
+        RefreshToken storedToken = refreshTokenRepository.findByTokenHash(hash(rawRefreshToken))
+                .orElseThrow(() -> new BusinessException(ResultCode.UNAUTHORIZED, "刷新令牌无效"));
+        if (storedToken.getRevokedAt() != null || storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "刷新令牌已失效");
         }
 
-        String username = jwtUtil.getUsernameFromToken(oldToken);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
+        User user = userRepository.findById(storedToken.getUserId())
+                .filter(candidate -> "enabled".equals(candidate.getStatus()))
+                .orElseThrow(() -> new BusinessException(ResultCode.UNAUTHORIZED, "账号不可用"));
+        revoke(storedToken);
+        return issueTokenPair(user);
+    }
 
-        CustomUserDetails userDetails = new CustomUserDetails(
-                user.getId(),
-                user.getUsername(),
-                user.getPasswordHash(),
-                user.getRealName(),
-                user.getRoleCode(),
-                "enabled".equals(user.getStatus())
-        );
+    private LoginResponse issueTokenPair(User user) {
+        CustomUserDetails userDetails = userDetailsService.fromUser(user);
+        String accessToken = jwtUtil.generateAccessToken(userDetails);
+        String rawRefreshToken = newRefreshToken();
+        LocalDateTime refreshExpiresAt = LocalDateTime.now().plus(Duration.ofMillis(refreshExpiration));
 
-        String token = jwtUtil.generateToken(userDetails);
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUserId(user.getId());
+        refreshToken.setTokenHash(hash(rawRefreshToken));
+        refreshToken.setExpiresAt(refreshExpiresAt);
+        refreshTokenRepository.save(refreshToken);
+
+        LocalDateTime accessExpiresAt = LocalDateTime.ofInstant(
+                jwtUtil.getAccessExpiresAt(accessToken), ZoneId.systemDefault());
 
         LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        response.setExpireAt(LocalDateTime.now().plusHours(24).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        response.setToken(accessToken);
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(rawRefreshToken);
+        response.setTokenType("Bearer");
+        response.setExpireAt(accessExpiresAt.format(DATE_TIME_FORMATTER));
+        response.setAccessExpireAt(accessExpiresAt.format(DATE_TIME_FORMATTER));
+        response.setRefreshExpireAt(refreshExpiresAt.format(DATE_TIME_FORMATTER));
 
         LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
         userInfo.setId(user.getId());
         userInfo.setRealName(user.getRealName());
         userInfo.setRoleCode(user.getRoleCode());
+        userInfo.setMobile(user.getMobile());
         response.setUser(userInfo);
-
         return response;
     }
 
+    private User findCurrentUser() {
+        return userRepository.findById(SecurityUtil.getCurrentUserId())
+                .orElseThrow(() -> new BusinessException(ResultCode.UNAUTHORIZED));
+    }
+
+    private void checkUniqueIdentity(String username, String mobile, String excludedUserId) {
+        userRepository.findByUsername(username)
+                .filter(user -> !user.getId().equals(excludedUserId))
+                .ifPresent(user -> {
+                    throw new BusinessException(ResultCode.CONFLICT, "用户名已存在");
+                });
+        if (StringUtils.hasText(mobile)) {
+            userRepository.findByMobile(mobile)
+                    .filter(user -> !user.getId().equals(excludedUserId))
+                    .ifPresent(user -> {
+                        throw new BusinessException(ResultCode.CONFLICT, "手机号已被使用");
+                    });
+        }
+    }
+
+    private void revoke(RefreshToken token) {
+        token.setRevokedAt(LocalDateTime.now());
+        refreshTokenRepository.save(token);
+    }
+
+    private String newRefreshToken() {
+        byte[] bytes = new byte[48];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String hash(String value) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(value.getBytes(StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is not available", exception);
+        }
+    }
 }

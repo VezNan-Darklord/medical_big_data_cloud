@@ -1,9 +1,7 @@
 package csulzc.medical_big_data_cloud.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import csulzc.medical_big_data_cloud.common.constant.ResultCode;
 import csulzc.medical_big_data_cloud.common.result.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,15 +15,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.io.IOException;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +30,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,40 +39,35 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/auth/login",
+                                "/auth/register",
+                                "/auth/refresh",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/api-docs/**",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs",
-                                "/swagger-resources/**",
-                                "/webjars/**",
                                 "/error",
                                 "/"
                         ).permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .authenticationEntryPoint((request, response, authException) ->
+                                writeError(response, ResultCode.UNAUTHORIZED))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                writeError(response, ResultCode.FORBIDDEN))
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (request, response, authException) -> {
-            String message = "未登录或Token无效";
-            writeUnauthorizedResponse(response, message);
-        };
-    }
-
-    private void writeUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    private void writeError(HttpServletResponse response, ResultCode resultCode) throws java.io.IOException {
+        response.setStatus(resultCode.getHttpStatus().value());
         response.setContentType("application/json;charset=UTF-8");
-        ApiResponse<Void> apiResponse = ApiResponse.error(ResultCode.UNAUTHORIZED.getCode(), message);
-        response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
+        objectMapper.writeValue(response.getWriter(), ApiResponse.error(resultCode.getCode(), resultCode.getMessage()));
     }
 
     @Bean
@@ -93,6 +84,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
+        return new BCryptPasswordEncoder(12);
     }
 }
