@@ -5,7 +5,6 @@
 import type { ApiElderly } from '../models/ApiElderly';
 import type { ApiElderlyPage } from '../models/ApiElderlyPage';
 import type { ApiEmpty } from '../models/ApiEmpty';
-import type { ApiObjectList } from '../models/ApiObjectList';
 import type { ElderlyProfileInput } from '../models/ElderlyProfileInput';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -124,74 +123,6 @@ export class ElderlyProfileService {
             },
             errors: {
                 404: `业务错误`,
-            },
-        });
-    }
-    /**
-     * 老人关联预警
-     * @param id
-     * @returns ApiObjectList 成功
-     * @throws ApiError
-     */
-    public getElderlyWarnings(
-        id: string,
-    ): CancelablePromise<ApiObjectList> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/elderly-profiles/{id}/warnings',
-            path: {
-                'id': id,
-            },
-        });
-    }
-    /**
-     * 老人关联报告
-     * @param id
-     * @returns ApiObjectList 成功
-     * @throws ApiError
-     */
-    public getElderlyReports(
-        id: string,
-    ): CancelablePromise<ApiObjectList> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/elderly-profiles/{id}/reports',
-            path: {
-                'id': id,
-            },
-        });
-    }
-    /**
-     * 老人关联设备
-     * @param id
-     * @returns ApiObjectList 成功
-     * @throws ApiError
-     */
-    public getElderlyDevices(
-        id: string,
-    ): CancelablePromise<ApiObjectList> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/elderly-profiles/{id}/devices',
-            path: {
-                'id': id,
-            },
-        });
-    }
-    /**
-     * 老人关联重点人群
-     * @param id
-     * @returns ApiObjectList 成功
-     * @throws ApiError
-     */
-    public getElderlyKeyPopulations(
-        id: string,
-    ): CancelablePromise<ApiObjectList> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/elderly-profiles/{id}/key-populations',
-            path: {
-                'id': id,
             },
         });
     }

@@ -467,17 +467,56 @@
 
 ### 9.5 评估报告
 
+访问角色：医生、管理员。老人不可访问（老人可通过个人中心查看自己的报告）。
+
+报告由医生创建，围绕具体病症/健康状况展开，每份报告至少包含一项病症评估，并给出用药建议和后续动作。不使用图表展示。
+
+所有评估报告接口均由后端提供统一响应。
+
 #### 报告列表
 
 - `GET /api/v1/assessment-reports`
+- 查询参数：`elderlyId`（可选）, `pageNo`, `pageSize`
+- 返回 `PageResult<AssessmentReport>` 分页数据
 
 #### 报告详情
 
 - `GET /api/v1/assessment-reports/{id}`
+- 返回 `ApiResponse<AssessmentReport>`
 
 #### 生成评估报告
 
 - `POST /api/v1/assessment-reports`
+- 请求体（`AssessmentReportInput`）：
+
+```json
+{
+	"elderlyId": "10001",
+	"reportType": "健康评估",
+	"score": 82,
+	"grade": "B",
+	"summary": "血压偏高，头晕频繁，请注意控制饮食和运动。",
+	"riskItems": ["血压偏高", "睡眠不足", "心律不齐"],
+	"recommendations": [
+		"硝苯地平 30mg qd 口服",
+		"阿司匹林 100mg qd 口服",
+		"建议每周复测血压 2 次",
+		"建议增加有氧运动每周 3 次",
+		"低盐低脂饮食"
+	],
+	"assessedAt": "2026-07-06 11:00:00"
+}
+```
+
+- 报告类型（`reportType`）建议枚举：`健康评估` / `康复评估` / `用药评估` / `睡眠评估`
+- 等级（`grade`）建议枚举：`A` / `B` / `C` / `D`
+- `summary`：综合评估结论
+- `riskItems`：识别到的风险项，支持 tag 展示
+- `recommendations`：按列表展示，每项包含具体用药名称、剂量、频次和后续动作建议
+
+#### 删除报告
+
+- `DELETE /api/v1/assessment-reports/{id}`
 
 #### 导出评估报告
 
@@ -503,17 +542,74 @@
 
 ### 9.7 报表统计
 
+访问角色：仅管理员。老人和医生不可访问。
+
+报表统计为全局数据看板，分为两部分：顶部非图表统计卡片 + 下方图表区域。图表使用 ECharts 渲染，后端返回 `domain` 对象，前端负责转换为 ECharts 配置。
+
 #### 统计总览
 
 - `GET /api/v1/reports/statistics/overview`
+- 返回 `ApiResponse<StatisticsOverview>`
+
+`StatisticsOverview` 数据结构（非图表字段）：
+
+```json
+{
+	"totalElderlyCount": 1280,
+	"totalDoctorCount": 96,
+	"totalDeviceCount": 642,
+	"unboundDeviceCount": 49,
+	"deviceOnlineRate": 0.93,
+	"totalWarningCount": 31,
+	"unhandledWarningCount": 4
+}
+```
+
+前端仅以统计卡片展示以下指标（不需要图表）：
+
+| 指标 | 说明 |
+| --- | --- |
+| `totalElderlyCount` | 在档老人总数 |
+| `totalDoctorCount` | 医生总数 |
+| `totalDeviceCount` | 设备总数 |
+| `unboundDeviceCount` | 未关联设备数量 |
+| `deviceOnlineRate` | 设备在线率（百分比） |
 
 #### 趋势图数据
 
 - `GET /api/v1/reports/statistics/trends`
+- 返回 `ApiResponse<Array<ChartDomain>>`，包含多个图表
+
+`ChartDomain` 数据结构：
+
+```json
+{
+	"chartType": "line",
+	"title": "重点人群变化趋势",
+	"xAxis": ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06"],
+	"series": [
+		{ "name": "慢病高风险", "data": [35, 37, 39, 38, 40, 42] },
+		{ "name": "跌倒高风险", "data": [15, 16, 18, 19, 18, 21] },
+		{ "name": "认知关注", "data": [10, 10, 11, 12, 11, 13] }
+	]
+}
+```
+
+前端根据 `chartType` 字段动态选择 ECharts 图表类型：
+- `line` → 折线图（趋势类）
+- `bar` → 柱状图（对比类）
+- `pie` → 饼图（分布类）
+
+推荐的三个固定图表：
+1. **重点人群变化趋势**（`line`）：各分类人群数量逐月变化
+2. **老人档案变化趋势**（`line`）：新增/注销老人档案数量逐月变化
+3. **未关联设备数量统计**（`pie`）：已关联 vs 未关联设备占比
 
 #### 分布数据
 
 - `GET /api/v1/reports/statistics/distributions`
+- 返回 `ApiResponse<Array<ChartDomain>>`
+- 数据结构与趋势图接口一致，可按区域/机构/风险等级等维度展示分布
 
 #### 导出统计报表
 

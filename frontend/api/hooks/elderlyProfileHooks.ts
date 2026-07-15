@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
 import type { ElderlyProfileInput } from '../models/ElderlyProfileInput'
 import type { ApiElderlyPage } from '../models/ApiElderlyPage'
@@ -26,7 +26,14 @@ export function useListElderlyProfilesQuery(params: ElderlyListParams = {}) {
 }
 
 export function useCreateElderlyProfileMutation() {
-  return useMutation({ mutationFn: async (req: ElderlyProfileInput) => medical.elderlyProfile.createElderlyProfile(req), mutationKey: ['createElderlyProfile'] })
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (req: ElderlyProfileInput) => medical.elderlyProfile.createElderlyProfile(req),
+    mutationKey: ['createElderlyProfile'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listElderlyProfiles'] })
+    }
+  })
 }
 
 export function useGetElderlyProfileQuery(id: string) {
@@ -34,25 +41,24 @@ export function useGetElderlyProfileQuery(id: string) {
 }
 
 export function useUpdateElderlyProfileMutation() {
-  return useMutation({ mutationFn: async ({ id, ...req }: ElderlyProfileInput & { id: string }) => medical.elderlyProfile.updateElderlyProfile(id, req), mutationKey: ['updateElderlyProfile'] })
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (req: ElderlyProfileInput & { id: string }) => medical.elderlyProfile.updateElderlyProfile(req.id, req),
+    mutationKey: ['updateElderlyProfile'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listElderlyProfiles'] })
+    }
+  })
 }
 
 export function useDeleteElderlyProfileMutation() {
-  return useMutation({ mutationFn: async (id: string) => medical.elderlyProfile.deleteElderlyProfile(id), mutationKey: ['deleteElderlyProfile'] })
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => medical.elderlyProfile.deleteElderlyProfile(id),
+    mutationKey: ['deleteElderlyProfile'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listElderlyProfiles'] })
+    }
+  })
 }
 
-export function useGetElderlyWarningsQuery(id: string) {
-  return useQuery({ queryKey: ['getElderlyWarnings', id], queryFn: async () => medical.elderlyProfile.getElderlyWarnings(id), enabled: !!id })
-}
-
-export function useGetElderlyReportsQuery(id: string) {
-  return useQuery({ queryKey: ['getElderlyReports', id], queryFn: async () => medical.elderlyProfile.getElderlyReports(id), enabled: !!id })
-}
-
-export function useGetElderlyDevicesQuery(id: string) {
-  return useQuery({ queryKey: ['getElderlyDevices', id], queryFn: async () => medical.elderlyProfile.getElderlyDevices(id), enabled: !!id })
-}
-
-export function useGetElderlyKeyPopulationsQuery(id: string) {
-  return useQuery({ queryKey: ['getElderlyKeyPopulations', id], queryFn: async () => medical.elderlyProfile.getElderlyKeyPopulations(id), enabled: !!id })
-}

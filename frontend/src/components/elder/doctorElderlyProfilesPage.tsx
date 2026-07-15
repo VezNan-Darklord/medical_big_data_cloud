@@ -23,7 +23,7 @@ function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => v
         })
       }}>
         <div className="grid gap-0 md:grid-cols-2 md:gap-x-4">
-          <Form.Item name="elderlyId" label="关联老人账户" rules={[{ required: true }]}>
+          <Form.Item name="id" label="关联老人账户" rules={[{ required: true }]}>
             <ElderlyAccountSelect setRealName={(name) => { form.setFieldsValue({ name }); }} setMobile={(phone) => { form.setFieldsValue({ phone }); }} />
           </Form.Item>
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
