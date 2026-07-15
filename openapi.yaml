@@ -33,11 +33,11 @@ paths:
       operationId: login
       security: []
       requestBody:
-        $ref: '#/components/requestBodies/Login'
+        $ref: "#/components/requestBodies/Login"
       responses:
-        '200': { $ref: '#/components/responses/LoginResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
+        "200": { $ref: "#/components/responses/LoginResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
   /auth/register:
     post:
       tags: [Auth]
@@ -46,11 +46,11 @@ paths:
       operationId: register
       security: []
       requestBody:
-        $ref: '#/components/requestBodies/Register'
+        $ref: "#/components/requestBodies/Register"
       responses:
-        '201': { $ref: '#/components/responses/LoginResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/LoginResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /auth/refresh:
     post:
       tags: [Auth]
@@ -61,19 +61,19 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/RefreshTokenRequest' }
+            schema: { $ref: "#/components/schemas/RefreshTokenRequest" }
       responses:
-        '200': { $ref: '#/components/responses/LoginResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
+        "200": { $ref: "#/components/responses/LoginResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
   /auth/me:
     get:
       tags: [Auth]
       summary: 获取当前用户
       operationId: getCurrentUser
       responses:
-        '200': { $ref: '#/components/responses/UserResponse' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
+        "200": { $ref: "#/components/responses/UserResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
   /auth/logout:
     post:
       tags: [Auth]
@@ -83,10 +83,10 @@ paths:
         required: false
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/LogoutRequest' }
+            schema: { $ref: "#/components/schemas/LogoutRequest" }
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
   /dashboard/overview:
     get:
@@ -94,18 +94,18 @@ paths:
       summary: 首页真实指标总览
       operationId: getDashboardOverview
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiDashboardOverview' }
+              schema: { $ref: "#/components/schemas/ApiDashboardOverview" }
   /dashboard/charts:
     get:
       tags: [Dashboard]
       summary: 首页聚合图表
       operationId: getDashboardCharts
       responses:
-        '200': { $ref: '#/components/responses/ChartListResponse' }
+        "200": { $ref: "#/components/responses/ChartListResponse" }
 
   /elderly-profiles:
     get:
@@ -113,19 +113,27 @@ paths:
       summary: 老人档案列表
       operationId: listElderlyProfiles
       parameters:
-        - { $ref: '#/components/parameters/Keyword' }
-        - { name: gender, in: query, schema: { type: string, enum: [male, female, unknown] } }
+        - { $ref: "#/components/parameters/Keyword" }
+        - {
+            name: gender,
+            in: query,
+            schema: { type: string, enum: [male, female, unknown] },
+          }
         - { name: careLevel, in: query, schema: { type: string } }
-        - { name: status, in: query, schema: { type: string, enum: [active, inactive] } }
+        - {
+            name: status,
+            in: query,
+            schema: { type: string, enum: [active, inactive] },
+          }
         - { name: regionCode, in: query, schema: { type: string } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiElderlyPage' }
+              schema: { $ref: "#/components/schemas/ApiElderlyPage" }
     post:
       tags: [ElderlyProfile]
       summary: 新增老人档案
@@ -134,22 +142,22 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ElderlyProfileCreateRequest' }
+            schema: { $ref: "#/components/schemas/ElderlyProfileCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/ElderlyResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/ElderlyResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /elderly-profiles/{id}:
     parameters:
-      - { $ref: '#/components/parameters/Id' }
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [ElderlyProfile]
       summary: 老人档案详情
       operationId: getElderlyProfile
       responses:
-        '200': { $ref: '#/components/responses/ElderlyResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/ElderlyResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
     put:
       tags: [ElderlyProfile]
       summary: 更新老人档案
@@ -158,57 +166,57 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ElderlyProfileUpdateRequest' }
+            schema: { $ref: "#/components/schemas/ElderlyProfileUpdateRequest" }
       responses:
-        '200': { $ref: '#/components/responses/ElderlyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "200": { $ref: "#/components/responses/ElderlyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
     delete:
       tags: [ElderlyProfile]
       summary: 软删除老人档案
       operationId: deleteElderlyProfile
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /elderly-profiles/{id}/warnings:
     get:
       tags: [ElderlyProfile]
       summary: 查询老人关联预警
       operationId: getElderlyWarnings
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/WarningListResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/WarningListResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /elderly-profiles/{id}/reports:
     get:
       tags: [ElderlyProfile]
       summary: 查询老人关联报告
       operationId: getElderlyReports
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/AssessmentReportListResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/AssessmentReportListResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /elderly-profiles/{id}/devices:
     get:
       tags: [ElderlyProfile]
       summary: 查询老人关联设备
       operationId: getElderlyDevices
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/DeviceListResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/DeviceListResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /elderly-profiles/{id}/key-populations:
     get:
       tags: [ElderlyProfile]
       summary: 查询老人重点人群记录
       operationId: getElderlyKeyPopulations
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/KeyPopulationListResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/KeyPopulationListResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /health-warnings:
     get:
@@ -218,20 +226,40 @@ paths:
       parameters:
         - { name: elderlyId, in: query, schema: { type: string } }
         - { name: warningType, in: query, schema: { type: string } }
-        - { name: severity, in: query, schema: { type: string, enum: [low, medium, high, critical] } }
-        - { name: status, in: query, schema: { type: string, enum: [unprocessed, processing, processed, closed] } }
+        - {
+            name: severity,
+            in: query,
+            schema: { type: string, enum: [low, medium, high, critical] },
+          }
+        - {
+            name: status,
+            in: query,
+            schema:
+              {
+                type: string,
+                enum: [unprocessed, processing, processed, closed],
+              },
+          }
         - { name: source, in: query, schema: { type: string } }
-        - { name: startTime, in: query, schema: { type: string, format: date-time } }
-        - { name: endTime, in: query, schema: { type: string, format: date-time } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - {
+            name: startTime,
+            in: query,
+            schema: { type: string, format: date-time },
+          }
+        - {
+            name: endTime,
+            in: query,
+            schema: { type: string, format: date-time },
+          }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiWarningPage' }
-        '400': { $ref: '#/components/responses/BadRequest' }
+              schema: { $ref: "#/components/schemas/ApiWarningPage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
     post:
       tags: [HealthWarning]
       summary: 新增健康预警
@@ -240,62 +268,62 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/HealthWarningCreateRequest' }
+            schema: { $ref: "#/components/schemas/HealthWarningCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/WarningResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+        "201": { $ref: "#/components/responses/WarningResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /health-warnings/{id}:
     parameters:
-      - { $ref: '#/components/parameters/Id' }
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [HealthWarning]
       summary: 预警详情
       operationId: getHealthWarning
       responses:
-        '200': { $ref: '#/components/responses/WarningResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/WarningResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [HealthWarning]
       summary: 软删除预警
       operationId: deleteHealthWarning
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /health-warnings/{id}/handle:
     post:
       tags: [HealthWarning]
       summary: 处理或关闭预警
       operationId: handleHealthWarning
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/HealthWarningHandleRequest' }
+            schema: { $ref: "#/components/schemas/HealthWarningHandleRequest" }
       responses:
-        '200': { $ref: '#/components/responses/WarningResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "200": { $ref: "#/components/responses/WarningResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /health-warnings/{id}/assign:
     post:
       tags: [HealthWarning]
       summary: 转派预警给医生
       operationId: assignHealthWarning
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/HealthWarningAssignRequest' }
+            schema: { $ref: "#/components/schemas/HealthWarningAssignRequest" }
       responses:
-        '200': { $ref: '#/components/responses/WarningResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/WarningResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /assessment-reports:
     get:
@@ -304,14 +332,14 @@ paths:
       operationId: listAssessmentReports
       parameters:
         - { name: elderlyId, in: query, schema: { type: string } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiAssessmentReportPage' }
+              schema: { $ref: "#/components/schemas/ApiAssessmentReportPage" }
     post:
       tags: [AssessmentReport]
       summary: 生成评估报告
@@ -321,53 +349,55 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AssessmentReportCreateRequest' }
+            schema:
+              { $ref: "#/components/schemas/AssessmentReportCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/AssessmentReportResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "201": { $ref: "#/components/responses/AssessmentReportResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /assessment-reports/{id}:
     parameters:
-      - { $ref: '#/components/parameters/Id' }
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [AssessmentReport]
       summary: 报告详情
       operationId: getAssessmentReport
       responses:
-        '200': { $ref: '#/components/responses/AssessmentReportResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/AssessmentReportResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [AssessmentReport]
       summary: 软删除报告
       operationId: deleteAssessmentReport
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /assessment-reports/{id}/review:
     post:
       tags: [AssessmentReport]
       summary: 复核评估报告
       operationId: reviewAssessmentReport
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AssessmentReportReviewRequest' }
+            schema:
+              { $ref: "#/components/schemas/AssessmentReportReviewRequest" }
       responses:
-        '200': { $ref: '#/components/responses/AssessmentReportResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/AssessmentReportResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /assessment-reports/{id}/export:
     get:
       tags: [AssessmentReport]
       summary: 导出 Markdown 报告文件
       operationId: exportAssessmentReport
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200':
+        "200":
           description: UTF-8 Markdown 文件
           headers:
             Content-Disposition:
@@ -375,7 +405,7 @@ paths:
           content:
             text/markdown:
               schema: { type: string, format: binary }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /key-populations:
     get:
@@ -383,15 +413,19 @@ paths:
       summary: 重点人群列表
       operationId: listKeyPopulations
       parameters:
-        - { name: status, in: query, schema: { type: string, enum: [active, closed] } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - {
+            name: status,
+            in: query,
+            schema: { type: string, enum: [active, closed] },
+          }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiKeyPopulationPage' }
+              schema: { $ref: "#/components/schemas/ApiKeyPopulationPage" }
     post:
       tags: [KeyPopulation]
       summary: 新增重点人群
@@ -400,22 +434,22 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/KeyPopulationCreateRequest' }
+            schema: { $ref: "#/components/schemas/KeyPopulationCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/KeyPopulationResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/KeyPopulationResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /key-populations/{id}:
     parameters:
-      - { $ref: '#/components/parameters/Id' }
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [KeyPopulation]
       summary: 重点人群详情
       operationId: getKeyPopulation
       responses:
-        '200': { $ref: '#/components/responses/KeyPopulationResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/KeyPopulationResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
     put:
       tags: [KeyPopulation]
       summary: 更新重点人群
@@ -424,29 +458,29 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/KeyPopulationUpdateRequest' }
+            schema: { $ref: "#/components/schemas/KeyPopulationUpdateRequest" }
       responses:
-        '200': { $ref: '#/components/responses/KeyPopulationResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/KeyPopulationResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [KeyPopulation]
       summary: 软删除重点人群记录
       operationId: deleteKeyPopulation
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /key-populations/{id}/close:
     post:
       tags: [KeyPopulation]
       summary: 关闭重点人群记录
       operationId: closeKeyPopulation
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /reports/statistics/overview:
     get:
@@ -454,32 +488,32 @@ paths:
       summary: 报表统计总览
       operationId: getStatisticsOverview
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiDashboardOverview' }
+              schema: { $ref: "#/components/schemas/ApiDashboardOverview" }
   /reports/statistics/trends:
     get:
       tags: [ReportStatistics]
       summary: 趋势统计图表
       operationId: getStatisticsTrends
       responses:
-        '200': { $ref: '#/components/responses/ChartListResponse' }
+        "200": { $ref: "#/components/responses/ChartListResponse" }
   /reports/statistics/distributions:
     get:
       tags: [ReportStatistics]
       summary: 分布统计图表
       operationId: getStatisticsDistributions
       responses:
-        '200': { $ref: '#/components/responses/ChartListResponse' }
+        "200": { $ref: "#/components/responses/ChartListResponse" }
   /reports/statistics/export:
     get:
       tags: [ReportStatistics]
       summary: 导出统计 CSV
       operationId: exportStatistics
       responses:
-        '200':
+        "200":
           description: UTF-8 CSV 文件
           headers:
             Content-Disposition:
@@ -494,16 +528,24 @@ paths:
       summary: 设备列表
       operationId: listDevices
       parameters:
-        - { name: bindingStatus, in: query, schema: { type: string, enum: [bound, unbound] } }
-        - { name: onlineStatus, in: query, schema: { type: string, enum: [online, offline] } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - {
+            name: bindingStatus,
+            in: query,
+            schema: { type: string, enum: [bound, unbound] },
+          }
+        - {
+            name: onlineStatus,
+            in: query,
+            schema: { type: string, enum: [online, offline] },
+          }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiDevicePage' }
+              schema: { $ref: "#/components/schemas/ApiDevicePage" }
     post:
       tags: [Device]
       summary: 新增设备
@@ -512,11 +554,11 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DeviceCreateRequest' }
+            schema: { $ref: "#/components/schemas/DeviceCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/DeviceResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/DeviceResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /devices/bind:
     post:
       tags: [Device]
@@ -526,22 +568,22 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DeviceBindRequest' }
+            schema: { $ref: "#/components/schemas/DeviceBindRequest" }
       responses:
-        '200': { $ref: '#/components/responses/DeviceResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "200": { $ref: "#/components/responses/DeviceResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /devices/{id}:
     parameters:
-      - { $ref: '#/components/parameters/Id' }
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [Device]
       summary: 设备详情
       operationId: getDevice
       responses:
-        '200': { $ref: '#/components/responses/DeviceResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/DeviceResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
     put:
       tags: [Device]
       summary: 更新设备
@@ -550,54 +592,54 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DeviceUpdateRequest' }
+            schema: { $ref: "#/components/schemas/DeviceUpdateRequest" }
       responses:
-        '200': { $ref: '#/components/responses/DeviceResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/DeviceResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [Device]
       summary: 软删除设备
       operationId: deleteDevice
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /devices/{id}/unbind:
     post:
       tags: [Device]
       summary: 解绑设备
       operationId: unbindDevice
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/DeviceResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/DeviceResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /devices/{id}/reports:
     get:
       tags: [Device]
       summary: 查询最近 100 条设备上报
       operationId: getDeviceReports
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/DeviceReportListResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/DeviceReportListResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
     post:
       tags: [Device]
       summary: 写入设备数据上报
       operationId: recordDeviceReport
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DeviceDataReportRequest' }
+            schema: { $ref: "#/components/schemas/DeviceDataReportRequest" }
       responses:
-        '201': { $ref: '#/components/responses/DeviceReportResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "201": { $ref: "#/components/responses/DeviceReportResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /elderly-accounts:
     get:
@@ -605,16 +647,20 @@ paths:
       summary: 老人账户列表
       operationId: listElderlyAccounts
       parameters:
-        - { name: status, in: query, schema: { type: string, enum: [enabled, disabled] } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - {
+            name: status,
+            in: query,
+            schema: { type: string, enum: [enabled, disabled] },
+          }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiUserPage' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+              schema: { $ref: "#/components/schemas/ApiUserPage" }
+        "403": { $ref: "#/components/responses/Forbidden" }
     post:
       tags: [ElderlyAccount]
       summary: 创建老人账户
@@ -623,35 +669,36 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/SpecializedUserCreateRequest' }
+            schema:
+              { $ref: "#/components/schemas/SpecializedUserCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/UserResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/UserResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /elderly-accounts/{id}/reset-password:
     post:
       tags: [ElderlyAccount]
       summary: 重置老人账户密码
       operationId: resetElderlyPassword
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
-        $ref: '#/components/requestBodies/Password'
+        $ref: "#/components/requestBodies/Password"
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /elderly-accounts/{id}/status:
     post:
       tags: [ElderlyAccount]
       summary: 修改老人账户状态
       operationId: updateElderlyAccountStatus
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
-        $ref: '#/components/requestBodies/UserStatus'
+        $ref: "#/components/requestBodies/UserStatus"
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /doctor-accounts:
     get:
@@ -659,16 +706,20 @@ paths:
       summary: 医生账户列表
       operationId: listDoctorAccounts
       parameters:
-        - { name: status, in: query, schema: { type: string, enum: [enabled, disabled] } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - {
+            name: status,
+            in: query,
+            schema: { type: string, enum: [enabled, disabled] },
+          }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiUserPage' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+              schema: { $ref: "#/components/schemas/ApiUserPage" }
+        "403": { $ref: "#/components/responses/Forbidden" }
     post:
       tags: [DoctorAccount]
       summary: 创建医生账户
@@ -677,38 +728,39 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/SpecializedUserCreateRequest' }
+            schema:
+              { $ref: "#/components/schemas/SpecializedUserCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/UserResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/UserResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /doctor-accounts/{id}:
     put:
       tags: [DoctorAccount]
       summary: 更新医生账户
       operationId: updateDoctorAccount
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UserUpdateRequest' }
+            schema: { $ref: "#/components/schemas/UserUpdateRequest" }
       responses:
-        '200': { $ref: '#/components/responses/UserResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/UserResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /doctor-accounts/{id}/reset-password:
     post:
       tags: [DoctorAccount]
       summary: 重置医生账户密码
       operationId: resetDoctorPassword
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
-        $ref: '#/components/requestBodies/Password'
+        $ref: "#/components/requestBodies/Password"
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /users:
     get:
@@ -716,18 +768,26 @@ paths:
       summary: 系统账户列表
       operationId: listUsers
       parameters:
-        - { $ref: '#/components/parameters/Keyword' }
-        - { name: roleCode, in: query, schema: { $ref: '#/components/schemas/RoleCode' } }
-        - { name: status, in: query, schema: { type: string, enum: [enabled, disabled] } }
-        - { $ref: '#/components/parameters/PageNo' }
-        - { $ref: '#/components/parameters/PageSize' }
+        - { $ref: "#/components/parameters/Keyword" }
+        - {
+            name: roleCode,
+            in: query,
+            schema: { $ref: "#/components/schemas/RoleCode" },
+          }
+        - {
+            name: status,
+            in: query,
+            schema: { type: string, enum: [enabled, disabled] },
+          }
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiUserPage' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+              schema: { $ref: "#/components/schemas/ApiUserPage" }
+        "403": { $ref: "#/components/responses/Forbidden" }
     post:
       tags: [UserAccount]
       summary: 创建系统账户
@@ -736,23 +796,23 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UserCreateRequest' }
+            schema: { $ref: "#/components/schemas/UserCreateRequest" }
       responses:
-        '201': { $ref: '#/components/responses/UserResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "201": { $ref: "#/components/responses/UserResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /users/{id}:
     parameters:
-      - { $ref: '#/components/parameters/Id' }
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [UserAccount]
       summary: 系统账户详情
       operationId: getUser
       responses:
-        '200': { $ref: '#/components/responses/UserResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/UserResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
     put:
       tags: [UserAccount]
       summary: 更新系统账户
@@ -761,47 +821,47 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UserUpdateRequest' }
+            schema: { $ref: "#/components/schemas/UserUpdateRequest" }
       responses:
-        '200': { $ref: '#/components/responses/UserResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/UserResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [UserAccount]
       summary: 软删除系统账户
       operationId: deleteUser
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /users/{id}/status:
     post:
       tags: [UserAccount]
       summary: 修改系统账户状态
       operationId: updateUserStatus
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
-        $ref: '#/components/requestBodies/UserStatus'
+        $ref: "#/components/requestBodies/UserStatus"
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /users/{id}/roles:
     post:
       tags: [UserAccount]
       summary: 分配单一系统角色
       operationId: assignUserRole
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/RoleAssignRequest' }
+            schema: { $ref: "#/components/schemas/RoleAssignRequest" }
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /profile:
     get:
@@ -809,7 +869,7 @@ paths:
       summary: 获取个人资料
       operationId: getProfile
       responses:
-        '200': { $ref: '#/components/responses/UserResponse' }
+        "200": { $ref: "#/components/responses/UserResponse" }
     put:
       tags: [Profile]
       summary: 更新个人资料
@@ -818,11 +878,11 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ProfileUpdateRequest' }
+            schema: { $ref: "#/components/schemas/ProfileUpdateRequest" }
       responses:
-        '200': { $ref: '#/components/responses/UserResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        "200": { $ref: "#/components/responses/UserResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /profile/change-password:
     post:
       tags: [Profile]
@@ -832,26 +892,26 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ChangePasswordRequest' }
+            schema: { $ref: "#/components/schemas/ChangePasswordRequest" }
       responses:
-        '200': { $ref: '#/components/responses/EmptyResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
   /profile/elderly:
     get:
       tags: [Profile]
       summary: 当前老人账号的关联档案
       operationId: getMyElderlyProfile
       responses:
-        '200': { $ref: '#/components/responses/ElderlyResponse' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/ElderlyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /profile/todos:
     get:
       tags: [Profile]
       summary: 当前用户待办
       operationId: getTodos
       responses:
-        '200': { $ref: '#/components/responses/TodoListResponse' }
+        "200": { $ref: "#/components/responses/TodoListResponse" }
 
   /ai/analysis/care-decision:
     post:
@@ -863,27 +923,27 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AnalysisRequest' }
+            schema: { $ref: "#/components/schemas/AnalysisRequest" }
       responses:
-        '200': { $ref: '#/components/responses/AnalysisResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+        "200": { $ref: "#/components/responses/AnalysisResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /ai/analysis/care-decision/history:
     get:
       tags: [AIAnalysis]
       summary: 查询最近 100 条分析历史
       operationId: listCareDecisionHistory
       responses:
-        '200': { $ref: '#/components/responses/AnalysisListResponse' }
+        "200": { $ref: "#/components/responses/AnalysisListResponse" }
   /ai/analysis/care-decision/{id}:
     get:
       tags: [AIAnalysis]
       summary: 分析详情
       operationId: getCareDecisionAnalysis
-      parameters: [{ $ref: '#/components/parameters/Id' }]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        '200': { $ref: '#/components/responses/AnalysisResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+        "200": { $ref: "#/components/responses/AnalysisResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
 components:
   securitySchemes:
@@ -914,138 +974,138 @@ components:
       required: true
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/LoginRequest' }
+          schema: { $ref: "#/components/schemas/LoginRequest" }
     Register:
       required: true
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/RegisterRequest' }
+          schema: { $ref: "#/components/schemas/RegisterRequest" }
     Password:
       required: true
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/PasswordRequest' }
+          schema: { $ref: "#/components/schemas/PasswordRequest" }
     UserStatus:
       required: true
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/UserStatusUpdateRequest' }
+          schema: { $ref: "#/components/schemas/UserStatusUpdateRequest" }
   responses:
     EmptyResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiEmpty' }
+          schema: { $ref: "#/components/schemas/ApiEmpty" }
     LoginResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiLogin' }
+          schema: { $ref: "#/components/schemas/ApiLogin" }
     UserResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiUser' }
+          schema: { $ref: "#/components/schemas/ApiUser" }
     ElderlyResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiElderly' }
+          schema: { $ref: "#/components/schemas/ApiElderly" }
     WarningResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiWarning' }
+          schema: { $ref: "#/components/schemas/ApiWarning" }
     WarningListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiWarningList' }
+          schema: { $ref: "#/components/schemas/ApiWarningList" }
     AssessmentReportResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiAssessmentReport' }
+          schema: { $ref: "#/components/schemas/ApiAssessmentReport" }
     AssessmentReportListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiAssessmentReportList' }
+          schema: { $ref: "#/components/schemas/ApiAssessmentReportList" }
     KeyPopulationResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiKeyPopulation' }
+          schema: { $ref: "#/components/schemas/ApiKeyPopulation" }
     KeyPopulationListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiKeyPopulationList' }
+          schema: { $ref: "#/components/schemas/ApiKeyPopulationList" }
     DeviceResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiDevice' }
+          schema: { $ref: "#/components/schemas/ApiDevice" }
     DeviceListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiDeviceList' }
+          schema: { $ref: "#/components/schemas/ApiDeviceList" }
     DeviceReportResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiDeviceReport' }
+          schema: { $ref: "#/components/schemas/ApiDeviceReport" }
     DeviceReportListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiDeviceReportList' }
+          schema: { $ref: "#/components/schemas/ApiDeviceReportList" }
     ChartListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiChartList' }
+          schema: { $ref: "#/components/schemas/ApiChartList" }
     TodoListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiTodoList' }
+          schema: { $ref: "#/components/schemas/ApiTodoList" }
     AnalysisResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiAnalysis' }
+          schema: { $ref: "#/components/schemas/ApiAnalysis" }
     AnalysisListResponse:
       description: 成功
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiAnalysisList' }
+          schema: { $ref: "#/components/schemas/ApiAnalysisList" }
     BadRequest:
       description: 参数或业务输入错误
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiError' }
+          schema: { $ref: "#/components/schemas/ApiError" }
     Unauthorized:
       description: 未登录、令牌无效或账号已禁用
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiError' }
+          schema: { $ref: "#/components/schemas/ApiError" }
     Forbidden:
       description: 当前角色无权访问
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiError' }
+          schema: { $ref: "#/components/schemas/ApiError" }
     NotFound:
       description: 数据不存在
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiError' }
+          schema: { $ref: "#/components/schemas/ApiError" }
     Conflict:
       description: 数据冲突或仍被引用
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiError' }
+          schema: { $ref: "#/components/schemas/ApiError" }
   schemas:
     ApiBase:
       type: object
@@ -1056,7 +1116,7 @@ components:
         traceId: { type: string, example: b3c1f8e9d8f14a7f }
     ApiEmpty:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
             data: { nullable: true }
@@ -1079,7 +1139,13 @@ components:
       type: object
       required: [username, password, realName]
       properties:
-        username: { type: string, minLength: 3, maxLength: 50, pattern: '^[A-Za-z0-9_]+$' }
+        username:
+          {
+            type: string,
+            minLength: 3,
+            maxLength: 50,
+            pattern: "^[A-Za-z0-9_]+$",
+          }
         password: { type: string, minLength: 8, maxLength: 64, writeOnly: true }
         realName: { type: string, maxLength: 50 }
         mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
@@ -1095,30 +1161,45 @@ components:
         refreshToken: { type: string, writeOnly: true }
     LoginResult:
       type: object
-      required: [token, accessToken, refreshToken, tokenType, expireAt, accessExpireAt, refreshExpireAt, user]
+      required:
+        [
+          token,
+          accessToken,
+          refreshToken,
+          tokenType,
+          expireAt,
+          accessExpireAt,
+          refreshExpireAt,
+          user,
+        ]
       properties:
         token: { type: string, description: 兼容旧前端的 accessToken 别名 }
         accessToken: { type: string }
         refreshToken: { type: string }
         tokenType: { type: string, example: Bearer }
-        expireAt: { type: string, format: date-time, description: 兼容旧前端的 accessExpireAt 别名 }
+        expireAt:
+          {
+            type: string,
+            format: date-time,
+            description: 兼容旧前端的 accessExpireAt 别名,
+          }
         accessExpireAt: { type: string, format: date-time }
         refreshExpireAt: { type: string, format: date-time }
         user:
-          $ref: '#/components/schemas/LoginUserInfo'
+          $ref: "#/components/schemas/LoginUserInfo"
     LoginUserInfo:
       type: object
       properties:
         id: { type: string }
         realName: { type: string }
-        roleCode: { $ref: '#/components/schemas/RoleCode' }
+        roleCode: { $ref: "#/components/schemas/RoleCode" }
         mobile: { type: string, nullable: true }
     ApiLogin:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/LoginResult' }
+            data: { $ref: "#/components/schemas/LoginResult" }
 
     RoleCode:
       type: string
@@ -1129,7 +1210,7 @@ components:
         id: { type: string }
         username: { type: string }
         realName: { type: string }
-        roleCode: { $ref: '#/components/schemas/RoleCode' }
+        roleCode: { $ref: "#/components/schemas/RoleCode" }
         mobile: { type: string, nullable: true }
         institutionId: { type: string, nullable: true }
         regionCode: { type: string, nullable: true }
@@ -1141,10 +1222,16 @@ components:
       type: object
       required: [username, password, realName, roleCode]
       properties:
-        username: { type: string, minLength: 3, maxLength: 50, pattern: '^[A-Za-z0-9_]+$' }
+        username:
+          {
+            type: string,
+            minLength: 3,
+            maxLength: 50,
+            pattern: "^[A-Za-z0-9_]+$",
+          }
         password: { type: string, minLength: 8, maxLength: 64, writeOnly: true }
         realName: { type: string, maxLength: 50 }
-        roleCode: { $ref: '#/components/schemas/RoleCode' }
+        roleCode: { $ref: "#/components/schemas/RoleCode" }
         mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
         institutionId: { type: string, maxLength: 64 }
         regionCode: { type: string, maxLength: 64 }
@@ -1153,7 +1240,13 @@ components:
       type: object
       required: [username, password, realName]
       properties:
-        username: { type: string, minLength: 3, maxLength: 50, pattern: '^[A-Za-z0-9_]+$' }
+        username:
+          {
+            type: string,
+            minLength: 3,
+            maxLength: 50,
+            pattern: "^[A-Za-z0-9_]+$",
+          }
         password: { type: string, minLength: 8, maxLength: 64, writeOnly: true }
         realName: { type: string, maxLength: 50 }
         mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
@@ -1164,7 +1257,7 @@ components:
       type: object
       properties:
         realName: { type: string, maxLength: 50 }
-        roleCode: { $ref: '#/components/schemas/RoleCode' }
+        roleCode: { $ref: "#/components/schemas/RoleCode" }
         mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
         institutionId: { type: string, maxLength: 64 }
         regionCode: { type: string, maxLength: 64 }
@@ -1178,18 +1271,20 @@ components:
       type: object
       required: [roleCode]
       properties:
-        roleCode: { $ref: '#/components/schemas/RoleCode' }
+        roleCode: { $ref: "#/components/schemas/RoleCode" }
     PasswordRequest:
       type: object
       required: [newPassword]
       properties:
-        newPassword: { type: string, minLength: 8, maxLength: 64, writeOnly: true }
+        newPassword:
+          { type: string, minLength: 8, maxLength: 64, writeOnly: true }
     ChangePasswordRequest:
       type: object
       required: [oldPassword, newPassword]
       properties:
         oldPassword: { type: string, writeOnly: true }
-        newPassword: { type: string, minLength: 8, maxLength: 64, writeOnly: true }
+        newPassword:
+          { type: string, minLength: 8, maxLength: 64, writeOnly: true }
     ProfileUpdateRequest:
       type: object
       properties:
@@ -1197,24 +1292,24 @@ components:
         mobile: { type: string, pattern: '^1[3-9]\d{9}$' }
     ApiUser:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/User' }
+            data: { $ref: "#/components/schemas/User" }
     UserPage:
       type: object
       required: [list, pageNo, pageSize, total]
       properties:
-        list: { type: array, items: { $ref: '#/components/schemas/User' } }
+        list: { type: array, items: { $ref: "#/components/schemas/User" } }
         pageNo: { type: integer }
         pageSize: { type: integer }
         total: { type: integer, format: int64 }
     ApiUserPage:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/UserPage' }
+            data: { $ref: "#/components/schemas/UserPage" }
 
     ElderlyProfile:
       type: object
@@ -1271,24 +1366,28 @@ components:
         status: { type: string, enum: [active, inactive] }
     ApiElderly:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/ElderlyProfile' }
+            data: { $ref: "#/components/schemas/ElderlyProfile" }
     ElderlyPage:
       type: object
       required: [list, pageNo, pageSize, total]
       properties:
-        list: { type: array, items: { $ref: '#/components/schemas/ElderlyProfile' } }
+        list:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/ElderlyProfile" },
+          }
         pageNo: { type: integer }
         pageSize: { type: integer }
         total: { type: integer, format: int64 }
     ApiElderlyPage:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/ElderlyPage' }
+            data: { $ref: "#/components/schemas/ElderlyPage" }
 
     HealthWarning:
       type: object
@@ -1301,7 +1400,8 @@ components:
         metricName: { type: string, nullable: true }
         metricValue: { type: number, format: double, nullable: true }
         thresholdValue: { type: number, format: double, nullable: true }
-        status: { type: string, enum: [unprocessed, processing, processed, closed] }
+        status:
+          { type: string, enum: [unprocessed, processing, processed, closed] }
         occurredAt: { type: string, format: date-time }
         handledAt: { type: string, format: date-time, nullable: true }
         handlerId: { type: string, nullable: true }
@@ -1322,7 +1422,12 @@ components:
         metricName: { type: string, maxLength: 50 }
         metricValue: { type: number, format: double }
         thresholdValue: { type: number, format: double }
-        status: { type: string, enum: [unprocessed, processing, processed, closed], default: unprocessed }
+        status:
+          {
+            type: string,
+            enum: [unprocessed, processing, processed, closed],
+            default: unprocessed,
+          }
         occurredAt: { type: string, format: date-time }
         remark: { type: string, maxLength: 500 }
     HealthWarningHandleRequest:
@@ -1344,29 +1449,34 @@ components:
         remark: { type: string, maxLength: 500 }
     ApiWarning:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/HealthWarning' }
+            data: { $ref: "#/components/schemas/HealthWarning" }
     ApiWarningList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/HealthWarning' } }
+            data:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/HealthWarning" },
+              }
     WarningPage:
       type: object
       properties:
-        list: { type: array, items: { $ref: '#/components/schemas/HealthWarning' } }
+        list:
+          { type: array, items: { $ref: "#/components/schemas/HealthWarning" } }
         pageNo: { type: integer }
         pageSize: { type: integer }
         total: { type: integer, format: int64 }
     ApiWarningPage:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/WarningPage' }
+            data: { $ref: "#/components/schemas/WarningPage" }
 
     AssessmentReport:
       type: object
@@ -1396,7 +1506,8 @@ components:
         grade: { type: string, maxLength: 10 }
         summary: { type: string, maxLength: 2000 }
         riskItems: { type: array, items: { type: string, maxLength: 200 } }
-        recommendations: { type: array, items: { type: string, maxLength: 200 } }
+        recommendations:
+          { type: array, items: { type: string, maxLength: 200 } }
         assessorId: { type: string, maxLength: 64 }
         assessedAt: { type: string, format: date-time }
     AssessmentReportReviewRequest:
@@ -1406,29 +1517,37 @@ components:
         reviewStatus: { type: string, enum: [approved, rejected] }
     ApiAssessmentReport:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/AssessmentReport' }
+            data: { $ref: "#/components/schemas/AssessmentReport" }
     ApiAssessmentReportList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/AssessmentReport' } }
+            data:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/AssessmentReport" },
+              }
     AssessmentReportPage:
       type: object
       properties:
-        list: { type: array, items: { $ref: '#/components/schemas/AssessmentReport' } }
+        list:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/AssessmentReport" },
+          }
         pageNo: { type: integer }
         pageSize: { type: integer }
         total: { type: integer, format: int64 }
     ApiAssessmentReportPage:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/AssessmentReportPage' }
+            data: { $ref: "#/components/schemas/AssessmentReportPage" }
 
     KeyPopulation:
       type: object
@@ -1465,29 +1584,34 @@ components:
         status: { type: string, enum: [active, closed] }
     ApiKeyPopulation:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/KeyPopulation' }
+            data: { $ref: "#/components/schemas/KeyPopulation" }
     ApiKeyPopulationList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/KeyPopulation' } }
+            data:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/KeyPopulation" },
+              }
     KeyPopulationPage:
       type: object
       properties:
-        list: { type: array, items: { $ref: '#/components/schemas/KeyPopulation' } }
+        list:
+          { type: array, items: { $ref: "#/components/schemas/KeyPopulation" } }
         pageNo: { type: integer }
         pageSize: { type: integer }
         total: { type: integer, format: int64 }
     ApiKeyPopulationPage:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/KeyPopulationPage' }
+            data: { $ref: "#/components/schemas/KeyPopulationPage" }
 
     Device:
       type: object
@@ -1542,41 +1666,46 @@ components:
         metrics: { type: object, additionalProperties: true }
     ApiDevice:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/Device' }
+            data: { $ref: "#/components/schemas/Device" }
     ApiDeviceList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/Device' } }
+            data:
+              { type: array, items: { $ref: "#/components/schemas/Device" } }
     DevicePage:
       type: object
       properties:
-        list: { type: array, items: { $ref: '#/components/schemas/Device' } }
+        list: { type: array, items: { $ref: "#/components/schemas/Device" } }
         pageNo: { type: integer }
         pageSize: { type: integer }
         total: { type: integer, format: int64 }
     ApiDevicePage:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/DevicePage' }
+            data: { $ref: "#/components/schemas/DevicePage" }
     ApiDeviceReport:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/DeviceDataReport' }
+            data: { $ref: "#/components/schemas/DeviceDataReport" }
     ApiDeviceReportList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/DeviceDataReport' } }
+            data:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/DeviceDataReport" },
+              }
 
     DashboardOverview:
       type: object
@@ -1585,7 +1714,8 @@ components:
         warningCount: { type: integer, format: int64 }
         unhandledWarningCount: { type: integer, format: int64 }
         keyPopulationCount: { type: integer, format: int64 }
-        deviceOnlineRate: { type: number, format: double, minimum: 0, maximum: 1 }
+        deviceOnlineRate:
+          { type: number, format: double, minimum: 0, maximum: 1 }
         recentTrend:
           type: array
           items:
@@ -1595,10 +1725,10 @@ components:
               value: { type: integer }
     ApiDashboardOverview:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/DashboardOverview' }
+            data: { $ref: "#/components/schemas/DashboardOverview" }
     DashboardChart:
       type: object
       properties:
@@ -1614,10 +1744,14 @@ components:
               data: { type: array, items: { type: number } }
     ApiChartList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/DashboardChart' } }
+            data:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/DashboardChart" },
+              }
 
     Todo:
       type: object
@@ -1629,10 +1763,10 @@ components:
         occurredAt: { type: string, format: date-time }
     ApiTodoList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/Todo' } }
+            data: { type: array, items: { $ref: "#/components/schemas/Todo" } }
 
     AnalysisRequest:
       type: object
@@ -1648,13 +1782,22 @@ components:
             end: { type: string }
         metrics:
           type: object
-          required: [elderlyCount, warningCount, unhandledWarningCount, highRiskPopulationCount, deviceOnlineRate]
+          required:
+            [
+              elderlyCount,
+              warningCount,
+              unhandledWarningCount,
+              highRiskPopulationCount,
+              deviceOnlineRate,
+            ]
           properties:
             elderlyCount: { type: integer, format: int64, minimum: 0 }
             warningCount: { type: integer, format: int64, minimum: 0 }
             unhandledWarningCount: { type: integer, format: int64, minimum: 0 }
-            highRiskPopulationCount: { type: integer, format: int64, minimum: 0 }
-            deviceOnlineRate: { type: number, format: double, minimum: 0, maximum: 1 }
+            highRiskPopulationCount:
+              { type: integer, format: int64, minimum: 0 }
+            deviceOnlineRate:
+              { type: number, format: double, minimum: 0, maximum: 1 }
         dimensions:
           type: object
           properties:
@@ -1702,13 +1845,17 @@ components:
         createdAt: { type: string, format: date-time }
     ApiAnalysis:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { $ref: '#/components/schemas/AnalysisResult' }
+            data: { $ref: "#/components/schemas/AnalysisResult" }
     ApiAnalysisList:
       allOf:
-        - { $ref: '#/components/schemas/ApiBase' }
+        - { $ref: "#/components/schemas/ApiBase" }
         - type: object
           properties:
-            data: { type: array, items: { $ref: '#/components/schemas/AnalysisResult' } }
+            data:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/AnalysisResult" },
+              }
