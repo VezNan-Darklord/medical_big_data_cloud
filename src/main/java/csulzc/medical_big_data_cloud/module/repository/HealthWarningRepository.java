@@ -25,8 +25,6 @@ public interface HealthWarningRepository
 
     long countBySeverityAndStatus(String severity, String status);
 
-    void delete(String id);
-
     /**
      * 处理预警时更新状态和处理人
      */

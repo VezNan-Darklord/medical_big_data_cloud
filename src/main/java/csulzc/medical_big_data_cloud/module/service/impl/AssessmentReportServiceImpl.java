@@ -57,6 +57,6 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
     @Transactional
     public void delete(String id)
     {
-        assessmentReportRepository.delete(id);
+        assessmentReportRepository.deleteById(id);
     }
 }

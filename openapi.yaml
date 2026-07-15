@@ -104,10 +104,6 @@ paths:
       operationId: deleteElderlyProfile
       parameters: [ { $ref: '#/components/parameters/Id' } ]
       responses: { '200': { $ref: '#/components/responses/EmptyResponse' }, '404': { $ref: '#/components/responses/Error' } }
-  /elderly-profiles/{id}/warnings: { get: { tags: [ElderlyProfile], summary: 老人关联预警, operationId: getElderlyWarnings, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
-  /elderly-profiles/{id}/reports: { get: { tags: [ElderlyProfile], summary: 老人关联报告, operationId: getElderlyReports, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
-  /elderly-profiles/{id}/devices: { get: { tags: [ElderlyProfile], summary: 老人关联设备, operationId: getElderlyDevices, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
-  /elderly-profiles/{id}/key-populations: { get: { tags: [ElderlyProfile], summary: 老人关联重点人群, operationId: getElderlyKeyPopulations, parameters: [{ $ref: '#/components/parameters/Id' }], responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
   /health-warnings:
     get:
       tags: [ HealthWarning ]

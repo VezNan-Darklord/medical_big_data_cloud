@@ -80,6 +80,6 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
     @Transactional
     public void delete(String id)
     {
-        keyPopulationRepository.delete(id);
+        keyPopulationRepository.deleteById(id);
     }
 }

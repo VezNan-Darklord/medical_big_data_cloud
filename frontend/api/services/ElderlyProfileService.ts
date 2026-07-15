@@ -116,7 +116,6 @@ export class ElderlyProfileService {
      */
     public deleteElderlyProfile(
         id: string,
-        id: string,
     ): CancelablePromise<ApiEmpty> {
         return this.httpRequest.request({
             method: 'DELETE',
