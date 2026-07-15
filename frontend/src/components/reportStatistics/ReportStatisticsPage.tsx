@@ -2,7 +2,6 @@ import { Button, Empty, Skeleton, message } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
 import type { EChartsCoreOption } from 'echarts'
 import {
-  useExportStatisticsQuery,
   useStatisticsOverviewQuery,
   useStatisticsTrendsQuery,
 } from '../../../api/hooks/reportStatisticsHooks'

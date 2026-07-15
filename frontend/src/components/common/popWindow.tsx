@@ -28,7 +28,6 @@ export const PopWindow = ({ open, onClose, title, width = 420, children }: PopWi
     <div
       ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
       <div
         className="relative max-h-[85vh] overflow-y-auto rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-[0_30px_80px_rgba(15,23,42,0.18)]"

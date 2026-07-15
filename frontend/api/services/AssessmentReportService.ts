@@ -54,9 +54,9 @@ export class AssessmentReportService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
+                400: `参数或业务输入错误`,
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -78,7 +78,7 @@ export class AssessmentReportService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -99,7 +99,7 @@ export class AssessmentReportService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -124,7 +124,7 @@ export class AssessmentReportService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -146,7 +146,7 @@ export class AssessmentReportService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }

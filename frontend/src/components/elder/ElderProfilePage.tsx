@@ -2,20 +2,12 @@ import { Descriptions, Tag, Skeleton, Result, Button } from 'antd'
 import {
   MedicineBoxOutlined, TagsOutlined, ManOutlined, WomanOutlined,
 } from '@ant-design/icons'
-import { useGetCurrentUserQuery } from '../../../api/hooks/authHooks'
-import { useGetElderlyProfileQuery } from '../../../api/hooks/elderlyProfileHooks'
 import { PanelCard } from '../common'
+import { useGetMyElderlyProfileQuery } from '../../../api/hooks/profileHooks'
 
 export default function ElderProfilePage() {
-  const { data: userData } = useGetCurrentUserQuery()
-  const userId = userData?.data?.id ?? ''
-
-  const { data: profileData, isLoading, error } = useGetElderlyProfileQuery(userId)
+  const { data: profileData, isLoading, error } = useGetMyElderlyProfileQuery()
   const profile = profileData?.data
-
-  if (!userId) {
-    return <Result status="warning" title="无法获取用户信息" subTitle="请确认已登录" />
-  }
 
   if (isLoading) {
     return <Skeleton active paragraph={{ rows: 10 }} className="rounded-[28px] bg-white p-8" />

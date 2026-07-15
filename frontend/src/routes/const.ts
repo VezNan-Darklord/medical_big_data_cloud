@@ -1,4 +1,4 @@
-export const ELDERLY_ALLOWED = new Set(['/elderly-profiles', '/health-warnings', '/profile'])
+export const ELDERLY_ALLOWED = new Set(['/elderly-profiles', '/health-warnings', '/profile','/assessment-reports'])
 
 export const DOCTOR_SIDEBAR_EXCLUDED = new Set(['doctor-accounts', 'users', 'report-statistics'])
 

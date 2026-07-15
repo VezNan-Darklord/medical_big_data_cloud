@@ -38,7 +38,7 @@ function CreateWarningModal({ open, onClose, elderlyId }: { open: boolean; onClo
           form.resetFields()
           onClose()
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           message.error(err?.message ?? '创建失败')
         },
       },
@@ -75,7 +75,7 @@ function CreateWarningModal({ open, onClose, elderlyId }: { open: boolean; onClo
             ]} />
           </Form.Item>
           <Form.Item name="occurredAt" label="发生时间" rules={[{ required: true }]} getValueFromEvent={(date: dayjs.Dayjs | null) => date?.toISOString()}>
-            <DatePicker showTime className="w-full" />
+            <DatePicker showTime className="w-full" onChange={(d)=>form.setFieldValue('occurredAt', d) } />
           </Form.Item>
           <Form.Item name="metricName" label="指标名称">
             <Input placeholder="如：心率、收缩压" />
@@ -170,7 +170,7 @@ export default function ElderlyHealthPage() {
         <Table
           rowKey="id"
           loading={isLoading}
-          dataSource={allWarnings as any[]}
+          dataSource={allWarnings}
           columns={columns}
           pagination={false}
           scroll={{ x: 1000 }}

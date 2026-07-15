@@ -28,8 +28,8 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
-                401: `未登录、令牌无效或账号已禁�?`,
+                400: `参数或业务输入错误`,
+                401: `未登录、令牌无效或账号已禁用`,
             },
         });
     }
@@ -54,9 +54,9 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
+                400: `参数或业务输入错误`,
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引�?`,
+                409: `数据冲突或仍被引用`,
             },
         });
     }
@@ -75,8 +75,8 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
-                401: `未登录、令牌无效或账号已禁�?`,
+                400: `参数或业务输入错误`,
+                401: `未登录、令牌无效或账号已禁用`,
             },
         });
     }
@@ -90,7 +90,7 @@ export class AuthService {
             method: 'GET',
             url: '/auth/me',
             errors: {
-                401: `未登录、令牌无效或账号已禁�?`,
+                401: `未登录、令牌无效或账号已禁用`,
             },
         });
     }
@@ -109,7 +109,7 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                401: `未登录、令牌无效或账号已禁�?`,
+                401: `未登录、令牌无效或账号已禁用`,
             },
         });
     }

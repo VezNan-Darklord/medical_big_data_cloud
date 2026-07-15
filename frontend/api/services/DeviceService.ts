@@ -57,7 +57,7 @@ export class DeviceService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引�?`,
+                409: `数据冲突或仍被引用`,
             },
         });
     }
@@ -76,9 +76,9 @@ export class DeviceService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
+                400: `参数或业务输入错误`,
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引�?`,
+                409: `数据冲突或仍被引用`,
             },
         });
     }
@@ -98,7 +98,7 @@ export class DeviceService {
                 'id': id,
             },
             errors: {
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -123,7 +123,7 @@ export class DeviceService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -144,8 +144,8 @@ export class DeviceService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
-                409: `数据冲突或仍被引�?`,
+                404: `数据不存在`,
+                409: `数据冲突或仍被引用`,
             },
         });
     }
@@ -166,7 +166,7 @@ export class DeviceService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -186,7 +186,7 @@ export class DeviceService {
                 'id': id,
             },
             errors: {
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }
@@ -210,9 +210,9 @@ export class DeviceService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
+                400: `参数或业务输入错误`,
                 403: `当前角色无权访问`,
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }

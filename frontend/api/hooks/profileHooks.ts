@@ -2,6 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import medical from '../instance'
 import type { ProfileUpdateRequest } from '../models/ProfileUpdateRequest'
 import type { ChangePasswordRequest } from '../models/ChangePasswordRequest'
+import type { ApiAssessmentReportPage } from '../models/ApiAssessmentReportPage'
 
 export function useGetProfileQuery() {
   return useQuery({ queryKey: ['getProfile'], queryFn: async () => medical.profile.getProfile() })
@@ -17,7 +18,11 @@ export function useChangePasswordMutation() {
 }
 
 export function useGetMyElderlyProfileQuery() {
-  return useQuery({ queryKey: ['getMyElderlyProfile'], queryFn: async () => medical.profile.getMyElderlyProfile() })
+  return useQuery({
+    queryKey: ['getMyElderlyProfile'],
+    queryFn: async () => medical.profile.getMyElderlyProfile(),
+    retry: 1,
+  })
 }
 
 export function useGetMyAssessmentReportsQuery(params: { pageSize?: number } = {}) {
@@ -25,7 +30,7 @@ export function useGetMyAssessmentReportsQuery(params: { pageSize?: number } = {
   return useInfiniteQuery({
     queryKey: ['getMyAssessmentReports'],
     queryFn: async ({ pageParam = 1 }) => medical.profile.getMyAssessmentReports(pageParam, pageSize),
-    getNextPageParam: (lastPage: any) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
+    getNextPageParam: (lastPage: ApiAssessmentReportPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
   })
 }

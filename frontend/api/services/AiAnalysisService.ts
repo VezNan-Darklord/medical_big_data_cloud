@@ -25,7 +25,7 @@ export class AiAnalysisService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错�?`,
+                400: `参数或业务输入错误`,
                 403: `当前角色无权访问`,
             },
         });
@@ -57,7 +57,7 @@ export class AiAnalysisService {
                 'id': id,
             },
             errors: {
-                404: `数据不存�?`,
+                404: `数据不存在`,
             },
         });
     }

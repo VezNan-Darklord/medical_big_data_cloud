@@ -21,7 +21,8 @@ const DoctorElderlyProfilesPage = lazy(() => import('../components/elder/doctorE
 const DoctorHealthWarningsPage = lazy(() => import('../components/health/doctorHealthWarningsPage'))
 const DoctorDevicesPage = lazy(() => import('../components/device/DevicesPage'))
 const DoctorKeyPopulationsPage = lazy(() => import('../components/keyPopulation/KeyPopulationsPage'))
-const AssessmentReportPage = lazy(() => import('../components/assessmentReport/AssessmentReportPage'))
+const AssessmentReportPage = lazy(() => import('../components/assessmentReport/DoctorAssessmentReportPage'))
+const ElderlyAssessmentReportPage = lazy(() => import('../components/assessmentReport/ElderlyAssessmentReportPage'))
 const ReportStatisticsPage = lazy(() => import('../components/reportStatistics/ReportStatisticsPage'))
 
 function RouteFallback() {
@@ -65,7 +66,7 @@ export function AppRouter() {
               <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorKeyPopulationsPage />} admin={<WorkspacePage config={workspaceConfigs['/key-populations']} />} />
             } />
             <Route path="/assessment-reports" element={
-              <RoleSwitch elderly={<NotFoundPage />} doctor={<AssessmentReportPage />} admin={<AssessmentReportPage />} />
+              <RoleSwitch elderly={<ElderlyAssessmentReportPage />} doctor={<AssessmentReportPage />} admin={<AssessmentReportPage />} />
             } />
             <Route path="/report-statistics" element={
               <RoleSwitch elderly={<NotFoundPage />} doctor={<NotFoundPage />} admin={<ReportStatisticsPage />} />

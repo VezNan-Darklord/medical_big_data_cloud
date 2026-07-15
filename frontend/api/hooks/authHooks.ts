@@ -31,13 +31,11 @@ export function useGetCurrentUserQuery() {
 }
 
 export function useLogoutMutation() {
-  const qc = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       const refreshToken = getRefreshToken()
       return medical.auth.logout(refreshToken ? { refreshToken } : undefined)
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['getCurrentUser'] }) },
     mutationKey: ['logout'],
   })
 }
