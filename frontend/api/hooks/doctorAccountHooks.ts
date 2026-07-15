@@ -1,19 +1,33 @@
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
+import type { UserUpdateRequest } from '../models/UserUpdateRequest'
+import type { PasswordRequest } from '../models/PasswordRequest'
+import type { SpecializedUserCreateRequest } from '../models/SpecializedUserCreateRequest'
 import type { ApiUserPage } from '../models/ApiUserPage'
 
 type LastPage = ApiUserPage
 
-export function useListDoctorAccountsQuery(params: { pageSize?: number } = {}) {
-  const { pageSize = 10 } = params
+export function useListDoctorAccountsQuery(params: { status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
+  const { pageSize = 10, status } = params
   return useInfiniteQuery({
-    queryKey: ['listDoctorAccounts'],
-    queryFn: async ({ pageParam = 1 }) => medical.doctorAccount.listDoctorAccounts(undefined, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    queryKey: ['listDoctorAccounts', { status }],
+    queryFn: async ({ pageParam = 1 }) => medical.doctorAccount.listDoctorAccounts(status, pageParam, pageSize),
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
   })
 }
 
+export function useCreateDoctorAccountMutation() {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (req: SpecializedUserCreateRequest) => medical.doctorAccount.createDoctorAccount(req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listDoctorAccounts'] }) }, mutationKey: ['createDoctorAccount'] })
+}
+
+export function useUpdateDoctorAccountMutation() {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: UserUpdateRequest & { id: string }) => medical.doctorAccount.updateDoctorAccount(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listDoctorAccounts'] }) }, mutationKey: ['updateDoctorAccount'] })
+}
+
 export function useResetDoctorPasswordMutation() {
-  return useMutation({ mutationFn: async ({ id, newPassword }: { id: string; newPassword: string }) => medical.doctorAccount.resetDoctorPassword(id, { newPassword }), mutationKey: ['resetDoctorPassword'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: PasswordRequest & { id: string }) => medical.doctorAccount.resetDoctorPassword(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listDoctorAccounts'] }) }, mutationKey: ['resetDoctorPassword'] })
 }

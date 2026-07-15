@@ -7,12 +7,8 @@ import type { ApiElderlyPage } from '../models/ApiElderlyPage'
 type LastPage = ApiElderlyPage
 
 export type ElderlyListParams = {
-  keyword?: string;
-  gender?: 'male' | 'female' | 'unknown';
-  careLevel?: string;
-  status?: 'active' | 'inactive';
-  regionCode?: string;
-  pageSize?: number
+  keyword?: string; gender?: 'male' | 'female' | 'unknown'; careLevel?: string; status?: 'active' | 'inactive'
+  regionCode?: string; pageSize?: number
 }
 
 export function useListElderlyProfilesQuery(params: ElderlyListParams = {}) {
@@ -21,19 +17,17 @@ export function useListElderlyProfilesQuery(params: ElderlyListParams = {}) {
     queryKey: ['listElderlyProfiles', filters],
     queryFn: async ({ pageParam = 1 }) =>
       medical.elderlyProfile.listElderlyProfiles(filters.keyword, filters.gender, filters.careLevel, filters.status, filters.regionCode, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
   })
 }
 
 export function useCreateElderlyProfileMutation() {
-  const queryClient = useQueryClient()
+  const qc = useQueryClient()
   return useMutation({
     mutationFn: async (req: ElderlyProfileCreateRequest) => medical.elderlyProfile.createElderlyProfile(req),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['listElderlyProfiles'] }) },
     mutationKey: ['createElderlyProfile'],
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listElderlyProfiles'] })
-    }
   })
 }
 
@@ -42,24 +36,35 @@ export function useGetElderlyProfileQuery(id: string) {
 }
 
 export function useUpdateElderlyProfileMutation() {
-  const queryClient = useQueryClient()
+  const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...req }: ElderlyProfileUpdateRequest & { id: string }) => medical.elderlyProfile.updateElderlyProfile(id, req),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['listElderlyProfiles'] }); qc.invalidateQueries({ queryKey: ['getElderlyProfile'] }) },
     mutationKey: ['updateElderlyProfile'],
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listElderlyProfiles'] })
-    }
   })
 }
 
 export function useDeleteElderlyProfileMutation() {
-  const queryClient = useQueryClient()
+  const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => medical.elderlyProfile.deleteElderlyProfile(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['listElderlyProfiles'] }) },
     mutationKey: ['deleteElderlyProfile'],
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listElderlyProfiles'] })
-    }
   })
 }
 
+export function useGetElderlyWarningsQuery(id: string) {
+  return useQuery({ queryKey: ['getElderlyWarnings', id], queryFn: async () => medical.elderlyProfile.getElderlyWarnings(id), enabled: !!id })
+}
+
+export function useGetElderlyReportsQuery(id: string) {
+  return useQuery({ queryKey: ['getElderlyReports', id], queryFn: async () => medical.elderlyProfile.getElderlyReports(id), enabled: !!id })
+}
+
+export function useGetElderlyDevicesQuery(id: string) {
+  return useQuery({ queryKey: ['getElderlyDevices', id], queryFn: async () => medical.elderlyProfile.getElderlyDevices(id), enabled: !!id })
+}
+
+export function useGetElderlyKeyPopulationsQuery(id: string) {
+  return useQuery({ queryKey: ['getElderlyKeyPopulations', id], queryFn: async () => medical.elderlyProfile.getElderlyKeyPopulations(id), enabled: !!id })
+}

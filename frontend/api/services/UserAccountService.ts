@@ -61,9 +61,9 @@ export class UserAccountService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引用`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -84,7 +84,7 @@ export class UserAccountService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
@@ -109,12 +109,12 @@ export class UserAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 软删除系统账户
+     * 软删除系统账�?
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -130,12 +130,12 @@ export class UserAccountService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 修改系统账户状态
+     * 修改系统账户状�?
      * @param id
      * @param requestBody
      * @returns ApiEmpty 成功
@@ -155,7 +155,7 @@ export class UserAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
@@ -179,9 +179,9 @@ export class UserAccountService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }

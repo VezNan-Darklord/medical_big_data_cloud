@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ApiError = {
+export type ApiErrorResponse = {
     code: 400 | 401 | 403 | 404 | 409 | 500 | 501;
     message: string;
     data?: any;

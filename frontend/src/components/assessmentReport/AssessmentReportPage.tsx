@@ -25,10 +25,10 @@ import {
 } from '@ant-design/icons'
 import dayjs, { type Dayjs } from 'dayjs'
 import {
-  useAssessmentReportsQuery,
+  useListAssessmentReportsQuery,
   useCreateAssessmentReportMutation,
   useDeleteAssessmentReportMutation,
-  useExportAssessmentReportMutation,
+  useExportAssessmentReportQuery,
 } from '../../../api/hooks/assessmentReportHooks'
 import { useListElderlyProfilesQuery } from '../../../api/hooks/elderlyProfileHooks'
 import type { AssessmentReport } from '../../../api/models/AssessmentReport'
@@ -125,7 +125,7 @@ function ReportCard({
   onView: (report: AssessmentReport) => void
 }) {
   const deleteMutation = useDeleteAssessmentReportMutation()
-  const exportMutation = useExportAssessmentReportMutation()
+  const exportMutation = useExportAssessmentReportQuery()
 
   return (
     <Card className="overflow-hidden rounded-2xl border border-slate-200/70 shadow-sm" styles={{ body: { padding: 20 } }}>
@@ -220,7 +220,7 @@ function ReportDetailDrawer({
 export default function AssessmentReportPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [detailReport, setDetailReport] = useState<AssessmentReport | null>(null)
-  const reportsQuery = useAssessmentReportsQuery()
+  const reportsQuery = useListAssessmentReportsQuery()
   const reports = useMemo(() => reportsQuery.data?.data?.list ?? [], [reportsQuery.data])
 
   return (

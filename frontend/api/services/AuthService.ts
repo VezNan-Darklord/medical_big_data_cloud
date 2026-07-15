@@ -28,16 +28,16 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
-                401: `未登录、令牌无效或账号已禁用`,
+                400: `参数或业务输入错�?`,
+                401: `未登录、令牌无效或账号已禁�?`,
             },
         });
     }
     /**
-     * 注册账号并直接登录
-     * 浏览器前端仅允许注册 elderly；User-Agent 包含 Apifox 时可注册 admin、doctor 或 elderly。成功后直接返回 access token 与可轮换 refresh token。该来源区分仅用于本地数据库开发环境。
+     * 注册账号并直接登�?
+     * 浏览器前端仅允许注册 elderly；User-Agent 包含 Apifox 时可注册 admin、doctor �?elderly。成功后直接返回 access token 与可轮换 refresh token。该来源区分仅用于本地数据库开发环境�?
      * @param requestBody
-     * @param userAgent 浏览器使用默认 User-Agent；Apifox 创建管理员或医生时必须包含 Apifox。
+     * @param userAgent 浏览器使用默�?User-Agent；Apifox 创建管理员或医生时必须包�?Apifox�?
      * @returns ApiLogin 成功
      * @throws ApiError
      */
@@ -54,14 +54,14 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引用`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
     /**
-     * 刷新并轮换令牌
+     * 刷新并轮换令�?
      * @param requestBody
      * @returns ApiLogin 成功
      * @throws ApiError
@@ -75,8 +75,8 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
-                401: `未登录、令牌无效或账号已禁用`,
+                400: `参数或业务输入错�?`,
+                401: `未登录、令牌无效或账号已禁�?`,
             },
         });
     }
@@ -90,12 +90,12 @@ export class AuthService {
             method: 'GET',
             url: '/auth/me',
             errors: {
-                401: `未登录、令牌无效或账号已禁用`,
+                401: `未登录、令牌无效或账号已禁�?`,
             },
         });
     }
     /**
-     * 退出登录并使当前 access token 失效
+     * 退出登录并使当�?access token 失效
      * @param requestBody
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -109,7 +109,7 @@ export class AuthService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                401: `未登录、令牌无效或账号已禁用`,
+                401: `未登录、令牌无效或账号已禁�?`,
             },
         });
     }

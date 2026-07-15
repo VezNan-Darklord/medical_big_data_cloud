@@ -88,13 +88,15 @@ function AssignModal({ open, warningId, onClose }: { open: boolean; warningId: s
 
   return (
     <PopWindow open={open} onClose={onClose} title="转派预警" width={400}>
-      <Form form={form} layout="vertical" onFinish={(v: { targetDoctorId: string }) => {
-        assignMutation.mutate({ id: warningId, targetDoctorId: v.targetDoctorId }, {
+      <Form form={form} layout="vertical" onFinish={(v: { handlerId: string; handlerName?: string; remark?: string }) => {
+        assignMutation.mutate({ id: warningId, handlerId: v.handlerId, handlerName: v.handlerName, remark: v.remark }, {
           onSuccess: () => { message.success('转派成功'); form.resetFields(); onClose() },
           onError: (err: Error) => message.error(err?.message ?? '转派失败'),
         })
       }}>
-        <Form.Item name="targetDoctorId" label="目标医生 ID" rules={[{ required: true }]}><Input placeholder="输入医生 ID" /></Form.Item>
+        <Form.Item name="handlerId" label="处理人 ID" rules={[{ required: true }]}><Input placeholder="输入医生 ID" /></Form.Item>
+        <Form.Item name="handlerName" label="处理人姓名"><Input placeholder="可选" /></Form.Item>
+        <Form.Item name="remark" label="备注"><Input.TextArea rows={2} /></Form.Item>
         <Button type="primary" htmlType="submit" loading={assignMutation.isPending} block>确认转派</Button>
       </Form>
     </PopWindow>

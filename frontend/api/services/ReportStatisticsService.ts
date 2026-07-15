@@ -10,7 +10,7 @@ export class ReportStatisticsService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * 报表统计总览
-     * 仅管理员可访问，返回顶部统计卡片所需的业务指标。
+     * 仅管理员可访问，返回顶部统计卡片所需的业务指标�?
      * @returns ApiStatisticsOverview 成功
      * @throws ApiError
      */
@@ -25,7 +25,7 @@ export class ReportStatisticsService {
     }
     /**
      * 趋势统计图表
-     * 仅管理员可访问。固定返回重点人群变化趋势、老人档案变化趋势和设备关联统计。
+     * 仅管理员可访问。固定返回重点人群变化趋势、老人档案变化趋势和设备关联统计�?
      * @returns ApiChartList 成功
      * @throws ApiError
      */
@@ -40,7 +40,7 @@ export class ReportStatisticsService {
     }
     /**
      * 分布统计图表
-     * 仅管理员可访问。
+     * 仅管理员可访问�?
      * @returns ApiChartList 成功
      * @throws ApiError
      */
@@ -55,7 +55,7 @@ export class ReportStatisticsService {
     }
     /**
      * 导出统计 CSV
-     * 仅管理员可访问。
+     * 仅管理员可访问�?
      * @returns binary UTF-8 CSV 文件
      * @throws ApiError
      */

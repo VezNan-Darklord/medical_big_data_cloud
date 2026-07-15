@@ -1,19 +1,26 @@
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
+import type { UserCreateRequest } from '../models/UserCreateRequest'
 import type { UserUpdateRequest } from '../models/UserUpdateRequest'
+import type { UserStatusUpdateRequest } from '../models/UserStatusUpdateRequest'
+import type { RoleAssignRequest } from '../models/RoleAssignRequest'
 import type { ApiUserPage } from '../models/ApiUserPage'
-import type { RoleCode } from '../models/RoleCode'
 
 type LastPage = ApiUserPage
 
-export function useListUsersQuery(params: { keyword?: string; roleCode?: RoleCode; status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
+export function useListUsersQuery(params: { keyword?: string; roleCode?: string; status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
   const { pageSize = 10, ...filters } = params
   return useInfiniteQuery({
     queryKey: ['listUsers', filters],
-    queryFn: async ({ pageParam = 1 }) => medical.userAccount.listUsers(filters.keyword, filters.roleCode, filters.status, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    queryFn: async ({ pageParam = 1 }) => medical.userAccount.listUsers(filters.keyword, filters.roleCode as any, filters.status, pageParam, pageSize),
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
   })
+}
+
+export function useCreateUserMutation() {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (req: UserCreateRequest) => medical.userAccount.createUser(req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listUsers'] }) }, mutationKey: ['createUser'] })
 }
 
 export function useGetUserQuery(id: string) {
@@ -21,13 +28,21 @@ export function useGetUserQuery(id: string) {
 }
 
 export function useUpdateUserMutation() {
-  return useMutation({ mutationFn: async ({ id, ...req }: UserUpdateRequest & { id: string }) => medical.userAccount.updateUser(id, req), mutationKey: ['updateUser'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: UserUpdateRequest & { id: string }) => medical.userAccount.updateUser(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listUsers'] }) }, mutationKey: ['updateUser'] })
 }
 
 export function useDeleteUserMutation() {
-  return useMutation({ mutationFn: async (id: string) => medical.userAccount.deleteUser(id), mutationKey: ['deleteUser'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (id: string) => medical.userAccount.deleteUser(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listUsers'] }) }, mutationKey: ['deleteUser'] })
+}
+
+export function useUpdateUserStatusMutation() {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: UserStatusUpdateRequest & { id: string }) => medical.userAccount.updateUserStatus(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listUsers'] }) }, mutationKey: ['updateUserStatus'] })
 }
 
 export function useAssignUserRoleMutation() {
-  return useMutation({ mutationFn: async ({ id, roleCode }: { id: string; roleCode: RoleCode }) => medical.userAccount.assignUserRole(id, { roleCode }), mutationKey: ['assignUserRole'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: RoleAssignRequest & { id: string }) => medical.userAccount.assignUserRole(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listUsers'] }) }, mutationKey: ['assignUserRole'] })
 }

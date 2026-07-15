@@ -54,7 +54,7 @@ export class ElderlyAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引用`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -79,12 +79,12 @@ export class ElderlyAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 修改老人账户状态
+     * 修改老人账户状�?
      * @param id
      * @param requestBody
      * @returns ApiEmpty 成功
@@ -104,7 +104,7 @@ export class ElderlyAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }

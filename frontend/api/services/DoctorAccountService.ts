@@ -54,7 +54,7 @@ export class DoctorAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引用`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -79,7 +79,7 @@ export class DoctorAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
@@ -104,7 +104,7 @@ export class DoctorAccountService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }

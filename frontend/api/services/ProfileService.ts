@@ -39,8 +39,8 @@ export class ProfileService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
-                409: `数据冲突或仍被引用`,
+                400: `参数或业务输入错�?`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -59,12 +59,12 @@ export class ProfileService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
             },
         });
     }
     /**
-     * 当前老人账号的关联档案
+     * 当前老人账号的关联档�?
      * @returns ApiElderly 成功
      * @throws ApiError
      */
@@ -74,13 +74,13 @@ export class ProfileService {
             url: '/profile/elderly',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 当前老人账号的评估报告
-     * 仅老人账号可访问，只返回其关联档案下的报告。
+     * 当前老人账号的评估报�?
+     * 仅老人账号可访问，只返回其关联档案下的报告�?
      * @param pageNo
      * @param pageSize
      * @returns ApiAssessmentReportPage 成功
@@ -99,7 +99,7 @@ export class ProfileService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }

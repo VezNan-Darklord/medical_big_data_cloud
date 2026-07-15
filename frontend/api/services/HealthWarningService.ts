@@ -52,7 +52,7 @@ export class HealthWarningService {
                 'pageSize': pageSize,
             },
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
             },
         });
     }
@@ -71,7 +71,7 @@ export class HealthWarningService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
             },
         });
@@ -92,12 +92,12 @@ export class HealthWarningService {
                 'id': id,
             },
             errors: {
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 软删除预警
+     * 软删除预�?
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -113,12 +113,12 @@ export class HealthWarningService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 处理或关闭预警
+     * 处理或关闭预�?
      * @param id
      * @param requestBody
      * @returns ApiWarning 成功
@@ -137,15 +137,15 @@ export class HealthWarningService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
-                409: `数据冲突或仍被引用`,
+                404: `数据不存�?`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
     /**
-     * 转派预警给医生
+     * 转派预警给医�?
      * @param id
      * @param requestBody
      * @returns ApiWarning 成功
@@ -164,9 +164,9 @@ export class HealthWarningService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }

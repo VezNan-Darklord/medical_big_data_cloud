@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
 import type { KeyPopulationCreateRequest } from '../models/KeyPopulationCreateRequest'
 import type { KeyPopulationUpdateRequest } from '../models/KeyPopulationUpdateRequest'
@@ -11,23 +11,31 @@ export function useListKeyPopulationsQuery(params: { status?: 'active' | 'closed
   return useInfiniteQuery({
     queryKey: ['listKeyPopulations', { status }],
     queryFn: async ({ pageParam = 1 }) => medical.keyPopulation.listKeyPopulations(status, pageParam, pageSize),
-    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d?.pageNo && d.total !== undefined && d.pageNo * pageSize < d.total) return d.pageNo + 1; return undefined },
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
   })
 }
 
 export function useCreateKeyPopulationMutation() {
-  return useMutation({ mutationFn: async (req: KeyPopulationCreateRequest) => medical.keyPopulation.createKeyPopulation(req), mutationKey: ['createKeyPopulation'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (req: KeyPopulationCreateRequest) => medical.keyPopulation.createKeyPopulation(req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listKeyPopulations'] }) }, mutationKey: ['createKeyPopulation'] })
+}
+
+export function useGetKeyPopulationQuery(id: string) {
+  return useQuery({ queryKey: ['getKeyPopulation', id], queryFn: async () => medical.keyPopulation.getKeyPopulation(id), enabled: !!id })
 }
 
 export function useUpdateKeyPopulationMutation() {
-  return useMutation({ mutationFn: async ({ id, ...req }: KeyPopulationUpdateRequest & { id: string }) => medical.keyPopulation.updateKeyPopulation(id, req), mutationKey: ['updateKeyPopulation'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: KeyPopulationUpdateRequest & { id: string }) => medical.keyPopulation.updateKeyPopulation(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listKeyPopulations'] }) }, mutationKey: ['updateKeyPopulation'] })
 }
 
 export function useDeleteKeyPopulationMutation() {
-  return useMutation({ mutationFn: async (id: string) => medical.keyPopulation.deleteKeyPopulation(id), mutationKey: ['deleteKeyPopulation'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (id: string) => medical.keyPopulation.deleteKeyPopulation(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listKeyPopulations'] }) }, mutationKey: ['deleteKeyPopulation'] })
 }
 
 export function useCloseKeyPopulationMutation() {
-  return useMutation({ mutationFn: async (id: string) => medical.keyPopulation.closeKeyPopulation(id), mutationKey: ['closeKeyPopulation'] })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (id: string) => medical.keyPopulation.closeKeyPopulation(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listKeyPopulations'] }) }, mutationKey: ['closeKeyPopulation'] })
 }

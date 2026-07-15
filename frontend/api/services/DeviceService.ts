@@ -57,7 +57,7 @@ export class DeviceService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引用`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -76,9 +76,9 @@ export class DeviceService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                409: `数据冲突或仍被引用`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -98,7 +98,7 @@ export class DeviceService {
                 'id': id,
             },
             errors: {
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
@@ -123,12 +123,12 @@ export class DeviceService {
             mediaType: 'application/json',
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 软删除设备
+     * 软删除设�?
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -144,8 +144,8 @@ export class DeviceService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
-                409: `数据冲突或仍被引用`,
+                404: `数据不存�?`,
+                409: `数据冲突或仍被引�?`,
             },
         });
     }
@@ -166,12 +166,12 @@ export class DeviceService {
             },
             errors: {
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
     /**
-     * 查询最近 100 条设备上报
+     * 查询最�?100 条设备上�?
      * @param id
      * @returns ApiDeviceReportList 成功
      * @throws ApiError
@@ -186,7 +186,7 @@ export class DeviceService {
                 'id': id,
             },
             errors: {
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }
@@ -210,9 +210,9 @@ export class DeviceService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `参数或业务输入错误`,
+                400: `参数或业务输入错�?`,
                 403: `当前角色无权访问`,
-                404: `数据不存在`,
+                404: `数据不存�?`,
             },
         });
     }

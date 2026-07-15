@@ -1,41 +1,40 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
 import type { AssessmentReportCreateRequest } from '../models/AssessmentReportCreateRequest'
+import type { AssessmentReportReviewRequest } from '../models/AssessmentReportReviewRequest'
+import type { ApiAssessmentReportPage } from '../models/ApiAssessmentReportPage'
 
-export function useAssessmentReportsQuery(elderlyId?: string) {
-  return useQuery({
-    queryKey: ['assessmentReports', elderlyId],
-    queryFn: () => medical.assessmentReport.listAssessmentReports(elderlyId, 1, 100),
+type LastPage = ApiAssessmentReportPage
+
+export function useListAssessmentReportsQuery(params: { elderlyId?: string; pageSize?: number } = {}) {
+  const { pageSize = 10, elderlyId } = params
+  return useInfiniteQuery({
+    queryKey: ['listAssessmentReports', { elderlyId }],
+    queryFn: async ({ pageParam = 1 }) => medical.assessmentReport.listAssessmentReports(elderlyId, pageParam, pageSize),
+    getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
+    initialPageParam: 1,
   })
 }
 
 export function useCreateAssessmentReportMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (request: AssessmentReportCreateRequest) =>
-      medical.assessmentReport.createAssessmentReport(request),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assessmentReports'] }),
-  })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (req: AssessmentReportCreateRequest) => medical.assessmentReport.createAssessmentReport(req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listAssessmentReports'] }) }, mutationKey: ['createAssessmentReport'] })
+}
+
+export function useGetAssessmentReportQuery(id: string) {
+  return useQuery({ queryKey: ['getAssessmentReport', id], queryFn: async () => medical.assessmentReport.getAssessmentReport(id), enabled: !!id })
 }
 
 export function useDeleteAssessmentReportMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => medical.assessmentReport.deleteAssessmentReport(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assessmentReports'] }),
-  })
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async (id: string) => medical.assessmentReport.deleteAssessmentReport(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listAssessmentReports'] }) }, mutationKey: ['deleteAssessmentReport'] })
 }
 
-export function useExportAssessmentReportMutation() {
-  return useMutation({
-    mutationFn: (id: string) => medical.assessmentReport.exportAssessmentReport(id),
-    onSuccess: (blob, id) => {
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `assessment-report-${id}.md`
-      link.click()
-      URL.revokeObjectURL(url)
-    },
-  })
+export function useReviewAssessmentReportMutation() {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: async ({ id, ...req }: AssessmentReportReviewRequest & { id: string }) => medical.assessmentReport.reviewAssessmentReport(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listAssessmentReports'] }); qc.invalidateQueries({ queryKey: ['getAssessmentReport'] }) }, mutationKey: ['reviewAssessmentReport'] })
+}
+
+export function useExportAssessmentReportQuery(id: string) {
+  return useQuery({ queryKey: ['exportAssessmentReport', id], queryFn: async () => medical.assessmentReport.exportAssessmentReport(id), enabled: !!id })
 }

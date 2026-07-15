@@ -28,7 +28,7 @@ export type { ApiDeviceReportList } from './models/ApiDeviceReportList';
 export type { ApiElderly } from './models/ApiElderly';
 export type { ApiElderlyPage } from './models/ApiElderlyPage';
 export type { ApiEmpty } from './models/ApiEmpty';
-export type { ApiError } from './models/ApiError';
+export type { ApiErrorResponse } from './models/ApiErrorResponse';
 export type { ApiKeyPopulation } from './models/ApiKeyPopulation';
 export type { ApiKeyPopulationList } from './models/ApiKeyPopulationList';
 export type { ApiKeyPopulationPage } from './models/ApiKeyPopulationPage';
