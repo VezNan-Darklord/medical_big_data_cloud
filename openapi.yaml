@@ -260,7 +260,7 @@ paths:
       summary: 我的健康档案
       description: 当前登录老人查看自己的健康档案。基于JWT Token自动识别身份，仅 elderly 角色可调用。
       operationId: getMyElderlyProfile
-      responses: { '200': { $ref: '#/components/schemas/ApiElderly' }, '401': { $ref: '#/components/responses/Error' }, '403': { $ref: '#/components/responses/Error' }, '404': { $ref: '#/components/responses/Error' } }
+      responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiElderly' } } } }, '400': { $ref: '#/components/responses/Error' }, '401': { $ref: '#/components/responses/Error' }, '403': { $ref: '#/components/responses/Error' } }
   /profile/todos: { get: { tags: [Profile], summary: 我的待办, operationId: getTodos, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
   /ai/analysis/care-decision: { post: { tags: [AIAnalysis], summary: 生成照护决策分析, description: 仅限 admin 和 doctor 角色调用, operationId: createCareDecisionAnalysis, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AnalysisRequest' } } } }, responses: { '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/ApiAnalysisResult' } } } } } } }
   /ai/analysis/care-decision/history: { get: { tags: [AIAnalysis], summary: 分析历史, operationId: listCareDecisionHistory, responses: { '200': { $ref: '#/components/responses/ObjectListResponse' } } } }
@@ -340,7 +340,7 @@ components:
     ElderlyProfileInput:
       type: object
       required: [name, gender]
-      properties: { id: { type: string, maxLength: 64 }, name: { type: string }, gender: { type: string }, birthday: { type: string, format: date }, age: { type: integer }, phone: { type: string }, address: { type: string }, institutionId: { type: string }, medicalHistory: { type: string }, careLevel: { type: string }, tags: { type: array, items: { type: string } }, status: { type: string } }
+      properties: { elderlyId: { type: string, maxLength: 64 }, name: { type: string }, gender: { type: string }, birthday: { type: string, format: date }, age: { type: integer }, phone: { type: string }, address: { type: string }, institutionId: { type: string }, medicalHistory: { type: string }, careLevel: { type: string }, tags: { type: array, items: { type: string } }, status: { type: string } }
     ElderlyProfile: { allOf: [{ $ref: '#/components/schemas/ElderlyProfileInput' }, { type: object, properties: { id: { type: string }, createdAt: { type: string, format: date-time }, updatedAt: { type: string, format: date-time } } }] }
     ApiElderly: { allOf: [{ $ref: '#/components/schemas/ApiBase' }, { type: object, properties: { data: { $ref: '#/components/schemas/ElderlyProfile' } } }] }
     ElderlyPage: { allOf: [{ $ref: '#/components/schemas/ObjectPage' }, { type: object, properties: { list: { type: array, items: { $ref: '#/components/schemas/ElderlyProfile' } } } }] }
