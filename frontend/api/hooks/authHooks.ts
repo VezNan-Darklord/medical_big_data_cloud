@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import medical from '../instance'
 import type { LoginRequest } from '../models/LoginRequest'
 import type { RegisterRequest } from '../models/RegisterRequest'
-import { getAccessToken } from '../instance'
+import { getAccessToken, getRefreshToken } from '../instance'
 
 export function useLoginMutation() {
   const qc = useQueryClient()
@@ -33,7 +33,10 @@ export function useGetCurrentUserQuery() {
 export function useLogoutMutation() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async () => medical.auth.logout(),
+    mutationFn: async () => {
+      const refreshToken = getRefreshToken()
+      return medical.auth.logout(refreshToken ? { refreshToken } : undefined)
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['getCurrentUser'] }) },
     mutationKey: ['logout'],
   })

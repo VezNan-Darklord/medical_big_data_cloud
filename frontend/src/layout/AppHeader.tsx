@@ -6,9 +6,10 @@ import { useUserContext } from '../store/userContext'
 import { useLoginMutation, useRegisterMutation, useGetCurrentUserQuery, useLogoutMutation } from '../../api/hooks/authHooks'
 import { PopWindow } from '../components/common'
 import { useQueryClient } from '@tanstack/react-query'
+import type { AuthTokenPair } from '../../api/tokenStorage'
 
 
-function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { open: boolean; onClose: () => void; onLoginSuccess: (token: string) => void; onSwitchToRegister: () => void }) {
+function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { open: boolean; onClose: () => void; onLoginSuccess: (tokens: AuthTokenPair) => void; onSwitchToRegister: () => void }) {
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
   const loginMutation = useLoginMutation()
@@ -17,13 +18,18 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
       await loginMutation.mutateAsync({ username: values.username, password: values.password },
         {
           onSuccess: (res) => {
-            const token = res.data?.token;
-            if (token) {
-              onLoginSuccess(token)
+            const tokens = res.data;
+            if (tokens?.accessToken && tokens.refreshToken) {
+              onLoginSuccess({
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+              })
               message.success('登录成功')
               queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] })
               onClose()
               form.resetFields()
+            } else {
+              message.error('登录响应缺少 access token 或 refresh token')
             }
           },
           onError: (error) => {
@@ -55,7 +61,7 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
   )
 }
 
-function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { open: boolean; onClose: () => void; onRegisterSuccess: (token: string) => void; onSwitchToLogin: () => void }) {
+function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { open: boolean; onClose: () => void; onRegisterSuccess: (tokens: AuthTokenPair) => void; onSwitchToLogin: () => void }) {
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
   const registerMutation = useRegisterMutation()
@@ -68,10 +74,18 @@ function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { 
         mobile: values.mobile,
       }, {
         onSuccess: (data) => {
+          const tokens = data.data;
+          if (!tokens?.accessToken || !tokens.refreshToken) {
+            message.error('注册响应缺少 access token 或 refresh token')
+            return
+          }
           message.success('注册成功')
           onClose()
           form.resetFields()
-          onRegisterSuccess(data.data!.token!);
+          onRegisterSuccess({
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+          });
           queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
         },
         onError: (error) => {
@@ -135,10 +149,13 @@ export function AppHeader() {
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     setUserMenuOpen(false)
     if (key === 'logout') {
-      logout()
-      clearAuth()
-      message.success('已退出登录');
-      queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
+      logout(undefined, {
+        onSettled: () => {
+          clearAuth()
+          message.success('已退出登录');
+          queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
+        },
+      })
     }
   };
 

@@ -1,14 +1,8 @@
 import { AuthFetchHttpRequest } from './AuthFetchHttpRequest';
 import { medical } from './medical';
+import { getAccessToken } from './tokenStorage';
 
-const TOKEN_STORAGE_KEY = 'token';
-
-export const getAccessToken = () => {
-  if (typeof localStorage === 'undefined') return null;
-  return localStorage.getItem(TOKEN_STORAGE_KEY);
-};
-export const setAccessToken = (token: string) => localStorage.setItem(TOKEN_STORAGE_KEY, token);
-export const clearAccessToken = () => localStorage.removeItem(TOKEN_STORAGE_KEY);
+export { getAccessToken, getRefreshToken, setTokenPair, clearTokenPair } from './tokenStorage';
 
 let medicalInstance = new medical();
 

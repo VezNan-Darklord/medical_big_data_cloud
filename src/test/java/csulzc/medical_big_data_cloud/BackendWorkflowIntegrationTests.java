@@ -95,6 +95,7 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.user.roleCode").value("doctor"))
                 .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())))
+                .andExpect(jsonPath("$.data.refreshToken", not(blankOrNullString())))
                 .andReturn();
         String apifoxDoctorToken = readBody(apifoxDoctorResult).at("/data/accessToken").asString();
 
@@ -118,7 +119,8 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.user.roleCode").value("admin"))
-                .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())));
+                .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())))
+                .andExpect(jsonPath("$.data.refreshToken", not(blankOrNullString())));
 
         String managedDoctorUsername = "managed_doctor_" + suffix;
         mockMvc.perform(post("/doctor-accounts")
@@ -177,6 +179,8 @@ class BackendWorkflowIntegrationTests {
                                 java.util.Map.of("refreshToken", firstRefreshToken))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())))
+                .andExpect(jsonPath("$.data.refreshToken", not(blankOrNullString())))
                 .andReturn();
         String rotatedRefreshToken = readBody(refreshResult).at("/data/refreshToken").asString();
         org.junit.jupiter.api.Assertions.assertNotEquals(firstRefreshToken, rotatedRefreshToken);
@@ -350,8 +354,14 @@ class BackendWorkflowIntegrationTests {
                                 java.util.Map.of("username", username, "password", password))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.accessToken", not(blankOrNullString())))
+                .andExpect(jsonPath("$.data.refreshToken", not(blankOrNullString())))
                 .andReturn();
-        return readBody(result);
+        JsonNode response = readBody(result);
+        org.junit.jupiter.api.Assertions.assertNotEquals(
+                response.at("/data/accessToken").asString(),
+                response.at("/data/refreshToken").asString());
+        return response;
     }
 
     private JsonNode readBody(MvcResult result) {
