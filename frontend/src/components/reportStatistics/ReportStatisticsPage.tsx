@@ -4,7 +4,9 @@ import type { EChartsCoreOption } from 'echarts'
 import {
   useStatisticsOverviewQuery,
   useStatisticsTrendsQuery,
+  useExportStatisticsMutation,
 } from '../../../api/hooks/reportStatisticsHooks'
+import { downloadBlob } from '../../../api/download'
 import type { DashboardChart } from '../../../api/models/DashboardChart'
 import EChart from '../charts/ECharts'
 import { PanelCard } from '../common'
@@ -66,6 +68,7 @@ export default function ReportStatisticsPage() {
           icon={<DownloadOutlined />}
           loading={exportMutation.isPending}
           onClick={() => exportMutation.mutate(undefined, {
+            onSuccess: blob => downloadBlob(blob, 'report-statistics.csv'),
             onError: (error: Error) => message.error(error.message || '导出失败'),
           })}
         >

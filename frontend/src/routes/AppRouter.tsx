@@ -33,14 +33,30 @@ function RouteFallback() {
   )
 }
 
-function RoleSwitch({ elderly, doctor, admin }: { elderly: React.ReactNode; doctor: React.ReactNode; admin: React.ReactNode }) {
-  const { data } = useGetCurrentUserQuery();
+function RoleSwitch({
+  elderly,
+  doctor,
+  operator,
+  analyst,
+  admin,
+}: {
+  elderly: React.ReactNode
+  doctor: React.ReactNode
+  operator?: React.ReactNode
+  analyst?: React.ReactNode
+  admin: React.ReactNode
+}) {
+  const { data, isLoading } = useGetCurrentUserQuery();
   const user = data?.data as User | undefined
   const role = user?.roleCode ?? ''
 
+  if (isLoading) return <RouteFallback />
   if (role === 'elderly') return <>{elderly}</>
   if (role === 'doctor') return <>{doctor}</>
-  return <>{admin}</>
+  if (role === 'operator') return <>{operator ?? <NotFoundPage />}</>
+  if (role === 'analyst') return <>{analyst ?? <NotFoundPage />}</>
+  if (role === 'admin') return <>{admin}</>
+  return <NotFoundPage />
 }
 
 export function AppRouter() {
@@ -54,16 +70,16 @@ export function AppRouter() {
             <Route path="/profile" element={<ProfilePage />} />
 
             <Route path="/elderly-profiles" element={
-              <RoleSwitch elderly={<ElderProfilePage />} doctor={<DoctorElderlyProfilesPage />} admin={<WorkspacePage config={workspaceConfigs['/elderly-profiles']} />} />
+              <RoleSwitch elderly={<ElderProfilePage />} doctor={<DoctorElderlyProfilesPage />} operator={<DoctorElderlyProfilesPage />} admin={<DoctorElderlyProfilesPage />} />
             } />
             <Route path="/health-warnings" element={
-              <RoleSwitch elderly={<ElderlyHealthPage />} doctor={<DoctorHealthWarningsPage />} admin={<WorkspacePage config={workspaceConfigs['/health-warnings']} />} />
+              <RoleSwitch elderly={<ElderlyHealthPage />} doctor={<DoctorHealthWarningsPage />} operator={<DoctorHealthWarningsPage />} admin={<DoctorHealthWarningsPage />} />
             } />
             <Route path="/devices" element={
-              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorDevicesPage />} admin={<WorkspacePage config={workspaceConfigs['/devices']} />} />
+              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorDevicesPage />} operator={<DoctorDevicesPage />} admin={<DoctorDevicesPage />} />
             } />
             <Route path="/key-populations" element={
-              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorKeyPopulationsPage />} admin={<WorkspacePage config={workspaceConfigs['/key-populations']} />} />
+              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorKeyPopulationsPage />} operator={<DoctorKeyPopulationsPage />} admin={<DoctorKeyPopulationsPage />} />
             } />
             <Route path="/assessment-reports" element={
               <RoleSwitch elderly={<ElderlyAssessmentReportPage />} doctor={<AssessmentReportPage />} admin={<AssessmentReportPage />} />

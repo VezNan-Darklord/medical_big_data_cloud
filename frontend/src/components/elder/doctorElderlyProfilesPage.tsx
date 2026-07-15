@@ -9,6 +9,7 @@ import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { ElderlyProfileCreateRequest } from '../../../api/models/ElderlyProfileCreateRequest'
 import type { ElderlyProfileUpdateRequest } from '../../../api/models/ElderlyProfileUpdateRequest'
 import type { ElderlyProfile } from '../../../api/models/ElderlyProfile'
+import { useCurrentRoleCode } from '../../hooks/useCurrentRoleCode'
 import dayjs from 'dayjs'
 
 function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -53,8 +54,25 @@ function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => v
   )
 }
 
-function ProfileCard({ profile, onResetPassword, onViewDetail, onEdit }: { profile: ElderlyProfile; onResetPassword: (id: string, name: string) => void; onViewDetail: (id: string) => void; onEdit: (profile: ElderlyProfile) => void }) {
+function ProfileCard({
+  profile,
+  canDelete,
+  canEdit,
+  canResetPassword,
+  onResetPassword,
+  onViewDetail,
+  onEdit,
+}: {
+  profile: ElderlyProfile
+  canDelete: boolean
+  canEdit: boolean
+  canResetPassword: boolean
+  onResetPassword: (id: string, name: string) => void
+  onViewDetail: (id: string) => void
+  onEdit: (profile: ElderlyProfile) => void
+}) {
   const deleteMutation = useDeleteElderlyProfileMutation()
+  const showActions = canEdit || canDelete || (canResetPassword && Boolean(profile.userId))
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -79,11 +97,18 @@ function ProfileCard({ profile, onResetPassword, onViewDetail, onEdit }: { profi
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
         <span className="text-xs text-slate-400">{profile.updatedAt?.slice(0, 10) ?? ''}</span>
-        <div className="flex gap-1">
-          <Button size="small" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation(); onEdit(profile) }}>编辑</Button>
-          <Button size="small" icon={<ReloadOutlined />} onClick={(e) => { e.stopPropagation(); onResetPassword(profile.id!, profile.name ?? '-') }}>重置密码</Button>
-          <Button size="small" danger icon={<DeleteOutlined />} onClick={handleDelete} loading={deleteMutation.isPending} />
-        </div>
+        {showActions && (
+          <div className="flex gap-1">
+            {canEdit && <Button size="small" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation(); onEdit(profile) }}>编辑</Button>}
+            {canResetPassword && profile.userId && (
+              <Button size="small" icon={<ReloadOutlined />} onClick={(e) => {
+                e.stopPropagation()
+                onResetPassword(profile.userId!, profile.name ?? '-')
+              }}>重置密码</Button>
+            )}
+            {canDelete && <Button size="small" danger icon={<DeleteOutlined />} onClick={handleDelete} loading={deleteMutation.isPending} />}
+          </div>
+        )}
       </div>
     </Card>
   )
@@ -179,6 +204,10 @@ function ResetPasswordModal({ open, profileId, profileName, onClose }: { open: b
 }
 
 export default function ElderlyProfilesPage() {
+  const role = useCurrentRoleCode()
+  const canCreateOrEdit = role === 'admin' || role === 'doctor'
+  const canResetPassword = role === 'admin' || role === 'operator'
+  const canDelete = role === 'admin'
   const [createOpen, setCreateOpen] = useState(false)
   const [detailId, setDetailId] = useState('')
   const [resetPwdTarget, setResetPwdTarget] = useState<{ id: string; name: string } | null>(null)
@@ -195,21 +224,32 @@ export default function ElderlyProfilesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-slate-200/80 bg-white px-6 py-5 shadow-sm">
         <div><div className="text-2xl font-semibold text-slate-900">老人档案管理</div><div className="mt-2 text-sm text-slate-500">共 {allProfiles.length} 位在档老人</div></div>
-        <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>新建档案</Button>
+        {canCreateOrEdit && <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>新建档案</Button>}
       </div>
       {isLoading ? <Skeleton active paragraph={{ rows: 6 }} /> : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {allProfiles.map(p => <ProfileCard key={p.id} profile={p} onViewDetail={setDetailId} onResetPassword={(id, name) => setResetPwdTarget({ id, name })} onEdit={setEditTarget} />)}
+            {allProfiles.map(p => (
+              <ProfileCard
+                key={p.id}
+                profile={p}
+                canDelete={canDelete}
+                canEdit={canCreateOrEdit}
+                canResetPassword={canResetPassword}
+                onViewDetail={setDetailId}
+                onResetPassword={(id, name) => setResetPwdTarget({ id, name })}
+                onEdit={setEditTarget}
+              />
+            ))}
           </div>
           <div ref={sentinelRef} className="h-px" />
           {isFetchingNextPage && <div className="text-center"><Spin /></div>}
         </>
       )}
-      <CreateProfileModal open={createOpen} onClose={() => setCreateOpen(false)} />
+      {canCreateOrEdit && <CreateProfileModal open={createOpen} onClose={() => setCreateOpen(false)} />}
       <ProfileDetailDrawer id={detailId} open={!!detailId} onClose={() => setDetailId('')} />
-      {resetPwdTarget && <ResetPasswordModal open={!!resetPwdTarget} profileId={resetPwdTarget.id} profileName={resetPwdTarget.name} onClose={() => setResetPwdTarget(null)} />}
-      <EditProfileModal open={editTarget!==null} profile={editTarget} onClose={() => setEditTarget(null)} />
+      {canResetPassword && resetPwdTarget && <ResetPasswordModal open={!!resetPwdTarget} profileId={resetPwdTarget.id} profileName={resetPwdTarget.name} onClose={() => setResetPwdTarget(null)} />}
+      {canCreateOrEdit && <EditProfileModal open={editTarget!==null} profile={editTarget} onClose={() => setEditTarget(null)} />}
     </div>
   )
 }

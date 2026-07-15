@@ -67,9 +67,18 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse updateUser(String id, UserUpdateRequest request) {
-        User user = findUser(id);
+        return updateUser(findUser(id), request);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateUserForRole(String id, String roleCode, UserUpdateRequest request) {
+        return updateUser(findUserWithRole(id, roleCode), request);
+    }
+
+    private UserResponse updateUser(User user, UserUpdateRequest request) {
         if (StringUtils.hasText(request.getMobile()) && !request.getMobile().equals(user.getMobile())) {
-            checkUniqueIdentity(user.getUsername(), request.getMobile(), id);
+            checkUniqueIdentity(user.getUsername(), request.getMobile(), user.getId());
         }
         if (StringUtils.hasText(request.getRoleCode())) {
             validateRole(request.getRoleCode());
@@ -86,7 +95,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateStatus(String id, UserStatusUpdateRequest request) {
-        User user = findUser(id);
+        updateStatus(findUser(id), request);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatusForRole(String id, String roleCode, UserStatusUpdateRequest request) {
+        updateStatus(findUserWithRole(id, roleCode), request);
+    }
+
+    private void updateStatus(User user, UserStatusUpdateRequest request) {
         if (!request.getStatus().equals(user.getStatus())) {
             user.setStatus(request.getStatus());
             invalidateTokens(user);
@@ -97,7 +115,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void resetPassword(String id, String newPassword) {
-        User user = findUser(id);
+        resetPassword(findUser(id), newPassword);
+    }
+
+    @Override
+    @Transactional
+    public void resetPasswordForRole(String id, String roleCode, String newPassword) {
+        resetPassword(findUserWithRole(id, roleCode), newPassword);
+    }
+
+    private void resetPassword(User user, String newPassword) {
         updatePassword(user, newPassword);
         userRepository.save(user);
     }
@@ -182,6 +209,14 @@ public class UserServiceImpl implements UserService {
     private User findUser(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND));
+    }
+
+    private User findUserWithRole(String id, String roleCode) {
+        User user = findUser(id);
+        if (!roleCode.equals(user.getRoleCode())) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "目标账户不存在");
+        }
+        return user;
     }
 
     private void validateRole(String roleCode) {

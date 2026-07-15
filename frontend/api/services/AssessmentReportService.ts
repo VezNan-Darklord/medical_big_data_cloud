@@ -7,6 +7,7 @@ import type { ApiAssessmentReportPage } from '../models/ApiAssessmentReportPage'
 import type { ApiEmpty } from '../models/ApiEmpty';
 import type { AssessmentReportCreateRequest } from '../models/AssessmentReportCreateRequest';
 import type { AssessmentReportReviewRequest } from '../models/AssessmentReportReviewRequest';
+import type { AssessmentReportUpdateRequest } from '../models/AssessmentReportUpdateRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AssessmentReportService {
@@ -77,6 +78,33 @@ export class AssessmentReportService {
                 'id': id,
             },
             errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 修改评估报告
+     * 修改后报告重新进入草稿状态，需重新复核。
+     * @param id
+     * @param requestBody
+     * @returns ApiAssessmentReport 成功
+     * @throws ApiError
+     */
+    public updateAssessmentReport(
+        id: string,
+        requestBody: AssessmentReportUpdateRequest,
+    ): CancelablePromise<ApiAssessmentReport> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/assessment-reports/{id}',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `参数或业务输入错误`,
                 403: `当前角色无权访问`,
                 404: `数据不存在`,
             },

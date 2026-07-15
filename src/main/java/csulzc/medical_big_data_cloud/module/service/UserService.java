@@ -18,9 +18,15 @@ public interface UserService {
 
     UserResponse updateUser(String id, UserUpdateRequest request);
 
+    UserResponse updateUserForRole(String id, String roleCode, UserUpdateRequest request);
+
     void updateStatus(String id, UserStatusUpdateRequest request);
 
+    void updateStatusForRole(String id, String roleCode, UserStatusUpdateRequest request);
+
     void resetPassword(String id, String newPassword);
+
+    void resetPasswordForRole(String id, String roleCode, String newPassword);
 
     void changePassword(String id, ChangePasswordRequest request);
 

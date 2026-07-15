@@ -10,6 +10,8 @@ spring:
       path: /h2-console
 
 app:
+  auth:
+    apifox-privileged-registration-enabled: true
   bootstrap-admin:
     enabled: true
     password: ${BOOTSTRAP_ADMIN_PASSWORD:Admin123!}

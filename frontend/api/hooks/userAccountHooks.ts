@@ -5,14 +5,15 @@ import type { UserUpdateRequest } from '../models/UserUpdateRequest'
 import type { UserStatusUpdateRequest } from '../models/UserStatusUpdateRequest'
 import type { RoleAssignRequest } from '../models/RoleAssignRequest'
 import type { ApiUserPage } from '../models/ApiUserPage'
+import type { RoleCode } from '../models/RoleCode'
 
 type LastPage = ApiUserPage
 
-export function useListUsersQuery(params: { keyword?: string; roleCode?: string; status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
+export function useListUsersQuery(params: { keyword?: string; roleCode?: RoleCode; status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
   const { pageSize = 10, ...filters } = params
   return useInfiniteQuery({
     queryKey: ['listUsers', filters],
-    queryFn: async ({ pageParam = 1 }) => medical.userAccount.listUsers(filters.keyword, filters.roleCode as any, filters.status, pageParam, pageSize),
+    queryFn: async ({ pageParam = 1 }) => medical.userAccount.listUsers(filters.keyword, filters.roleCode, filters.status, pageParam, pageSize),
     getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
   })

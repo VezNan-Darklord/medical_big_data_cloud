@@ -53,6 +53,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${jwt.refresh-expiration:604800000}")
     private long refreshExpiration;
 
+    @Value("${app.auth.apifox-privileged-registration-enabled:false}")
+    private boolean apifoxPrivilegedRegistrationEnabled;
+
     @Override
     @Transactional
     public LoginResponse register(RegisterRequest request, String userAgent) {
@@ -157,9 +160,10 @@ public class AuthServiceImpl implements AuthService {
 
     private String resolveRegistrationRole(String requestedRole, String userAgent) {
         String roleCode = StringUtils.hasText(requestedRole) ? requestedRole : "elderly";
-        boolean isApifox = StringUtils.hasText(userAgent)
+        boolean isPrivilegedApifoxRequest = apifoxPrivilegedRegistrationEnabled
+                && StringUtils.hasText(userAgent)
                 && userAgent.toLowerCase(Locale.ROOT).contains("apifox");
-        if (!"elderly".equals(roleCode) && !isApifox) {
+        if (!"elderly".equals(roleCode) && !isPrivilegedApifoxRequest) {
             throw new BusinessException(
                     ResultCode.FORBIDDEN,
                     "前端注册仅允许创建老人账号，管理员和医生账号请使用 Apifox 或管理员功能创建");

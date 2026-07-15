@@ -19,6 +19,7 @@ import {
 import {
   DeleteOutlined,
   DownloadOutlined,
+  EditOutlined,
   EyeOutlined,
   MedicineBoxOutlined,
   PlusOutlined,
@@ -28,11 +29,14 @@ import {
   useListAssessmentReportsQuery,
   useCreateAssessmentReportMutation,
   useDeleteAssessmentReportMutation,
-  useExportAssessmentReportQuery,
+  useExportAssessmentReportMutation,
+  useUpdateAssessmentReportMutation,
 } from '../../../api/hooks/assessmentReportHooks'
+import { downloadBlob } from '../../../api/download'
 import { useListElderlyProfilesQuery } from '../../../api/hooks/elderlyProfileHooks'
 import type { AssessmentReport } from '../../../api/models/AssessmentReport'
 import type { AssessmentReportCreateRequest } from '../../../api/models/AssessmentReportCreateRequest'
+import type { AssessmentReportUpdateRequest } from '../../../api/models/AssessmentReportUpdateRequest'
 
 const gradeColors: Record<string, string> = { A: 'green', B: 'blue', C: 'orange', D: 'red' }
 const reportTypes: AssessmentReportCreateRequest['reportType'][] =
@@ -42,33 +46,58 @@ type ReportFormValues = Omit<AssessmentReportCreateRequest, 'assessedAt'> & {
   assessedAt: Dayjs
 }
 
-function CreateReportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function ReportFormModal({
+  open,
+  onClose,
+  report,
+}: {
+  open: boolean
+  onClose: () => void
+  report: AssessmentReport | null
+}) {
   const [form] = Form.useForm<ReportFormValues>()
   const createMutation = useCreateAssessmentReportMutation()
+  const updateMutation = useUpdateAssessmentReportMutation()
   const elderlyQuery = useListElderlyProfilesQuery({ pageSize: 100 })
   const elderlyProfiles = elderlyQuery.data?.pages.flatMap(page => page.data?.list ?? []) ?? []
 
   const submit = (values: ReportFormValues) => {
+    const callbacks = {
+      onSuccess: () => {
+        message.success(report ? '评估报告已修改，复核状态已重置为草稿' : '评估报告已创建')
+        form.resetFields()
+        onClose()
+      },
+      onError: (error: Error) => message.error(error.message || (report ? '修改报告失败' : '创建报告失败')),
+    }
+
+    if (report) {
+      const request: AssessmentReportUpdateRequest = {
+        reportType: values.reportType,
+        score: values.score,
+        grade: values.grade,
+        summary: values.summary,
+        riskItems: values.riskItems,
+        recommendations: values.recommendations,
+        assessedAt: values.assessedAt.toISOString(),
+      }
+      updateMutation.mutate({ id: report.id, ...request }, callbacks)
+      return
+    }
+
     createMutation.mutate(
       { ...values, assessedAt: values.assessedAt.toISOString() },
-      {
-        onSuccess: () => {
-          message.success('评估报告已创建')
-          form.resetFields()
-          onClose()
-        },
-        onError: (error: Error) => message.error(error.message || '创建报告失败'),
-      },
+      callbacks,
     )
   }
 
   return (
     <Modal
-      title="创建评估报告"
+      title={report ? '修改评估报告' : '创建评估报告'}
       open={open}
       onCancel={onClose}
       onOk={() => form.submit()}
-      confirmLoading={createMutation.isPending}
+      confirmLoading={createMutation.isPending || updateMutation.isPending}
       width={720}
       destroyOnHidden
     >
@@ -76,11 +105,26 @@ function CreateReportModal({ open, onClose }: { open: boolean; onClose: () => vo
         form={form}
         layout="vertical"
         onFinish={submit}
-        initialValues={{ reportType: '健康评估', grade: 'B', score: 80, assessedAt: dayjs() }}
+        initialValues={report ? {
+          elderlyId: report.elderlyId,
+          reportType: report.reportType,
+          score: report.score,
+          grade: report.grade,
+          summary: report.summary,
+          riskItems: report.riskItems,
+          recommendations: report.recommendations,
+          assessedAt: dayjs(report.assessedAt),
+        } : {
+          reportType: '健康评估',
+          grade: 'B',
+          score: 80,
+          assessedAt: dayjs(),
+        }}
       >
         <div className="grid gap-x-4 md:grid-cols-2">
           <Form.Item name="elderlyId" label="老人档案" rules={[{ required: true }]}>
             <Select
+              disabled={Boolean(report)}
               showSearch
               loading={elderlyQuery.isLoading}
               optionFilterProp="label"
@@ -119,13 +163,15 @@ function CreateReportModal({ open, onClose }: { open: boolean; onClose: () => vo
 
 function ReportCard({
   report,
+  onEdit,
   onView,
 }: {
   report: AssessmentReport
+  onEdit: (report: AssessmentReport) => void
   onView: (report: AssessmentReport) => void
 }) {
   const deleteMutation = useDeleteAssessmentReportMutation()
-  const exportMutation = useExportAssessmentReportQuery()
+  const exportMutation = useExportAssessmentReportMutation()
 
   return (
     <Card className="overflow-hidden rounded-2xl border border-slate-200/70 shadow-sm" styles={{ body: { padding: 20 } }}>
@@ -144,12 +190,16 @@ function ReportCard({
       <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
         <span className="text-xs text-slate-400">{dayjs(report.assessedAt).format('YYYY-MM-DD HH:mm')}</span>
         <div className="flex gap-1">
+          <Button size="small" icon={<EditOutlined />} onClick={() => onEdit(report)} />
           <Button size="small" icon={<EyeOutlined />} onClick={() => onView(report)} />
           <Button
             size="small"
             icon={<DownloadOutlined />}
             loading={exportMutation.isPending}
-            onClick={() => exportMutation.mutate(report.id)}
+            onClick={() => exportMutation.mutate(report.id, {
+              onSuccess: blob => downloadBlob(blob, `assessment-report-${report.id}.md`),
+              onError: (error: Error) => message.error(error.message || '导出失败'),
+            })}
           />
           <Popconfirm
             title="确认删除这份报告？"
@@ -219,16 +269,21 @@ function ReportDetailDrawer({
 
 export default function AssessmentReportPage() {
   const [createOpen, setCreateOpen] = useState(false)
+  const [editingReport, setEditingReport] = useState<AssessmentReport | null>(null)
   const [detailReport, setDetailReport] = useState<AssessmentReport | null>(null)
   const reportsQuery = useListAssessmentReportsQuery()
-  const reports = useMemo(() => reportsQuery.data?.data?.list ?? [], [reportsQuery.data])
+  const reports = useMemo(
+    () => reportsQuery.data?.pages.flatMap(page => page.data?.list ?? []) ?? [],
+    [reportsQuery.data],
+  )
+  const total = reportsQuery.data?.pages[0]?.data?.total ?? 0
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
         <div>
           <div className="text-2xl font-semibold text-slate-900">评估报告</div>
-          <div className="mt-2 text-sm text-slate-500">共 {reportsQuery.data?.data?.total ?? 0} 份报告</div>
+          <div className="mt-2 text-sm text-slate-500">共 {total} 份报告</div>
         </div>
         <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>创建报告</Button>
       </div>
@@ -237,11 +292,26 @@ export default function AssessmentReportPage() {
         <Empty description="暂无评估报告" />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {reports.map(report => <ReportCard key={report.id} report={report} onView={setDetailReport} />)}
+          {reports.map(report => (
+            <ReportCard
+              key={report.id}
+              report={report}
+              onEdit={setEditingReport}
+              onView={setDetailReport}
+            />
+          ))}
         </div>
       )}
 
-      <CreateReportModal open={createOpen} onClose={() => setCreateOpen(false)} />
+      <ReportFormModal open={createOpen} onClose={() => setCreateOpen(false)} report={null} />
+      {editingReport && (
+        <ReportFormModal
+          key={editingReport.id}
+          open
+          report={editingReport}
+          onClose={() => setEditingReport(null)}
+        />
+      )}
       <ReportDetailDrawer report={detailReport} onClose={() => setDetailReport(null)} />
     </div>
   )

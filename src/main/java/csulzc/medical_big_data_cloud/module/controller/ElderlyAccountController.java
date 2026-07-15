@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/elderly-accounts")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('admin', 'operator')")
 @Tag(name = "ElderlyAccount", description = "老人账户")
 public class ElderlyAccountController {
 
     private final UserService userService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator')")
     public ApiResponse<PageResult<UserResponse>> list(
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") @Min(1) int pageNo,
@@ -43,6 +43,7 @@ public class ElderlyAccountController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('admin', 'operator')")
     public ResponseEntity<ApiResponse<UserResponse>> create(@Valid @RequestBody UserCreateRequest request) {
         request.setRoleCode("elderly");
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -50,16 +51,18 @@ public class ElderlyAccountController {
     }
 
     @PostMapping("/{id}/reset-password")
+    @PreAuthorize("hasAnyRole('admin', 'operator')")
     public ApiResponse<Void> resetPassword(
             @PathVariable String id, @Valid @RequestBody PasswordRequest request) {
-        userService.resetPassword(id, request.getNewPassword());
+        userService.resetPasswordForRole(id, "elderly", request.getNewPassword());
         return ApiResponse.success();
     }
 
     @PostMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('admin', 'operator')")
     public ApiResponse<Void> updateStatus(
             @PathVariable String id, @Valid @RequestBody UserStatusUpdateRequest request) {
-        userService.updateStatus(id, request);
+        userService.updateStatusForRole(id, "elderly", request);
         return ApiResponse.success();
     }
 }

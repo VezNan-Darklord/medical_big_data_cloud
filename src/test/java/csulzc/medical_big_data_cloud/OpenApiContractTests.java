@@ -31,6 +31,11 @@ class OpenApiContractTests {
         assertTrue(paths.containsKey("/devices/{id}/reports"));
         assertTrue(paths.containsKey("/profile/change-password"));
         assertTrue(paths.containsKey("/profile/reports"));
+        assertCrudOperations(paths, "/users", "/users/{id}");
+        assertCrudOperations(paths, "/elderly-profiles", "/elderly-profiles/{id}");
+        assertCrudOperations(paths, "/assessment-reports", "/assessment-reports/{id}");
+        assertCrudOperations(paths, "/key-populations", "/key-populations/{id}");
+        assertCrudOperations(paths, "/devices", "/devices/{id}");
 
         Map<String, Object> components = castMap(document.get("components"));
         Map<String, Object> schemas = castMap(components.get("schemas"));
@@ -58,6 +63,9 @@ class OpenApiContractTests {
                 "elderlyId", "reportType", "score", "grade", "summary",
                 "riskItems", "recommendations", "assessedAt"
         )));
+        Map<String, Object> reportPath = castMap(paths.get("/assessment-reports/{id}"));
+        assertTrue(reportPath.containsKey("put"));
+        assertTrue(schemas.containsKey("AssessmentReportUpdateRequest"));
 
         Set<String> operationIds = new HashSet<>();
         paths.values().stream()
@@ -78,6 +86,17 @@ class OpenApiContractTests {
     @SuppressWarnings("unchecked")
     private static Map<String, Object> castMap(Object value) {
         return (Map<String, Object>) value;
+    }
+
+    private static void assertCrudOperations(
+            Map<String, Object> paths, String collectionPath, String itemPath) {
+        Map<String, Object> collection = castMap(paths.get(collectionPath));
+        Map<String, Object> item = castMap(paths.get(itemPath));
+        assertTrue(collection.containsKey("get"), collectionPath + " 缺少列表查询");
+        assertTrue(collection.containsKey("post"), collectionPath + " 缺少创建接口");
+        assertTrue(item.containsKey("get"), itemPath + " 缺少详情查询");
+        assertTrue(item.containsKey("put"), itemPath + " 缺少修改接口");
+        assertTrue(item.containsKey("delete"), itemPath + " 缺少删除接口");
     }
 
     private static void assertAllReferencesResolve(

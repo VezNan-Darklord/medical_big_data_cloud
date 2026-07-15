@@ -16,13 +16,14 @@ import {
     setTokenPair,
     type AuthTokenPair,
 } from '../../api/tokenStorage';
+import type { RoleCode } from '../../api/models/RoleCode';
 
 type UserContextValue = {
     token: string | null;
     refreshToken: string | null;
     isLoggedIn: boolean;
-    role: "admin" | "doctor" | "elder" | null;
-    setRole: (role: "admin" | "doctor" | "elder") => void;
+    role: RoleCode | null;
+    setRole: (role: RoleCode) => void;
     setAuth: (tokens: AuthTokenPair) => void;
     clearAuth: () => void;
 };
@@ -32,7 +33,7 @@ const UserContext = createContext<UserContextValue | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(() => getAccessToken());
     const [refreshToken, setRefreshToken] = useState<string | null>(() => getRefreshToken());
-    const [role, setRole] = useState<"admin" | "doctor" | "elder" | null>(null);
+    const [role, setRole] = useState<RoleCode | null>(null);
 
     const setAuth = useCallback((tokens: AuthTokenPair) => {
         setToken(tokens.accessToken);

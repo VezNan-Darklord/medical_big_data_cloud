@@ -96,10 +96,13 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     @Transactional
     public HealthWarningResponse handle(String id, HealthWarningHandleRequest request) {
         HealthWarning warning = findEntity(id);
-        if ("closed".equals(warning.getStatus())) {
-            throw new BusinessException(ResultCode.CONFLICT, "已关闭的预警不能再次处理");
-        }
+        requireOpenWarning(warning);
+        User handler = StringUtils.hasText(request.getHandlerId())
+                ? requireEnabledDoctor(request.getHandlerId())
+                : requireEnabledCurrentHandler();
         healthWarningMapper.updateFromHandleRequest(request, warning);
+        warning.setHandlerId(handler.getId());
+        warning.setHandlerName(handler.getRealName());
         if ("processed".equals(request.getStatus()) || "closed".equals(request.getStatus())) {
             warning.setHandledAt(LocalDateTime.now());
         }
@@ -110,12 +113,10 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     @Transactional
     public HealthWarningResponse assign(String id, HealthWarningAssignRequest request) {
         HealthWarning warning = findEntity(id);
-        User handler = userRepository.findById(request.getHandlerId())
-                .filter(user -> "doctor".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
-                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "目标医生不存在或不可用"));
+        requireOpenWarning(warning);
+        User handler = requireEnabledDoctor(request.getHandlerId());
         warning.setHandlerId(handler.getId());
-        warning.setHandlerName(StringUtils.hasText(request.getHandlerName())
-                ? request.getHandlerName() : handler.getRealName());
+        warning.setHandlerName(handler.getRealName());
         warning.setStatus("processing");
         if (StringUtils.hasText(request.getRemark())) {
             warning.setRemark(request.getRemark());
@@ -132,6 +133,24 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     private HealthWarning findEntity(String id) {
         return healthWarningRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "健康预警不存在"));
+    }
+
+    private void requireOpenWarning(HealthWarning warning) {
+        if ("closed".equals(warning.getStatus())) {
+            throw new BusinessException(ResultCode.CONFLICT, "已关闭的预警不能再次处理");
+        }
+    }
+
+    private User requireEnabledDoctor(String userId) {
+        return userRepository.findById(userId)
+                .filter(user -> "doctor".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
+                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "目标医生不存在或不可用"));
+    }
+
+    private User requireEnabledCurrentHandler() {
+        return userRepository.findById(SecurityUtil.getCurrentUserId())
+                .filter(user -> "enabled".equals(user.getStatus()))
+                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "当前处理人账户不存在或不可用"));
     }
 
     private void requireElderly(String id) {

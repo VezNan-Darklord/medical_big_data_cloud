@@ -4,10 +4,13 @@ import csulzc.medical_big_data_cloud.common.result.FilePayload;
 import csulzc.medical_big_data_cloud.common.result.PageResult;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportReviewRequest;
+import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportUpdateRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.report.AssessmentReportResponse;
 
 public interface AssessmentReportService {
     AssessmentReportResponse create(AssessmentReportCreateRequest request);
+
+    AssessmentReportResponse update(String id, AssessmentReportUpdateRequest request);
 
     AssessmentReportResponse getById(String id);
 

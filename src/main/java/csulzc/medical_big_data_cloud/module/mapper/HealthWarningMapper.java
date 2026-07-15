@@ -26,6 +26,8 @@ public interface HealthWarningMapper {
     @Mapping(target = "thresholdValue", ignore = true)
     @Mapping(target = "occurredAt", ignore = true)
     @Mapping(target = "handledAt", ignore = true)
+    @Mapping(target = "handlerId", ignore = true)
+    @Mapping(target = "handlerName", ignore = true)
     @Mapping(target = "handleResult", source = "result")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

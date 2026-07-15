@@ -44,6 +44,7 @@ export type { AssessmentReport } from './models/AssessmentReport';
 export type { AssessmentReportCreateRequest } from './models/AssessmentReportCreateRequest';
 export type { AssessmentReportPage } from './models/AssessmentReportPage';
 export type { AssessmentReportReviewRequest } from './models/AssessmentReportReviewRequest';
+export type { AssessmentReportUpdateRequest } from './models/AssessmentReportUpdateRequest';
 export type { ChangePasswordRequest } from './models/ChangePasswordRequest';
 export type { DashboardChart } from './models/DashboardChart';
 export type { DashboardOverview } from './models/DashboardOverview';

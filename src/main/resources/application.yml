@@ -38,6 +38,8 @@ springdoc:
     default-models-expand-depth: -1
 
 app:
+  auth:
+    apifox-privileged-registration-enabled: ${APIFOX_PRIVILEGED_REGISTRATION_ENABLED:false}
   bootstrap-admin:
     enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
     username: ${BOOTSTRAP_ADMIN_USERNAME:admin}

@@ -14,3 +14,7 @@ jwt:
   secret: medical-big-data-cloud-test-secret-key-at-least-thirty-two-bytes
   access-expiration: 900000
   refresh-expiration: 604800000
+
+app:
+  auth:
+    apifox-privileged-registration-enabled: true

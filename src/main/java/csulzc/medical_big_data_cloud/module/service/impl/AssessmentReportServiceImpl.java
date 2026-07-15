@@ -7,6 +7,7 @@ import csulzc.medical_big_data_cloud.common.result.PageResult;
 import csulzc.medical_big_data_cloud.common.util.SecurityUtil;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportReviewRequest;
+import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportUpdateRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.report.AssessmentReportResponse;
 import csulzc.medical_big_data_cloud.module.entity.AssessmentReport;
 import csulzc.medical_big_data_cloud.module.entity.ElderlyProfile;
@@ -45,6 +46,17 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
         entity.setAssessorId(SecurityUtil.getCurrentUserId());
         entity.setReviewStatus("draft");
         return assessmentReportMapper.toResponse(assessmentReportRepository.save(entity));
+    }
+
+    @Override
+    @Transactional
+    public AssessmentReportResponse update(String id, AssessmentReportUpdateRequest request) {
+        AssessmentReport report = findEntity(id);
+        assessmentReportMapper.updateFromRequest(request, report);
+        report.setReviewStatus("draft");
+        report.setReviewerId(null);
+        report.setReviewedAt(null);
+        return assessmentReportMapper.toResponse(assessmentReportRepository.save(report));
     }
 
     @Override

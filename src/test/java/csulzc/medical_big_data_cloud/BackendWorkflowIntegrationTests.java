@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.blankOrNullString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -173,6 +174,14 @@ class BackendWorkflowIntegrationTests {
         String elderlyAccessToken = registerBody.at("/data/accessToken").asString();
         String firstRefreshToken = registerBody.at("/data/refreshToken").asString();
 
+        mockMvc.perform(get("/elderly-accounts")
+                        .header("Authorization", "Bearer " + doctorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.list[0].id").value(elderlyUserId))
+                .andExpect(jsonPath("$.data.list[0].roleCode").value("elderly"));
+
         MvcResult refreshResult = mockMvc.perform(post("/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
@@ -296,6 +305,54 @@ class BackendWorkflowIntegrationTests {
                 .andReturn();
         String reportId = readBody(reportResult).at("/data/id").asString();
 
+        mockMvc.perform(put("/assessment-reports/{id}", reportId)
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reportType": "康复评估",
+                                  "score": 88,
+                                  "grade": "A",
+                                  "summary": "首次修改后的康复评估结论。",
+                                  "riskItems": ["下肢力量不足"],
+                                  "recommendations": ["每日完成两组平衡训练"],
+                                  "assessedAt": "%s"
+                                }
+                                """.formatted(LocalDateTime.now())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.elderlyId").value(elderlyId))
+                .andExpect(jsonPath("$.data.reportType").value("康复评估"))
+                .andExpect(jsonPath("$.data.score").value(88))
+                .andExpect(jsonPath("$.data.reviewStatus").value("draft"));
+
+        mockMvc.perform(post("/assessment-reports/{id}/review", reportId)
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"reviewStatus\":\"approved\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewStatus").value("approved"))
+                .andExpect(jsonPath("$.data.reviewerId").value(doctor.getId()))
+                .andExpect(jsonPath("$.data.reviewedAt").isNotEmpty());
+
+        mockMvc.perform(put("/assessment-reports/{id}", reportId)
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reportType": "康复评估",
+                                  "score": 90,
+                                  "grade": "A",
+                                  "summary": "复核后再次修改，必须重新进入草稿。",
+                                  "riskItems": ["步态稳定性不足"],
+                                  "recommendations": ["继续康复训练并在一周后复评"],
+                                  "assessedAt": "%s"
+                                }
+                                """.formatted(LocalDateTime.now())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewStatus").value("draft"))
+                .andExpect(jsonPath("$.data.reviewerId").doesNotExist())
+                .andExpect(jsonPath("$.data.reviewedAt").doesNotExist());
+
         mockMvc.perform(get("/assessment-reports")
                         .header("Authorization", "Bearer " + elderlyAccessToken))
                 .andExpect(status().isForbidden())
@@ -314,7 +371,7 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(content().contentTypeCompatibleWith("text/markdown"))
                 .andExpect(header().string("Content-Disposition", containsString(".md")))
                 .andExpect(content().string(containsString("# 健康评估报告")))
-                .andExpect(content().string(containsString("血压偏高")));
+                .andExpect(content().string(containsString("复核后再次修改")));
 
         mockMvc.perform(get("/assessment-reports/{id}", "missing-report")
                         .header("Authorization", "Bearer " + doctorToken))

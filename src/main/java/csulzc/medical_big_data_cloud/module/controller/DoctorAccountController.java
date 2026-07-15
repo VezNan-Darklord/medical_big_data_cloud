@@ -54,13 +54,13 @@ public class DoctorAccountController {
     public ApiResponse<UserResponse> update(
             @PathVariable String id, @Valid @RequestBody UserUpdateRequest request) {
         request.setRoleCode("doctor");
-        return ApiResponse.success(userService.updateUser(id, request));
+        return ApiResponse.success(userService.updateUserForRole(id, "doctor", request));
     }
 
     @PostMapping("/{id}/reset-password")
     public ApiResponse<Void> resetPassword(
             @PathVariable String id, @Valid @RequestBody PasswordRequest request) {
-        userService.resetPassword(id, request.getNewPassword());
+        userService.resetPasswordForRole(id, "doctor", request.getNewPassword());
         return ApiResponse.success();
     }
 }

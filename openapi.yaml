@@ -3,16 +3,16 @@ info:
   title: 医养结合云端后台管理系统 API
   version: 2.0.0
   description: |
-    基于 train.md 与当�?Spring Boot 实现维护�?REST API 契约�?
-    除登录、公开注册和刷新令牌外，接口均需�?Bearer access token�?
-    JSON 成功响应的业�?code 固定�?0，错误响应同时使用正确的 HTTP 状态码�?
+    基于 train.md 与当前 Spring Boot 实现维护的 REST API 契约。
+    除登录、公开注册和刷新令牌外，接口均需要 Bearer access token。
+    JSON 成功响应的业务 code 固定为 0，错误响应同时使用正确的 HTTP 状态码。
 servers:
   - url: http://localhost:8080/api/v1
-    description: 本地开发环�?
+    description: 本地开发环境
 security:
   - bearerAuth: []
 tags:
-  - { name: Auth, description: �?Token 认证 }
+  - { name: Auth, description: Token 认证 }
   - { name: Dashboard, description: 首页看板 }
   - { name: ElderlyProfile, description: 老人档案 }
   - { name: HealthWarning, description: 健康预警 }
@@ -24,7 +24,7 @@ tags:
   - { name: DoctorAccount, description: 医生账户 }
   - { name: UserAccount, description: 系统账户 }
   - { name: Profile, description: 个人中心 }
-  - { name: AIAnalysis, description: 结构化照护决策分�?}
+  - { name: AIAnalysis, description: 结构化照护决策分析 }
 paths:
   /auth/login:
     post:
@@ -41,15 +41,15 @@ paths:
   /auth/register:
     post:
       tags: [Auth]
-      summary: 注册账号并直接登�?
-      description: 浏览器前端仅允许注册 elderly；User-Agent 包含 Apifox 时可注册 admin、doctor �?elderly。成功后直接返回 access token 与可轮换 refresh token。该来源区分仅用于本地数据库开发环境�?
+      summary: 注册账号并直接登录
+      description: 浏览器前端仅允许注册 elderly；仅当服务端开启 Apifox 特权注册开关且 User-Agent 包含 Apifox 时，才可注册 admin、doctor 或 elderly。成功后直接返回 access token 与可轮换 refresh token。该开关默认关闭，仅用于本地开发。
       operationId: register
       security: []
       parameters:
         - name: User-Agent
           in: header
           required: false
-          description: 浏览器使用默�?User-Agent；Apifox 创建管理员或医生时必须包�?Apifox�?
+          description: 浏览器使用默认 User-Agent；Apifox 创建管理员或医生时必须包含 Apifox，且服务端已开启特权注册开关。
           schema: { type: string }
       requestBody:
         $ref: "#/components/requestBodies/Register"
@@ -61,7 +61,7 @@ paths:
   /auth/refresh:
     post:
       tags: [Auth]
-      summary: 刷新并轮换令�?
+      summary: 刷新并轮换令牌
       operationId: refreshToken
       security: []
       requestBody:
@@ -84,7 +84,7 @@ paths:
   /auth/logout:
     post:
       tags: [Auth]
-      summary: 退出登录并使当�?access token 失效
+      summary: 退出登录并使当前 access token 失效
       operationId: logout
       requestBody:
         required: false
@@ -292,7 +292,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [HealthWarning]
-      summary: 软删除预�?
+      summary: 软删除预警
       operationId: deleteHealthWarning
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -301,7 +301,7 @@ paths:
   /health-warnings/{id}/handle:
     post:
       tags: [HealthWarning]
-      summary: 处理或关闭预�?
+      summary: 处理或关闭预警
       operationId: handleHealthWarning
       parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
@@ -318,7 +318,7 @@ paths:
   /health-warnings/{id}/assign:
     post:
       tags: [HealthWarning]
-      summary: 转派预警给医�?
+      summary: 转派预警给医生
       operationId: assignHealthWarning
       parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
@@ -336,7 +336,7 @@ paths:
     get:
       tags: [AssessmentReport]
       summary: 评估报告列表
-      description: 仅管理员和医生可访问�?
+      description: 仅管理员和医生可访问。
       operationId: listAssessmentReports
       parameters:
         - { name: elderlyId, in: query, schema: { type: string } }
@@ -352,7 +352,7 @@ paths:
     post:
       tags: [AssessmentReport]
       summary: 创建评估报告
-      description: 管理员或医生创建。评估人固定取当前登录用户，报告必须包含病症/风险评估和用药或后续动作建议�?
+      description: 管理员或医生创建。评估人固定取当前登录用户，报告必须包含病症/风险评估和用药或后续动作建议。
       operationId: createAssessmentReport
       requestBody:
         required: true
@@ -371,15 +371,31 @@ paths:
     get:
       tags: [AssessmentReport]
       summary: 报告详情
-      description: 仅管理员和医生可访问�?
+      description: 仅管理员和医生可访问。
       operationId: getAssessmentReport
       responses:
         "200": { $ref: "#/components/responses/AssessmentReportResponse" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [AssessmentReport]
+      summary: 修改评估报告
+      description: 仅管理员和医生可访问。修改后复核状态重置为 draft，需重新复核；不允许更换关联老人。
+      operationId: updateAssessmentReport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: "#/components/schemas/AssessmentReportUpdateRequest" }
+      responses:
+        "200": { $ref: "#/components/responses/AssessmentReportResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [AssessmentReport]
-      summary: 软删除报�?
+      summary: 软删除报告
       operationId: deleteAssessmentReport
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -405,7 +421,7 @@ paths:
     get:
       tags: [AssessmentReport]
       summary: 导出 Markdown 报告文件
-      description: 仅管理员和医生可访问�?
+      description: 仅管理员和医生可访问。
       operationId: exportAssessmentReport
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
@@ -478,7 +494,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [KeyPopulation]
-      summary: 软删除重点人群记�?
+      summary: 软删除重点人群记录
       operationId: deleteKeyPopulation
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -499,7 +515,7 @@ paths:
     get:
       tags: [ReportStatistics]
       summary: 报表统计总览
-      description: 仅管理员可访问，返回顶部统计卡片所需的业务指标�?
+      description: 仅管理员可访问，返回顶部统计卡片所需的业务指标。
       operationId: getStatisticsOverview
       responses:
         "200":
@@ -512,7 +528,7 @@ paths:
     get:
       tags: [ReportStatistics]
       summary: 趋势统计图表
-      description: 仅管理员可访问。固定返回重点人群变化趋势、老人档案变化趋势和设备关联统计�?
+      description: 仅管理员可访问。固定返回重点人群变化趋势、老人档案变化趋势和设备关联统计。
       operationId: getStatisticsTrends
       responses:
         "200": { $ref: "#/components/responses/ChartListResponse" }
@@ -521,7 +537,7 @@ paths:
     get:
       tags: [ReportStatistics]
       summary: 分布统计图表
-      description: 仅管理员可访问�?
+      description: 仅管理员可访问。
       operationId: getStatisticsDistributions
       responses:
         "200": { $ref: "#/components/responses/ChartListResponse" }
@@ -530,7 +546,7 @@ paths:
     get:
       tags: [ReportStatistics]
       summary: 导出统计 CSV
-      description: 仅管理员可访问�?
+      description: 仅管理员可访问。
       operationId: exportStatistics
       responses:
         "200":
@@ -620,7 +636,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [Device]
-      summary: 软删除设�?
+      summary: 软删除设备
       operationId: deleteDevice
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -640,7 +656,7 @@ paths:
   /devices/{id}/reports:
     get:
       tags: [Device]
-      summary: 查询最�?100 条设备上�?
+      summary: 查询最近 100 条设备上报
       operationId: getDeviceReports
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
@@ -666,6 +682,7 @@ paths:
     get:
       tags: [ElderlyAccount]
       summary: 老人账户列表
+      description: 管理员、医生和运营人员可查询老人账户列表。
       operationId: listElderlyAccounts
       parameters:
         - {
@@ -711,7 +728,7 @@ paths:
   /elderly-accounts/{id}/status:
     post:
       tags: [ElderlyAccount]
-      summary: 修改老人账户状�?
+      summary: 修改老人账户状态
       operationId: updateElderlyAccountStatus
       parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
@@ -849,7 +866,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
     delete:
       tags: [UserAccount]
-      summary: 软删除系统账�?
+      summary: 软删除系统账户
       operationId: deleteUser
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -858,7 +875,7 @@ paths:
   /users/{id}/status:
     post:
       tags: [UserAccount]
-      summary: 修改系统账户状�?
+      summary: 修改系统账户状态
       operationId: updateUserStatus
       parameters: [{ $ref: "#/components/parameters/Id" }]
       requestBody:
@@ -920,7 +937,7 @@ paths:
   /profile/elderly:
     get:
       tags: [Profile]
-      summary: 当前老人账号的关联档�?
+      summary: 当前老人账号的关联档案
       operationId: getMyElderlyProfile
       responses:
         "200": { $ref: "#/components/responses/ElderlyResponse" }
@@ -929,8 +946,8 @@ paths:
   /profile/reports:
     get:
       tags: [Profile]
-      summary: 当前老人账号的评估报�?
-      description: 仅老人账号可访问，只返回其关联档案下的报告�?
+      summary: 当前老人账号的评估报告
+      description: 仅老人账号可访问，只返回其关联档案下的报告。
       operationId: getMyAssessmentReports
       parameters:
         - { $ref: "#/components/parameters/PageNo" }
@@ -955,7 +972,7 @@ paths:
     post:
       tags: [AIAnalysis]
       summary: 生成并持久化照护决策分析
-      description: 当前实现使用可复现的业务规则引擎，根据请求中的结构化指标生成结果并持久化�?
+      description: 当前实现使用可复现的业务规则引擎，根据请求中的结构化指标生成结果并持久化。
       operationId: createCareDecisionAnalysis
       requestBody:
         required: true
@@ -969,7 +986,7 @@ paths:
   /ai/analysis/care-decision/history:
     get:
       tags: [AIAnalysis]
-      summary: 查询最�?100 条分析历�?
+      summary: 查询最近 100 条分析历史
       operationId: listCareDecisionHistory
       responses:
         "200": { $ref: "#/components/responses/AnalysisListResponse" }
@@ -1191,7 +1208,7 @@ components:
           type: string
           enum: [elderly, doctor, admin]
           default: elderly
-          description: 浏览器前端只能传 elderly；Apifox 可传 doctor �?admin�?
+          description: 浏览器前端只能传 elderly；服务端开启特权注册开关后，Apifox 可传 doctor 或 admin。
     RefreshTokenRequest:
       type: object
       required: [refreshToken]
@@ -1547,6 +1564,27 @@ components:
         [elderlyId, reportType, score, grade, summary, riskItems, recommendations, assessedAt]
       properties:
         elderlyId: { type: string, maxLength: 64 }
+        reportType:
+          { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
+        score: { type: integer, minimum: 0, maximum: 100 }
+        grade: { type: string, enum: [A, B, C, D] }
+        summary: { type: string, minLength: 1, maxLength: 2000 }
+        riskItems:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items: { type: string, minLength: 1, maxLength: 200 }
+        recommendations:
+          type: array
+          minItems: 1
+          maxItems: 30
+          items: { type: string, minLength: 1, maxLength: 200 }
+        assessedAt: { type: string, format: date-time }
+    AssessmentReportUpdateRequest:
+      type: object
+      required:
+        [reportType, score, grade, summary, riskItems, recommendations, assessedAt]
+      properties:
         reportType:
           { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
         score: { type: integer, minimum: 0, maximum: 100 }

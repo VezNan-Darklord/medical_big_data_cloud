@@ -2,6 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import medical from '../instance'
 import type { AssessmentReportCreateRequest } from '../models/AssessmentReportCreateRequest'
 import type { AssessmentReportReviewRequest } from '../models/AssessmentReportReviewRequest'
+import type { AssessmentReportUpdateRequest } from '../models/AssessmentReportUpdateRequest'
 import type { ApiAssessmentReportPage } from '../models/ApiAssessmentReportPage'
 
 type LastPage = ApiAssessmentReportPage
@@ -35,6 +36,23 @@ export function useReviewAssessmentReportMutation() {
   return useMutation({ mutationFn: async ({ id, ...req }: AssessmentReportReviewRequest & { id: string }) => medical.assessmentReport.reviewAssessmentReport(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listAssessmentReports'] }); qc.invalidateQueries({ queryKey: ['getAssessmentReport'] }) }, mutationKey: ['reviewAssessmentReport'] })
 }
 
-export function useExportAssessmentReportQuery(id: string) {
-  return useQuery({ queryKey: ['exportAssessmentReport', id], queryFn: async () => medical.assessmentReport.exportAssessmentReport(id), enabled: !!id })
+export function useExportAssessmentReportMutation() {
+  return useMutation({
+    mutationFn: async (id: string) => medical.assessmentReport.exportAssessmentReport(id),
+    mutationKey: ['exportAssessmentReport'],
+  })
+}
+
+export function useUpdateAssessmentReportMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...req }: AssessmentReportUpdateRequest & { id: string }) =>
+      medical.assessmentReport.updateAssessmentReport(id, req),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['listAssessmentReports'] })
+      qc.invalidateQueries({ queryKey: ['getAssessmentReport', variables.id] })
+      qc.invalidateQueries({ queryKey: ['getMyAssessmentReports'] })
+    },
+    mutationKey: ['updateAssessmentReport'],
+  })
 }

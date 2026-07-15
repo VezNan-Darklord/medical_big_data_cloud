@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Card, Form, Input, Select, DatePicker, Tag, message, Skeleton, InputNumber, Spin } from 'antd'
-import { PlusOutlined, SendOutlined, CheckCircleOutlined } from '@ant-design/icons'
-import { useListHealthWarningsQuery, useCreateHealthWarningMutation, useHandleHealthWarningMutation, useAssignHealthWarningMutation } from '../../../api/hooks/healthWarningHooks'
+import { Button, Card, Form, Input, Select, DatePicker, Tag, message, Skeleton, InputNumber, Popconfirm, Spin } from 'antd'
+import { PlusOutlined, SendOutlined, CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useListHealthWarningsQuery, useCreateHealthWarningMutation, useHandleHealthWarningMutation, useAssignHealthWarningMutation, useDeleteHealthWarningMutation } from '../../../api/hooks/healthWarningHooks'
 import { useListElderlyProfilesQuery } from '../../../api/hooks/elderlyProfileHooks'
 import { StatusTag, PopWindow } from '../common'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
@@ -9,11 +9,27 @@ import type { HealthWarningCreateRequest } from '../../../api/models/HealthWarni
 import dayjs from 'dayjs'
 import type { HealthWarning } from '../../../api/models/HealthWarning'
 import type { HealthWarningHandleRequest } from '../../../api/models/HealthWarningHandleRequest'
+import { useCurrentRoleCode } from '../../hooks/useCurrentRoleCode'
 
 const severityColors: Record<string, string> = { low: 'blue', medium: 'orange', high: 'red', critical: '#7c0221' }
 const severityBg: Record<string, string> = { low: 'bg-blue-50 border-blue-200', medium: 'bg-orange-50 border-orange-200', high: 'bg-red-50 border-red-200', critical: 'bg-rose-100 border-rose-300' }
 
-function WarningCard({ warning, onHandle, onAssign }: { warning: HealthWarning; onHandle: (id: string) => void; onAssign: (id: string) => void }) {
+function WarningCard({
+  warning,
+  canDelete,
+  canHandle,
+  onHandle,
+  onAssign,
+}: {
+  warning: HealthWarning
+  canDelete: boolean
+  canHandle: boolean
+  onHandle: (id: string) => void
+  onAssign: (id: string) => void
+}) {
+  const isClosed = warning.status === 'closed'
+  const deleteMutation = useDeleteHealthWarningMutation()
+
   return (
     <Card className={`overflow-hidden rounded-2xl border shadow-sm ${severityBg[warning.severity!] ?? 'border-slate-200'}`} styles={{ body: { padding: 20 } }}>
       <div className="flex items-start justify-between gap-2"><Tag color={severityColors[warning.severity!] ?? 'default'}>{warning.severity}</Tag><StatusTag value={warning.status!} /></div>
@@ -22,8 +38,19 @@ function WarningCard({ warning, onHandle, onAssign }: { warning: HealthWarning; 
       {warning.metricName && <div className="mt-2 rounded-lg bg-white/60 px-3 py-2 text-sm">{warning.metricName}: <span className="font-semibold">{warning.metricValue}</span> / <span className="text-slate-400">{warning.thresholdValue}</span></div>}
       <div className="mt-2 text-xs text-slate-400">{warning.occurredAt}</div>
       <div className="mt-3 flex gap-2">
-        {warning.status !== 'processed' && <Button size="small" type="primary" ghost icon={<CheckCircleOutlined />} onClick={() => onHandle(warning.id!)}>处理</Button>}
-        <Button size="small" icon={<SendOutlined />} onClick={() => onAssign(warning.id!)}>转派</Button>
+        {canHandle && warning.status !== 'processed' && !isClosed && <Button size="small" type="primary" ghost icon={<CheckCircleOutlined />} onClick={() => onHandle(warning.id!)}>处理</Button>}
+        {canHandle && !isClosed && <Button size="small" icon={<SendOutlined />} onClick={() => onAssign(warning.id!)}>转派</Button>}
+        {canDelete && (
+          <Popconfirm
+            title="确认删除这条预警？"
+            onConfirm={() => deleteMutation.mutate(warning.id!, {
+              onSuccess: () => message.success('预警已删除'),
+              onError: (error: Error) => message.error(error.message || '删除失败'),
+            })}
+          >
+            <Button size="small" danger icon={<DeleteOutlined />} loading={deleteMutation.isPending}>删除</Button>
+          </Popconfirm>
+        )}
       </div>
     </Card>
   )
@@ -104,6 +131,9 @@ function AssignModal({ open, warningId, onClose }: { open: boolean; warningId: s
 }
 
 export default function HealthWarningsPage() {
+  const role = useCurrentRoleCode()
+  const canHandle = role === 'admin' || role === 'doctor'
+  const canDelete = role === 'admin'
   const [createOpen, setCreateOpen] = useState(false)
   const [handleId, setHandleId] = useState('')
   const [assignId, setAssignId] = useState('')
@@ -124,15 +154,24 @@ export default function HealthWarningsPage() {
       {isLoading ? <Skeleton active paragraph={{ rows: 6 }} /> : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {allWarnings.map((w: HealthWarning) => <WarningCard key={w.id} warning={w} onHandle={setHandleId} onAssign={setAssignId} />)}
+            {allWarnings.map((w: HealthWarning) => (
+              <WarningCard
+                key={w.id}
+                warning={w}
+                canDelete={canDelete}
+                canHandle={canHandle}
+                onHandle={setHandleId}
+                onAssign={setAssignId}
+              />
+            ))}
           </div>
           <div ref={sentinelRef} className="h-px" />
           {isFetchingNextPage && <div className="text-center"><Spin /></div>}
         </>
       )}
       <CreateWarningModal open={createOpen} onClose={() => setCreateOpen(false)} />
-      {handleId && <HandleModal open={!!handleId} warningId={handleId} onClose={() => setHandleId('')} />}
-      {assignId && <AssignModal open={!!assignId} warningId={assignId} onClose={() => setAssignId('')} />}
+      {canHandle && handleId && <HandleModal open={!!handleId} warningId={handleId} onClose={() => setHandleId('')} />}
+      {canHandle && assignId && <AssignModal open={!!assignId} warningId={assignId} onClose={() => setAssignId('')} />}
     </div>
   )
 }
