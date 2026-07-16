@@ -4,6 +4,9 @@
 /* eslint-disable */
 export type KeyPopulation = {
     id?: string;
+    /**
+     * 老人账户本人的用户 ID，不是老人档案 ID。
+     */
     elderlyId?: string;
     category?: string;
     reason?: string | null;

@@ -58,6 +58,7 @@ export class HealthWarningService {
     }
     /**
      * 新增健康预警
+     * 管理员、医生和运营人员创建时 elderlyId 必须是老人档案 ID；老人本人创建时可不传 elderlyId，服务端会自动绑定当前账号关联的老人档案。
      * @param requestBody
      * @returns ApiWarning 成功
      * @throws ApiError
@@ -97,7 +98,7 @@ export class HealthWarningService {
         });
     }
     /**
-     * 软删除预�?
+     * 软删除预警
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -118,7 +119,7 @@ export class HealthWarningService {
         });
     }
     /**
-     * 处理或关闭预�?
+     * 处理或关闭预警
      * @param id
      * @param requestBody
      * @returns ApiWarning 成功
@@ -145,7 +146,7 @@ export class HealthWarningService {
         });
     }
     /**
-     * 转派预警给医�?
+     * 转派预警给医生
      * @param id
      * @param requestBody
      * @returns ApiWarning 成功

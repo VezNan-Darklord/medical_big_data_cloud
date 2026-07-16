@@ -114,7 +114,7 @@ export class UserAccountService {
         });
     }
     /**
-     * 软删除系统账�?
+     * 软删除系统账户
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -135,7 +135,7 @@ export class UserAccountService {
         });
     }
     /**
-     * 修改系统账户状�?
+     * 修改系统账户状态
      * @param id
      * @param requestBody
      * @returns ApiEmpty 成功

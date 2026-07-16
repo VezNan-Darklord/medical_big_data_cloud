@@ -4,7 +4,7 @@ import { PlusOutlined, ReloadOutlined, DeleteOutlined, EditOutlined } from '@ant
 import { useListElderlyProfilesQuery, useCreateElderlyProfileMutation, useGetElderlyProfileQuery, useDeleteElderlyProfileMutation, useUpdateElderlyProfileMutation } from '../../../api/hooks/elderlyProfileHooks'
 import { useResetElderlyPasswordMutation } from '../../../api/hooks/elderlyAccountHooks'
 import { PanelCard, PopWindow } from '../common'
-import { ElderlyAccountSelect } from '../common/ElderlyAccountSelect'
+import { AccountSelect } from '../common/AccountSelect'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { ElderlyProfileCreateRequest } from '../../../api/models/ElderlyProfileCreateRequest'
 import type { ElderlyProfileUpdateRequest } from '../../../api/models/ElderlyProfileUpdateRequest'
@@ -26,7 +26,7 @@ function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => v
       }}>
         <div className="grid gap-0 md:grid-cols-2 md:gap-x-4">
           <Form.Item name="userId" label="关联老人账户" rules={[{ required: true }]}>
-            <ElderlyAccountSelect setRealName={(name) => { form.setFieldsValue({ name }); }} setMobile={(phone) => { form.setFieldsValue({ phone }); }} />
+            <AccountSelect setRealName={(name) => { form.setFieldsValue({ name }); }} setMobile={(phone) => { form.setFieldsValue({ phone }); }} />
           </Form.Item>
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
             <Input disabled placeholder={'已关联账户'} />

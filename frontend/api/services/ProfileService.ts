@@ -64,7 +64,7 @@ export class ProfileService {
         });
     }
     /**
-     * 当前老人账号的关联档�?
+     * 当前老人账号的关联档案
      * @returns ApiElderly 成功
      * @throws ApiError
      */
@@ -79,8 +79,8 @@ export class ProfileService {
         });
     }
     /**
-     * 当前老人账号的评估报�?
-     * 仅老人账号可访问，只返回其关联档案下的报告�?
+     * 当前老人账号的评估报告
+     * 仅老人账号可访问，只返回其关联档案下的报告。
      * @param pageNo
      * @param pageSize
      * @returns ApiAssessmentReportPage 成功

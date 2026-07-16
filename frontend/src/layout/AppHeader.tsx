@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { Button, Input, Form, message, Avatar, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
-import { CalendarOutlined, SearchOutlined, UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
-import { useUserContext } from '../store/userContext'
+import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
 import { useLoginMutation, useRegisterMutation, useGetCurrentUserQuery, useLogoutMutation } from '../../api/hooks/authHooks'
 import { PopWindow } from '../components/common'
 import { useQueryClient } from '@tanstack/react-query'
-import type { AuthTokenPair } from '../../api/tokenStorage'
+import { clearTokenPair, getAccessToken, setTokenPair, type AuthTokenPair } from '../../api/tokenStorage'
+import { useNavigate } from 'react-router-dom'
 
 
 function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { open: boolean; onClose: () => void; onLoginSuccess: (tokens: AuthTokenPair) => void; onSwitchToRegister: () => void }) {
-  const [form] = Form.useForm()
-  const queryClient = useQueryClient()
-  const loginMutation = useLoginMutation()
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const loginMutation = useLoginMutation();
 
   const handleSubmit = async (values: { username: string; password: string }) => {
       await loginMutation.mutateAsync({ username: values.username, password: values.password },
@@ -24,8 +25,17 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
               })
+              if (res.data?.user.roleCode === 'elderly') { 
+                navigate('/elderly-profiles')
+              }
+              if (res.data?.user.roleCode === 'doctor') {
+                navigate('/health-warnings')
+              }
+              if (res.data?.user.roleCode === 'admin') {
+                navigate('/report-statistics')
+              }
               message.success('登录成功')
-              queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] })
+              queryClient.resetQueries({ queryKey: ['getCurrentUser'] })
               onClose()
               form.resetFields()
             } else {
@@ -86,7 +96,7 @@ function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { 
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
           });
-          queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
+          queryClient.resetQueries({ queryKey: ['getCurrentUser'] });
         },
         onError: (error) => {
           message.error(error?.message ?? '注册失败，请稍后重试')
@@ -127,12 +137,10 @@ function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { 
 
 
 export function AppHeader() {
-  const { isLoggedIn, setAuth, clearAuth } = useUserContext()
-
+  const navigate = useNavigate(); 
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const queryClient = useQueryClient();
 
   const { data: currentUserData } = useGetCurrentUserQuery();
   const { mutate: logout } = useLogoutMutation();
@@ -151,21 +159,19 @@ export function AppHeader() {
     if (key === 'logout') {
       logout(undefined, {
         onSettled: () => {
-          clearAuth()
+          clearTokenPair();
+          navigate('/');
           message.success('已退出登录');
-          queryClient.invalidateQueries({ queryKey: ['getCurrentUser'] });
         },
       })
     }
   };
 
   return (
-    <header className="flex h-20 items-center justify-start border-b border-slate-200/80 bg-white/75 px-6 backdrop-blur">
-      <Input prefix={<SearchOutlined className="text-slate-400" />} placeholder="搜索老人、设备、报告" className="flex-1/2 rounded-xl" />
-      <div className="ml-3 flex items-center gap-3">
-        <Button icon={<CalendarOutlined />} className="rounded-xl">今日</Button>
+    <header className="flex h-20 items-center justify-end border-b border-slate-200/80 bg-white/75 px-6 backdrop-blur">
+      <div className="ml-3 flex items-center gap-3 justify-end">
 
-        {isLoggedIn ? (
+        {getAccessToken() ? (
           <Dropdown
             menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
             open={userMenuOpen}
@@ -187,8 +193,8 @@ export function AppHeader() {
         )}
       </div>
 
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onLoginSuccess={setAuth} onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true) }} />
-      <RegisterModal open={registerOpen} onClose={() => setRegisterOpen(false)} onRegisterSuccess={setAuth} onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true) }} />
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onLoginSuccess={setTokenPair} onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true) }} />
+      <RegisterModal open={registerOpen} onClose={() => setRegisterOpen(false)} onRegisterSuccess={setTokenPair} onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true) }} />
     </header>
   )
 }

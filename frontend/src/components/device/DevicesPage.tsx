@@ -3,7 +3,7 @@ import { Button, Card, Form, Input, message, Popconfirm, Skeleton, Spin } from '
 import { PlusOutlined, WifiOutlined, DisconnectOutlined, DeleteOutlined, LinkOutlined, EditOutlined } from '@ant-design/icons'
 import { useListDevicesQuery, useCreateDeviceMutation, useBindDeviceMutation, useUnbindDeviceMutation, useUpdateDeviceMutation, useDeleteDeviceMutation } from '../../../api/hooks/deviceHooks'
 import { StatusTag, PopWindow } from '../common'
-import { ElderlyAccountSelect } from '../common/ElderlyAccountSelect'
+import { AccountSelect } from '../common/AccountSelect'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { DeviceCreateRequest } from '../../../api/models/DeviceCreateRequest'
 import type { DeviceUpdateRequest } from '../../../api/models/DeviceUpdateRequest'
@@ -44,7 +44,7 @@ function BindDeviceModal({ open, deviceId, onClose }: { open: boolean; deviceId:
         })
       }}>
         <Form.Item name="elderlyId" label="选择老人" rules={[{ required: true }]}>
-          <ElderlyAccountSelect />
+          <AccountSelect />
         </Form.Item>
         <Button type="primary" htmlType="submit" loading={bindMutation.isPending} block size="large">确认绑定</Button>
       </Form>

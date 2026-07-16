@@ -34,10 +34,10 @@ export class AuthService {
         });
     }
     /**
-     * 注册账号并直接登�?
-     * 浏览器前端仅允许注册 elderly；User-Agent 包含 Apifox 时可注册 admin、doctor �?elderly。成功后直接返回 access token 与可轮换 refresh token。该来源区分仅用于本地数据库开发环境�?
+     * 注册账号并直接登录
+     * 浏览器前端仅允许注册 elderly；仅当服务端开启 Apifox 特权注册开关且 User-Agent 包含 Apifox 时，才可注册 admin、doctor 或 elderly。成功后直接返回 access token 与可轮换 refresh token。该开关默认关闭，仅用于本地开发。
      * @param requestBody
-     * @param userAgent 浏览器使用默�?User-Agent；Apifox 创建管理员或医生时必须包�?Apifox�?
+     * @param userAgent 浏览器使用默认 User-Agent；Apifox 创建管理员或医生时必须包含 Apifox，且服务端已开启特权注册开关。
      * @returns ApiLogin 成功
      * @throws ApiError
      */
@@ -61,7 +61,7 @@ export class AuthService {
         });
     }
     /**
-     * 刷新并轮换令�?
+     * 刷新并轮换令牌
      * @param requestBody
      * @returns ApiLogin 成功
      * @throws ApiError
@@ -95,7 +95,7 @@ export class AuthService {
         });
     }
     /**
-     * 退出登录并使当�?access token 失效
+     * 退出登录并使当前 access token 失效
      * @param requestBody
      * @returns ApiEmpty 成功
      * @throws ApiError

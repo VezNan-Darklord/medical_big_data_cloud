@@ -1,13 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Menu } from 'antd'
 import { type NavItem } from '../mock-data'
-import { ApartmentOutlined, TeamOutlined, AlertOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, RadarChartOutlined, CloudServerOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons'
-import { useGetCurrentUserQuery } from '../../api/hooks/authHooks'
+import { TeamOutlined, AlertOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, RadarChartOutlined, CloudServerOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons'
 import { canAccessPath } from '../routes/const'
-import type { User } from '../../api/models/User'
+import { useCurrentRoleCode } from '../store/useCurrentRoleCode'
 
 const allNavigationItems: NavItem[] = [
-  { key: 'dashboard', path: '/', label: '首页', icon: <ApartmentOutlined />, description: '总览、趋势、AI 建议与指挥席。' },
   { key: 'elderly', path: '/elderly-profiles', label: '老人档案', icon: <TeamOutlined />, description: '老人信息、标签、分组与关联业务视图。' },
   { key: 'warnings', path: '/health-warnings', label: '健康预警', icon: <AlertOutlined />, description: '设备异常、等级分层、转派与处置状态。' },
   { key: 'reports', path: '/assessment-reports', label: '评估报告', icon: <MedicineBoxOutlined />, description: '评估生成、复核记录与建议摘要。' },
@@ -17,17 +15,14 @@ const allNavigationItems: NavItem[] = [
   { key: 'elderly-accounts', path: '/elderly-accounts', label: '老人账户管理', icon: <UserOutlined />, description: '老人端账户启停、重置密码与使用情况。' },
   { key: 'doctor-accounts', path: '/doctor-accounts', label: '医生账户管理', icon: <HeartOutlined />, description: '医生账号、角色、机构归属与状态。' },
   { key: 'analysis', path: '/decision-analysis', label: '大数据决策分析', icon: <RadarChartOutlined />, description: '多维分析、AI 结论与资源建议。' },
-  { key: 'users', path: '/users', label: '用户账号管理', icon: <SafetyCertificateOutlined />, description: '系统账号、角色、状态与审计。' },
   { key: 'profile', path: '/profile', label: '个人中心', icon: <UserOutlined />, description: '个人资料、安全设置、待办与消息。' },
 ]
 
 export default function AppSidebar() {
   const location = useLocation()
-  const { data } = useGetCurrentUserQuery()
-  const user = data?.data as User | undefined
 
-  const roleCode = user?.roleCode ?? ''
-  const visibleItems = user
+  const roleCode = useCurrentRoleCode();
+  const visibleItems = roleCode
     ? allNavigationItems.filter(item => canAccessPath(roleCode, item.path))
     : []
 

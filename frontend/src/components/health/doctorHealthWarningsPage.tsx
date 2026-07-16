@@ -77,7 +77,9 @@ function CreateWarningModal({ open, onClose }: { open: boolean; onClose: () => v
           <Form.Item name="warningType" label="预警类型" rules={[{ required: true }]}><Select options={['abnormal_heart_rate','blood_pressure','blood_sugar','sleep','fall','other'].map(v => ({ value: v, label: v }))} /></Form.Item>
           <Form.Item name="severity" label="严重程度" rules={[{ required: true }]}><Select options={['low','medium','high','critical'].map(v => ({ value: v, label: v }))} /></Form.Item>
           <Form.Item name="source" label="来源" rules={[{ required: true }]}><Select options={['device','manual','self_report'].map(v => ({ value: v, label: v }))} /></Form.Item>
-          <Form.Item name="occurredAt" label="发生时间" rules={[{ required: true }]} getValueFromEvent={(d: dayjs.Dayjs | null) => d?.toISOString()}><DatePicker showTime className="w-full" /></Form.Item>
+          <Form.Item name="occurredAt" label="发生时间" rules={[{ required: true }]}>
+            <DatePicker showTime className="w-full"  onChange={(d)=>form.setFieldValue('occurredAt',d)}/>
+          </Form.Item>
           <Form.Item name="metricName" label="指标名"><Input /></Form.Item>
           <Form.Item name="metricValue" label="指标值"><InputNumber className="w-full" /></Form.Item>
         </div>

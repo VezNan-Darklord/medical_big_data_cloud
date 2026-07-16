@@ -13,7 +13,7 @@ const roleNames: Record<string, string> = {
 
 export default function ProfilePage() {
   const { data, isLoading } = useGetCurrentUserQuery()
-  const user = data?.data as User | undefined
+  const user = data?.data as User | undefined;
   const { data: todosData } = useGetTodosQuery()
   const todos = todosData?.data;
 

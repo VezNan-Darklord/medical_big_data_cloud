@@ -14,6 +14,7 @@ export class ElderlyAccountService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * 老人账户列表
+     * 管理员、医生和运营人员可查询老人账户列表。
      * @param status
      * @param pageNo
      * @param pageSize
@@ -84,7 +85,7 @@ export class ElderlyAccountService {
         });
     }
     /**
-     * 修改老人账户状�?
+     * 修改老人账户状态
      * @param id
      * @param requestBody
      * @returns ApiEmpty 成功

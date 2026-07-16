@@ -14,7 +14,7 @@ export class AssessmentReportService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * 评估报告列表
-     * 仅管理员和医生可访问�?
+     * 仅管理员和医生可访问。
      * @param elderlyId
      * @param pageNo
      * @param pageSize
@@ -41,7 +41,7 @@ export class AssessmentReportService {
     }
     /**
      * 创建评估报告
-     * 管理员或医生创建。评估人固定取当前登录用户，报告必须包含病症/风险评估和用药或后续动作建议�?
+     * 管理员或医生创建。评估人固定取当前登录用户，报告必须包含病症/风险评估和用药或后续动作建议。
      * @param requestBody
      * @returns ApiAssessmentReport 成功
      * @throws ApiError
@@ -63,7 +63,7 @@ export class AssessmentReportService {
     }
     /**
      * 报告详情
-     * 仅管理员和医生可访问�?
+     * 仅管理员和医生可访问。
      * @param id
      * @returns ApiAssessmentReport 成功
      * @throws ApiError
@@ -85,7 +85,7 @@ export class AssessmentReportService {
     }
     /**
      * 修改评估报告
-     * 修改后报告重新进入草稿状态，需重新复核。
+     * 仅管理员和医生可访问。修改后复核状态重置为 draft，需重新复核；不允许更换关联老人。
      * @param id
      * @param requestBody
      * @returns ApiAssessmentReport 成功
@@ -111,7 +111,7 @@ export class AssessmentReportService {
         });
     }
     /**
-     * 软删除报�?
+     * 软删除报告
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -158,7 +158,7 @@ export class AssessmentReportService {
     }
     /**
      * 导出 Markdown 报告文件
-     * 仅管理员和医生可访问�?
+     * 仅管理员和医生可访问。
      * @param id
      * @returns binary UTF-8 Markdown 文件
      * @throws ApiError

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import medical from '../instance'
 
 export function useStatisticsOverviewQuery() {
@@ -13,9 +13,9 @@ export function useStatisticsDistributionsQuery() {
   return useQuery({ queryKey: ['statisticsDistributions'], queryFn: async () => medical.reportStatistics.getStatisticsDistributions() })
 }
 
-export function useExportStatisticsMutation() {
-  return useMutation({
-    mutationFn: async () => medical.reportStatistics.exportStatistics(),
-    mutationKey: ['exportStatistics'],
+export function useExportStatisticsQuery() {
+  return useQuery({
+    queryKey: ['exportStatistics'],
+    queryFn: async () => medical.reportStatistics.exportStatistics(),
   })
 }
