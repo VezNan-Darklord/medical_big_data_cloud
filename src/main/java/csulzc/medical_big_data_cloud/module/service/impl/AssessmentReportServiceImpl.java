@@ -27,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
         AssessmentReport entity = assessmentReportMapper.toEntity(request);
         entity.setAssessorId(SecurityUtil.getCurrentUserId());
         entity.setReviewStatus("draft");
-        return assessmentReportMapper.toResponse(assessmentReportRepository.save(entity));
+        return toResponse(assessmentReportRepository.save(entity));
     }
 
     @Override
@@ -56,13 +58,13 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
         report.setReviewStatus("draft");
         report.setReviewerId(null);
         report.setReviewedAt(null);
-        return assessmentReportMapper.toResponse(assessmentReportRepository.save(report));
+        return toResponse(assessmentReportRepository.save(report));
     }
 
     @Override
     @Transactional(readOnly = true)
     public AssessmentReportResponse getById(String id) {
-        return assessmentReportMapper.toResponse(findEntity(id));
+        return toResponse(findEntity(id));
     }
 
     @Override
@@ -72,7 +74,7 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
         Page<AssessmentReport> page = StringUtils.hasText(elderlyId)
                 ? assessmentReportRepository.findByElderlyId(elderlyId, pageable)
                 : assessmentReportRepository.findAll(pageable);
-        return new PageResult<>(page.getContent().stream().map(assessmentReportMapper::toResponse).toList(),
+        return new PageResult<>(toResponses(page.getContent()),
                 pageNo, pageSize, page.getTotalElements());
     }
 
@@ -83,7 +85,7 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "老人账号尚未关联档案"));
         PageRequest pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "assessedAt"));
         Page<AssessmentReport> page = assessmentReportRepository.findByElderlyId(profile.getId(), pageable);
-        return new PageResult<>(page.getContent().stream().map(assessmentReportMapper::toResponse).toList(),
+        return new PageResult<>(toResponses(page.getContent()),
                 pageNo, pageSize, page.getTotalElements());
     }
 
@@ -94,7 +96,7 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
         report.setReviewStatus(request.getReviewStatus());
         report.setReviewerId(SecurityUtil.getCurrentUserId());
         report.setReviewedAt(LocalDateTime.now());
-        return assessmentReportMapper.toResponse(assessmentReportRepository.save(report));
+        return toResponse(assessmentReportRepository.save(report));
     }
 
     @Override
@@ -131,6 +133,29 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
     private AssessmentReport findEntity(String id) {
         return assessmentReportRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "评估报告不存在"));
+    }
+
+    private AssessmentReportResponse toResponse(AssessmentReport report) {
+        String elderlyName = elderlyProfileRepository.findById(report.getElderlyId())
+                .map(ElderlyProfile::getName)
+                .orElse(null);
+        return toResponse(report, elderlyName);
+    }
+
+    private List<AssessmentReportResponse> toResponses(List<AssessmentReport> reports) {
+        Map<String, String> elderlyNames = elderlyProfileRepository.findAllById(
+                        reports.stream().map(AssessmentReport::getElderlyId).distinct().toList())
+                .stream()
+                .collect(Collectors.toMap(ElderlyProfile::getId, ElderlyProfile::getName));
+        return reports.stream()
+                .map(report -> toResponse(report, elderlyNames.get(report.getElderlyId())))
+                .toList();
+    }
+
+    private AssessmentReportResponse toResponse(AssessmentReport report, String elderlyName) {
+        AssessmentReportResponse response = assessmentReportMapper.toResponse(report);
+        response.setElderlyName(elderlyName);
+        return response;
     }
 
     private void appendItems(StringBuilder builder, List<String> values) {

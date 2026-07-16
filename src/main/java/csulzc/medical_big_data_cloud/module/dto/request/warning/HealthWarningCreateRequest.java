@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class HealthWarningCreateRequest {
-    @NotBlank(message = "老人 ID 不能为空")
     @Size(max = 64, message = "老人 ID 长度不能超过 64")
     private String elderlyId;
 

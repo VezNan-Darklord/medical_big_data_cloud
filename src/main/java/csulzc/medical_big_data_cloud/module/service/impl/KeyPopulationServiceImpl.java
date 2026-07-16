@@ -8,7 +8,6 @@ import csulzc.medical_big_data_cloud.module.dto.request.keypop.KeyPopulationUpda
 import csulzc.medical_big_data_cloud.module.dto.response.keypop.KeyPopulationResponse;
 import csulzc.medical_big_data_cloud.module.entity.KeyPopulation;
 import csulzc.medical_big_data_cloud.module.mapper.KeyPopulationMapper;
-import csulzc.medical_big_data_cloud.module.repository.ElderlyProfileRepository;
 import csulzc.medical_big_data_cloud.module.repository.KeyPopulationRepository;
 import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.KeyPopulationService;
@@ -25,14 +24,13 @@ import org.springframework.util.StringUtils;
 public class KeyPopulationServiceImpl implements KeyPopulationService {
 
     private final KeyPopulationRepository keyPopulationRepository;
-    private final ElderlyProfileRepository elderlyProfileRepository;
     private final UserRepository userRepository;
     private final KeyPopulationMapper keyPopulationMapper;
 
     @Override
     @Transactional
     public KeyPopulationResponse create(KeyPopulationCreateRequest request) {
-        requireElderly(request.getElderlyId());
+        requireElderlyUser(request.getElderlyId());
         validateDoctor(request.getOwnerDoctorId());
         boolean duplicate = keyPopulationRepository.findByElderlyIdOrderByCreatedAtDesc(request.getElderlyId()).stream()
                 .anyMatch(item -> item.getCategory().equals(request.getCategory()) && "active".equals(item.getStatus()));
@@ -101,10 +99,10 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "重点人群记录不存在"));
     }
 
-    private void requireElderly(String elderlyId) {
-        if (!elderlyProfileRepository.existsById(elderlyId)) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "老人档案不存在");
-        }
+    private void requireElderlyUser(String elderlyId) {
+        userRepository.findById(elderlyId)
+                .filter(user -> "elderly".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
+                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "老人账户不存在或不可用"));
     }
 
     private void validateDoctor(String doctorId) {

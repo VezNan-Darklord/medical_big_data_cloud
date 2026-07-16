@@ -42,9 +42,10 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     @Transactional
     public HealthWarningResponse create(HealthWarningCreateRequest request) {
         if (isElderlyUser()) {
-            requireOwnProfile(request.getElderlyId());
+            request.setElderlyId(currentElderlyProfileId());
+        } else {
+            requireElderly(request.getElderlyId());
         }
-        requireElderly(request.getElderlyId());
         HealthWarning entity = healthWarningMapper.toEntity(request);
         if (!StringUtils.hasText(entity.getStatus())) {
             entity.setStatus("unprocessed");
@@ -154,7 +155,7 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     }
 
     private void requireElderly(String id) {
-        if (!elderlyProfileRepository.existsById(id)) {
+        if (!StringUtils.hasText(id) || !elderlyProfileRepository.existsById(id)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "老人档案不存在");
         }
     }

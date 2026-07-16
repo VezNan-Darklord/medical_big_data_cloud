@@ -270,6 +270,7 @@ paths:
     post:
       tags: [HealthWarning]
       summary: 新增健康预警
+      description: 管理员、医生和运营人员创建时 elderlyId 必须是老人档案 ID；老人本人创建时可不传 elderlyId，服务端会自动绑定当前账号关联的老人档案。
       operationId: createHealthWarning
       requestBody:
         required: true
@@ -458,6 +459,7 @@ paths:
     post:
       tags: [KeyPopulation]
       summary: 新增重点人群
+      description: elderlyId 必须传老人账户本人的用户 ID，不是老人档案 ID。
       operationId: createKeyPopulation
       requestBody:
         required: true
@@ -495,6 +497,7 @@ paths:
     delete:
       tags: [KeyPopulation]
       summary: 软删除重点人群记录
+      description: 管理员和医生可删除。
       operationId: deleteKeyPopulation
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -586,6 +589,7 @@ paths:
     post:
       tags: [Device]
       summary: 新增设备
+      description: 管理员、医生和运营人员可创建设备。
       operationId: createDevice
       requestBody:
         required: true
@@ -637,6 +641,7 @@ paths:
     delete:
       tags: [Device]
       summary: 软删除设备
+      description: 仅管理员可删除设备，医生无权删除。
       operationId: deleteDevice
       responses:
         "200": { $ref: "#/components/responses/EmptyResponse" }
@@ -1472,9 +1477,12 @@ components:
         updatedAt: { type: string, format: date-time }
     HealthWarningCreateRequest:
       type: object
-      required: [elderlyId, warningType, severity, source, occurredAt]
+      required: [warningType, severity, source, occurredAt]
       properties:
-        elderlyId: { type: string, maxLength: 64 }
+        elderlyId:
+          type: string
+          maxLength: 64
+          description: 管理员、医生和运营人员传老人档案 ID；老人本人创建时可省略，服务端自动使用本人关联档案。
         warningType: { type: string, maxLength: 50 }
         severity: { type: string, enum: [low, medium, high, critical] }
         source: { type: string, maxLength: 20 }
@@ -1540,10 +1548,11 @@ components:
     AssessmentReport:
       type: object
       required:
-        [id, elderlyId, reportType, score, grade, summary, riskItems, recommendations, assessorId, assessedAt, reviewStatus]
+        [id, elderlyId, elderlyName, reportType, score, grade, summary, riskItems, recommendations, assessorId, assessedAt, reviewStatus]
       properties:
         id: { type: string }
         elderlyId: { type: string }
+        elderlyName: { type: string }
         reportType:
           { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
         score: { type: integer, minimum: 0, maximum: 100 }
@@ -1644,7 +1653,9 @@ components:
       type: object
       properties:
         id: { type: string }
-        elderlyId: { type: string }
+        elderlyId:
+          type: string
+          description: 老人账户本人的用户 ID，不是老人档案 ID。
         category: { type: string }
         reason: { type: string, nullable: true }
         level: { type: string }
@@ -1657,10 +1668,13 @@ components:
       type: object
       required: [elderlyId, category]
       properties:
-        elderlyId: { type: string, maxLength: 64 }
+        elderlyId:
+          type: string
+          maxLength: 64
+          description: 老人账户本人的用户 ID，不是老人档案 ID。
         category: { type: string, maxLength: 50 }
         reason: { type: string, maxLength: 500 }
-        level: { type: string, maxLength: 10, default: B }
+        level: { type: string, maxLength: 10, default: C }
         ownerDoctorId: { type: string, maxLength: 64 }
         followUpCycleDays: { type: integer, default: 30 }
         status: { type: string, enum: [active, closed], default: active }

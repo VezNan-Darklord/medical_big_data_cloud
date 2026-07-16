@@ -9,6 +9,7 @@ import java.util.List;
 public class AssessmentReportResponse {
     private String id;
     private String elderlyId;
+    private String elderlyName;
     private String reportType;
     private Integer score;
     private String grade;

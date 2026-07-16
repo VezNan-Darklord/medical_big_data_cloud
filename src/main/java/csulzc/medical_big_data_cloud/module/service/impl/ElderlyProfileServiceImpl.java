@@ -139,9 +139,13 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional(readOnly = true)
     public List<AssessmentReportResponse> getReports(String id) {
-        findEntity(id);
+        ElderlyProfile profile = findEntity(id);
         return assessmentReportRepository.findByElderlyIdOrderByAssessedAtDesc(id).stream()
-                .map(assessmentReportMapper::toResponse).toList();
+                .map(report -> {
+                    AssessmentReportResponse response = assessmentReportMapper.toResponse(report);
+                    response.setElderlyName(profile.getName());
+                    return response;
+                }).toList();
     }
 
     @Override
@@ -155,8 +159,11 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional(readOnly = true)
     public List<KeyPopulationResponse> getKeyPopulations(String id) {
-        findEntity(id);
-        return keyPopulationRepository.findByElderlyIdOrderByCreatedAtDesc(id).stream()
+        ElderlyProfile profile = findEntity(id);
+        if (!StringUtils.hasText(profile.getUserId())) {
+            return List.of();
+        }
+        return keyPopulationRepository.findByElderlyIdOrderByCreatedAtDesc(profile.getUserId()).stream()
                 .map(keyPopulationMapper::toResponse).toList();
     }
 

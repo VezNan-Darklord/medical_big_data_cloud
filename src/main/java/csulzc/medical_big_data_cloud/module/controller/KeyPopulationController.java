@@ -72,7 +72,7 @@ public class KeyPopulationController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ApiResponse<Void> delete(@PathVariable String id) {
         keyPopulationService.delete(id);
         return ApiResponse.success();

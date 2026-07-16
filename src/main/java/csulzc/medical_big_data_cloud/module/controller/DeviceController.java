@@ -40,7 +40,7 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('admin', 'operator')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator')")
     public ResponseEntity<ApiResponse<DeviceResponse>> create(@Valid @RequestBody DeviceCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(deviceService.create(request)));

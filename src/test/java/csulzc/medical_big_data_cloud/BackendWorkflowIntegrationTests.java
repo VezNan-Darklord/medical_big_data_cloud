@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.blankOrNullString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -234,6 +235,69 @@ class BackendWorkflowIntegrationTests {
                 .andReturn();
         String elderlyId = readBody(elderlyResult).at("/data/id").asString();
 
+        mockMvc.perform(post("/key-populations")
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "elderlyId": "%s",
+                                  "category": "慢病高风险"
+                                }
+                                """.formatted(elderlyId)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        MvcResult keyPopulationResult = mockMvc.perform(post("/key-populations")
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "elderlyId": "%s",
+                                  "category": "慢病高风险"
+                                }
+                                """.formatted(elderlyUserId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.elderlyId").value(elderlyUserId))
+                .andReturn();
+        String keyPopulationId = readBody(keyPopulationResult).at("/data/id").asString();
+
+        mockMvc.perform(get("/elderly-profiles/{id}/key-populations", elderlyId)
+                        .header("Authorization", "Bearer " + doctorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].id").value(keyPopulationId))
+                .andExpect(jsonPath("$.data[0].elderlyId").value(elderlyUserId));
+
+        mockMvc.perform(delete("/key-populations/{id}", keyPopulationId)
+                        .header("Authorization", "Bearer " + doctorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        MvcResult deviceResult = mockMvc.perform(post("/devices")
+                        .header("Authorization", "Bearer " + doctorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "deviceName": "测试血压计",
+                                  "deviceType": "blood_pressure_monitor",
+                                  "deviceSn": "SN-%s",
+                                  "firmwareVersion": "1.0.0"
+                                }
+                                """.formatted(suffix)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.deviceSn").value("SN-" + suffix))
+                .andReturn();
+        String deviceId = readBody(deviceResult).at("/data/id").asString();
+
+        mockMvc.perform(delete("/devices/{id}", deviceId)
+                        .header("Authorization", "Bearer " + doctorToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+
+        mockMvc.perform(delete("/devices/{id}", deviceId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
         mockMvc.perform(post("/health-warnings")
                         .header("Authorization", "Bearer " + doctorToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -259,6 +323,21 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.total").value(1))
                 .andExpect(jsonPath("$.data.list[0].elderlyId").value(elderlyId));
+
+        mockMvc.perform(post("/health-warnings")
+                        .header("Authorization", "Bearer " + elderlyAccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "warningType": "self_report",
+                                  "severity": "medium",
+                                  "source": "self_report",
+                                  "occurredAt": "%s"
+                                }
+                                """.formatted(LocalDateTime.now())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.elderlyId").value(elderlyId))
+                .andExpect(jsonPath("$.data.status").value("unprocessed"));
 
         mockMvc.perform(get("/dashboard/overview")
                         .header("Authorization", "Bearer " + elderlyAccessToken))
@@ -300,6 +379,7 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(jsonPath("$.data.score").value(82))
                 .andExpect(jsonPath("$.data.grade").value("B"))
                 .andExpect(jsonPath("$.data.assessorId").value(doctor.getId()))
+                .andExpect(jsonPath("$.data.elderlyName").value("报告流程测试老人"))
                 .andExpect(jsonPath("$.data.reviewStatus").value("draft"))
                 .andExpect(jsonPath("$.data.riskItems[0]").value("血压偏高"))
                 .andReturn();
@@ -321,6 +401,7 @@ class BackendWorkflowIntegrationTests {
                                 """.formatted(LocalDateTime.now())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.elderlyId").value(elderlyId))
+                .andExpect(jsonPath("$.data.elderlyName").value("报告流程测试老人"))
                 .andExpect(jsonPath("$.data.reportType").value("康复评估"))
                 .andExpect(jsonPath("$.data.score").value(88))
                 .andExpect(jsonPath("$.data.reviewStatus").value("draft"));
@@ -363,7 +444,8 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.total").value(1))
-                .andExpect(jsonPath("$.data.list[0].id").value(reportId));
+                .andExpect(jsonPath("$.data.list[0].id").value(reportId))
+                .andExpect(jsonPath("$.data.list[0].elderlyName").value("报告流程测试老人"));
 
         mockMvc.perform(get("/assessment-reports/{id}/export", reportId)
                         .header("Authorization", "Bearer " + doctorToken))
@@ -392,8 +474,8 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(jsonPath("$.data.totalDoctorCount").value(3))
                 .andExpect(jsonPath("$.data.totalDeviceCount").value(0))
                 .andExpect(jsonPath("$.data.unboundDeviceCount").value(0))
-                .andExpect(jsonPath("$.data.totalWarningCount").value(1))
-                .andExpect(jsonPath("$.data.unhandledWarningCount").value(1));
+                .andExpect(jsonPath("$.data.totalWarningCount").value(2))
+                .andExpect(jsonPath("$.data.unhandledWarningCount").value(2));
 
         mockMvc.perform(get("/reports/statistics/trends")
                         .header("Authorization", "Bearer " + adminToken))

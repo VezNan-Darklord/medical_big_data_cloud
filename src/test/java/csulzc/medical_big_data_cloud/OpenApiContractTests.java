@@ -63,6 +63,22 @@ class OpenApiContractTests {
                 "elderlyId", "reportType", "score", "grade", "summary",
                 "riskItems", "recommendations", "assessedAt"
         )));
+        Map<String, Object> reportResponse = castMap(schemas.get("AssessmentReport"));
+        Set<String> requiredReportResponseFields =
+                new HashSet<>((java.util.List<String>) reportResponse.get("required"));
+        assertTrue(requiredReportResponseFields.contains("elderlyName"));
+        assertTrue(castMap(reportResponse.get("properties")).containsKey("elderlyName"));
+
+        Map<String, Object> warningCreate = castMap(schemas.get("HealthWarningCreateRequest"));
+        Set<String> requiredWarningFields =
+                new HashSet<>((java.util.List<String>) warningCreate.get("required"));
+        assertFalse(requiredWarningFields.contains("elderlyId"));
+
+        Map<String, Object> keyPopulationCreate = castMap(schemas.get("KeyPopulationCreateRequest"));
+        Map<String, Object> keyPopulationProperties = castMap(keyPopulationCreate.get("properties"));
+        assertTrue(castMap(keyPopulationProperties.get("elderlyId"))
+                .get("description").toString().contains("用户 ID"));
+
         Map<String, Object> reportPath = castMap(paths.get("/assessment-reports/{id}"));
         assertTrue(reportPath.containsKey("put"));
         assertTrue(schemas.containsKey("AssessmentReportUpdateRequest"));

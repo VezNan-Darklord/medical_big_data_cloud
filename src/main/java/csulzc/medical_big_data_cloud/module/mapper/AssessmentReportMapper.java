@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface AssessmentReportMapper {
 
+    @Mapping(target = "elderlyName", ignore = true)
     AssessmentReportResponse toResponse(AssessmentReport entity);
 
     @Mapping(target = "id", ignore = true)
