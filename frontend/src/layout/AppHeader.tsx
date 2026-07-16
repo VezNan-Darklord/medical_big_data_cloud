@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { Button, Input, Form, message, Avatar, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
-import { CalendarOutlined, SearchOutlined, UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
 import { useLoginMutation, useRegisterMutation, useGetCurrentUserQuery, useLogoutMutation } from '../../api/hooks/authHooks'
 import { PopWindow } from '../components/common'
 import { useQueryClient } from '@tanstack/react-query'
 import { clearTokenPair, getAccessToken, setTokenPair, type AuthTokenPair } from '../../api/tokenStorage'
+import { useNavigate } from 'react-router-dom'
 
 
 function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { open: boolean; onClose: () => void; onLoginSuccess: (tokens: AuthTokenPair) => void; onSwitchToRegister: () => void }) {
-  const [form] = Form.useForm()
-  const queryClient = useQueryClient()
-  const loginMutation = useLoginMutation()
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const loginMutation = useLoginMutation();
 
   const handleSubmit = async (values: { username: string; password: string }) => {
       await loginMutation.mutateAsync({ username: values.username, password: values.password },
@@ -23,6 +25,15 @@ function LoginModal({ open, onClose, onLoginSuccess, onSwitchToRegister }: { ope
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
               })
+              if (res.data?.user.roleCode === 'elderly') { 
+                navigate('/elderly-profiles')
+              }
+              if (res.data?.user.roleCode === 'doctor') {
+                navigate('/health-warnings')
+              }
+              if (res.data?.user.roleCode === 'admin') {
+                navigate('/report-statistics')
+              }
               message.success('登录成功')
               queryClient.resetQueries({ queryKey: ['getCurrentUser'] })
               onClose()
@@ -126,7 +137,7 @@ function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToLogin }: { 
 
 
 export function AppHeader() {
-
+  const navigate = useNavigate(); 
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -149,6 +160,7 @@ export function AppHeader() {
       logout(undefined, {
         onSettled: () => {
           clearTokenPair();
+          navigate('/');
           message.success('已退出登录');
         },
       })
@@ -156,10 +168,8 @@ export function AppHeader() {
   };
 
   return (
-    <header className="flex h-20 items-center justify-start border-b border-slate-200/80 bg-white/75 px-6 backdrop-blur">
-      <Input prefix={<SearchOutlined className="text-slate-400" />} placeholder="搜索老人、设备、报告" className="flex-1/2 rounded-xl" />
-      <div className="ml-3 flex items-center gap-3">
-        <Button icon={<CalendarOutlined />} className="rounded-xl">今日</Button>
+    <header className="flex h-20 items-center justify-end border-b border-slate-200/80 bg-white/75 px-6 backdrop-blur">
+      <div className="ml-3 flex items-center gap-3 justify-end">
 
         {getAccessToken() ? (
           <Dropdown

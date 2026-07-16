@@ -30,7 +30,7 @@ function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           <Input.TextArea rows={2} />
         </Form.Item>
         <Form.Item name="ownerDoctorId" label="负责医生 ID">
-          <Input />
+          <AccountSelect roleCode='doctor' />
         </Form.Item>
         <Form.Item name="followUpCycleDays" label="随访周期(天)">
           <InputNumber className="w-full" min={1} />
@@ -64,7 +64,9 @@ function EditModal({ open, item, onClose }: { open: boolean; item: PopulationIte
         <Form.Item name="category" label="类别" rules={[{ required: true }]}><Select options={['慢病高风险','跌倒高风险','认知关注','失能','高龄'].map(v => ({ value: v, label: v }))} /></Form.Item>
         <Form.Item name="level" label="等级"><Input /></Form.Item>
         <Form.Item name="reason" label="原因"><Input.TextArea rows={2} /></Form.Item>
-        <Form.Item name="ownerDoctorId" label="负责医生 ID"><Input /></Form.Item>
+        <Form.Item name="ownerDoctorId" label="负责医生 ID">
+          <AccountSelect roleCode='doctor' />
+        </Form.Item>
         <Form.Item name="followUpCycleDays" label="随访周期(天)"><InputNumber className="w-full" min={1} /></Form.Item>
         <Form.Item name="status" label="状态"><Select options={[{ value: 'active', label: '活跃' }, { value: 'closed', label: '关闭' }]} /></Form.Item>
         <Button type="primary" htmlType="submit" loading={updateMutation.isPending} block>保存修改</Button>

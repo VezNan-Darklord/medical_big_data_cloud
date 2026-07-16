@@ -1,12 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Menu } from 'antd'
 import { type NavItem } from '../mock-data'
-import { ApartmentOutlined, TeamOutlined, AlertOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, RadarChartOutlined, CloudServerOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons'
+import { TeamOutlined, AlertOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, RadarChartOutlined, CloudServerOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons'
 import { canAccessPath } from '../routes/const'
 import { useCurrentRoleCode } from '../store/useCurrentRoleCode'
 
 const allNavigationItems: NavItem[] = [
-  { key: 'dashboard', path: '/', label: '首页', icon: <ApartmentOutlined />, description: '总览、趋势、AI 建议与指挥席。' },
   { key: 'elderly', path: '/elderly-profiles', label: '老人档案', icon: <TeamOutlined />, description: '老人信息、标签、分组与关联业务视图。' },
   { key: 'warnings', path: '/health-warnings', label: '健康预警', icon: <AlertOutlined />, description: '设备异常、等级分层、转派与处置状态。' },
   { key: 'reports', path: '/assessment-reports', label: '评估报告', icon: <MedicineBoxOutlined />, description: '评估生成、复核记录与建议摘要。' },

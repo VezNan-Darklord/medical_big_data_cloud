@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Button, Card, Form, Input, Select, message, Spin } from 'antd'
-import { PlusOutlined, ReloadOutlined, EditOutlined } from '@ant-design/icons'
+import { PlusOutlined, ReloadOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons'
 import {
   useListDoctorAccountsQuery,
   useCreateDoctorAccountMutation,
@@ -10,17 +10,16 @@ import {
 import { StatusTag, PopWindow } from '../common'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { SpecializedUserCreateRequest } from '../../../api/models/SpecializedUserCreateRequest'
-import type { UserUpdateRequest } from '../../../api/models/UserUpdateRequest'
 import type { PasswordRequest } from '../../../api/models/PasswordRequest'
 import type { User } from '../../../api/models/User'
 
 interface AccountCardProps {
   account: User
   onResetPassword: (id: string, name: string) => void
-  onEdit: (account: User) => void
+  onToggleStatus: (id: string, status: 'enabled' | 'disabled', name: string) => void
 }
 
-function AccountCard({ account, onResetPassword, onEdit }: AccountCardProps) {
+function AccountCard({ account, onResetPassword, onToggleStatus }: AccountCardProps) {
   const isEnabled = account.status === 'enabled'
 
   return (
@@ -51,7 +50,16 @@ function AccountCard({ account, onResetPassword, onEdit }: AccountCardProps) {
 
       <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4">
         <Button size="small" icon={<ReloadOutlined />} className="flex-1" onClick={() => onResetPassword(account.id!, account.realName ?? account.username!)}>重置密码</Button>
-        <Button size="small" icon={<EditOutlined />} className="flex-1" onClick={() => onEdit(account)}>编辑</Button>
+        <Button
+          size="small"
+          className="flex-1"
+          danger={isEnabled}
+          type={isEnabled ? 'default' : 'primary'}
+          icon={isEnabled ? <StopOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onToggleStatus(account.id!, isEnabled ? 'disabled' : 'enabled', account.realName ?? account.username!)}
+        >
+          {isEnabled ? '禁用' : '启用'}
+        </Button>
       </div>
     </Card>
   )
@@ -86,34 +94,6 @@ function CreateAccountModal({ open, onClose }: { open: boolean; onClose: () => v
   )
 }
 
-function EditAccountModal({ open, account, onClose }: { open: boolean; account: User | null; onClose: () => void }) {
-  const [form] = Form.useForm()
-  const updateMutation = useUpdateDoctorAccountMutation()
-
-  if (!account) return null
-
-  return (
-    <PopWindow open={open} onClose={onClose} title={`编辑 - ${account.realName ?? account.username}`} width={440}>
-      <Form form={form} layout="vertical" initialValues={{ realName: account.realName, mobile: account.mobile, institutionId: account.institutionId, regionCode: account.regionCode, status: account.status }} onFinish={(v: UserUpdateRequest) => {
-        updateMutation.mutate({ id: account.id!, ...v }, {
-          onSuccess: () => { message.success('更新成功'); form.resetFields(); onClose() },
-          onError: (err: Error) => message.error(err?.message ?? '更新失败'),
-        })
-      }}>
-        <div className="grid gap-0 md:grid-cols-2 md:gap-x-4">
-          <Form.Item name="realName" label="真实姓名"><Input /></Form.Item>
-          <Form.Item name="mobile" label="手机号"><Input /></Form.Item>
-          <Form.Item name="institutionId" label="所属机构"><Input /></Form.Item>
-          <Form.Item name="regionCode" label="所属区域"><Input /></Form.Item>
-          <Form.Item name="status" label="状态">
-            <Select options={[{ value: 'enabled', label: '启用' }, { value: 'disabled', label: '禁用' }]} />
-          </Form.Item>
-        </div>
-        <Button type="primary" htmlType="submit" loading={updateMutation.isPending} block size="large">保存修改</Button>
-      </Form>
-    </PopWindow>
-  )
-}
 
 function ResetPasswordModal({ open, accountId, accountName, onClose }: { open: boolean; accountId: string; accountName: string; onClose: () => void }) {
   const [form] = Form.useForm()
@@ -135,8 +115,9 @@ function ResetPasswordModal({ open, accountId, accountName, onClose }: { open: b
 }
 
 export default function DoctorAccountPage() {
+  const updateMutation = useUpdateDoctorAccountMutation()
+
   const [createOpen, setCreateOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<User | null>(null)
   const [resetPwdTarget, setResetPwdTarget] = useState<{ id: string; name: string } | null>(null)
   const [statusFilter, setStatusFilter] = useState<'enabled' | 'disabled' | undefined>(undefined)
 
@@ -178,7 +159,6 @@ export default function DoctorAccountPage() {
           onChange={setStatusFilter}
           options={[{ value: 'enabled', label: '已启用' }, { value: 'disabled', label: '已禁用' }]}
         />
-        <span className="text-xs text-slate-400">时间筛选由前端处理</span>
       </div>
 
       {isLoading ? (
@@ -193,7 +173,9 @@ export default function DoctorAccountPage() {
                 key={a.id}
                 account={a}
                 onResetPassword={(id, name) => setResetPwdTarget({ id, name })}
-                onEdit={setEditTarget}
+                onToggleStatus={(id, status) => {
+                  updateMutation.mutate({ id, status });
+                }}
               />
             ))}
           </div>
@@ -203,7 +185,6 @@ export default function DoctorAccountPage() {
       )}
 
       <CreateAccountModal open={createOpen} onClose={() => setCreateOpen(false)} />
-      <EditAccountModal open={!!editTarget} account={editTarget} onClose={() => setEditTarget(null)} />
       {resetPwdTarget && (
         <ResetPasswordModal
           open={!!resetPwdTarget}

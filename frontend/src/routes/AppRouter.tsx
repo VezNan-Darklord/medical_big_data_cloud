@@ -2,9 +2,11 @@ import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { Spin } from 'antd'
 import { AppShell } from '../layout/AppShell'
+import { PublicLayout } from '../layout/PublicLayout'
 import { RoleGuard } from './guards'
 import { useGetCurrentUserQuery } from '../../api/hooks/authHooks'
 import type { User } from '../../api/models/User'
+import HomePage from '../components/home/HomePage'
 
 const DashboardPage = lazy(() => import('../components/dashboard/DashboardPage'))
 const DecisionAnalysisPage = lazy(() => import('../components/decision/DecisionAnalysisPage'))
@@ -41,7 +43,7 @@ function RoleSwitch({
   doctor: React.ReactNode
   admin: React.ReactNode
 }) {
-  const { data, isLoading } = useGetCurrentUserQuery();
+  const { data, isLoading } = useGetCurrentUserQuery()
   const user = data?.data as User | undefined
   const role = user?.roleCode ?? ''
 
@@ -56,9 +58,15 @@ export function AppRouter() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
+        {/* 公共首页 — 未登录时展示 LandingPage，已登录自动跳转 */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+        </Route>
+
+        {/* 已登录后台 */}
         <Route element={<AppShell />}>
           <Route element={<RoleGuard />}>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/decision-analysis" element={<DecisionAnalysisPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
