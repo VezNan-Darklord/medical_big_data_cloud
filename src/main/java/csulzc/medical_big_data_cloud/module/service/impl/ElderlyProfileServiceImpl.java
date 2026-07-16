@@ -91,7 +91,8 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Transactional
     public void delete(String id) {
         ElderlyProfile entity = findEntity(id);
-        if (!deviceRepository.findByElderlyIdOrderByCreatedAtDesc(id).isEmpty()) {
+        if (StringUtils.hasText(entity.getUserId())
+                && !deviceRepository.findByElderlyIdOrderByCreatedAtDesc(entity.getUserId()).isEmpty()) {
             throw new BusinessException(ResultCode.CONFLICT, "请先解绑该老人的设备");
         }
         elderlyProfileRepository.delete(entity);
@@ -131,8 +132,11 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional(readOnly = true)
     public List<HealthWarningResponse> getWarnings(String id) {
-        findEntity(id);
-        return healthWarningRepository.findByElderlyIdOrderByOccurredAtDesc(id).stream()
+        ElderlyProfile profile = findEntity(id);
+        if (!StringUtils.hasText(profile.getUserId())) {
+            return List.of();
+        }
+        return healthWarningRepository.findByElderlyIdOrderByOccurredAtDesc(profile.getUserId()).stream()
                 .map(healthWarningMapper::toResponse).toList();
     }
 
@@ -140,7 +144,10 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Transactional(readOnly = true)
     public List<AssessmentReportResponse> getReports(String id) {
         ElderlyProfile profile = findEntity(id);
-        return assessmentReportRepository.findByElderlyIdOrderByAssessedAtDesc(id).stream()
+        if (!StringUtils.hasText(profile.getUserId())) {
+            return List.of();
+        }
+        return assessmentReportRepository.findByElderlyIdOrderByAssessedAtDesc(profile.getUserId()).stream()
                 .map(report -> {
                     AssessmentReportResponse response = assessmentReportMapper.toResponse(report);
                     response.setElderlyName(profile.getName());
@@ -151,8 +158,11 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
     @Override
     @Transactional(readOnly = true)
     public List<DeviceResponse> getDevices(String id) {
-        findEntity(id);
-        return deviceRepository.findByElderlyIdOrderByCreatedAtDesc(id).stream()
+        ElderlyProfile profile = findEntity(id);
+        if (!StringUtils.hasText(profile.getUserId())) {
+            return List.of();
+        }
+        return deviceRepository.findByElderlyIdOrderByCreatedAtDesc(profile.getUserId()).stream()
                 .map(deviceMapper::toResponse).toList();
     }
 

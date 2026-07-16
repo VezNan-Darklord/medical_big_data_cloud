@@ -312,7 +312,7 @@ class BackendWorkflowIntegrationTests {
                                   "thresholdValue": 100,
                                   "occurredAt": "%s"
                                 }
-                                """.formatted(elderlyId, LocalDateTime.now())))
+                                """.formatted(elderlyUserId, LocalDateTime.now())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.status").value("unprocessed"));
@@ -322,7 +322,7 @@ class BackendWorkflowIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.total").value(1))
-                .andExpect(jsonPath("$.data.list[0].elderlyId").value(elderlyId));
+                .andExpect(jsonPath("$.data.list[0].elderlyId").value(elderlyUserId));
 
         mockMvc.perform(post("/health-warnings")
                         .header("Authorization", "Bearer " + elderlyAccessToken)
@@ -336,7 +336,7 @@ class BackendWorkflowIntegrationTests {
                                 }
                                 """.formatted(LocalDateTime.now())))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.elderlyId").value(elderlyId))
+                .andExpect(jsonPath("$.data.elderlyId").value(elderlyUserId))
                 .andExpect(jsonPath("$.data.status").value("unprocessed"));
 
         mockMvc.perform(get("/dashboard/overview")
@@ -352,7 +352,7 @@ class BackendWorkflowIntegrationTests {
                                   "elderlyId": "%s",
                                   "reportType": "健康评估"
                                 }
-                                """.formatted(elderlyId)))
+                                """.formatted(elderlyUserId)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
@@ -373,7 +373,7 @@ class BackendWorkflowIntegrationTests {
                                   ],
                                   "assessedAt": "%s"
                                 }
-                                """.formatted(elderlyId, LocalDateTime.now())))
+                                """.formatted(elderlyUserId, LocalDateTime.now())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.score").value(82))
@@ -400,7 +400,7 @@ class BackendWorkflowIntegrationTests {
                                 }
                                 """.formatted(LocalDateTime.now())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.elderlyId").value(elderlyId))
+                .andExpect(jsonPath("$.data.elderlyId").value(elderlyUserId))
                 .andExpect(jsonPath("$.data.elderlyName").value("报告流程测试老人"))
                 .andExpect(jsonPath("$.data.reportType").value("康复评估"))
                 .andExpect(jsonPath("$.data.score").value(88))

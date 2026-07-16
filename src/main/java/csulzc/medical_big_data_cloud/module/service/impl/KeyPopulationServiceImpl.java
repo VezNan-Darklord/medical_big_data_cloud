@@ -7,7 +7,9 @@ import csulzc.medical_big_data_cloud.module.dto.request.keypop.KeyPopulationCrea
 import csulzc.medical_big_data_cloud.module.dto.request.keypop.KeyPopulationUpdateRequest;
 import csulzc.medical_big_data_cloud.module.dto.response.keypop.KeyPopulationResponse;
 import csulzc.medical_big_data_cloud.module.entity.KeyPopulation;
+import csulzc.medical_big_data_cloud.module.entity.User;
 import csulzc.medical_big_data_cloud.module.mapper.KeyPopulationMapper;
+import csulzc.medical_big_data_cloud.module.repository.ElderlyProfileRepository;
 import csulzc.medical_big_data_cloud.module.repository.KeyPopulationRepository;
 import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.KeyPopulationService;
@@ -19,12 +21,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class KeyPopulationServiceImpl implements KeyPopulationService {
 
     private final KeyPopulationRepository keyPopulationRepository;
     private final UserRepository userRepository;
+    private final ElderlyProfileRepository elderlyProfileRepository;
     private final KeyPopulationMapper keyPopulationMapper;
 
     @Override
@@ -47,7 +55,7 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
         if (!StringUtils.hasText(entity.getStatus())) {
             entity.setStatus("active");
         }
-        return keyPopulationMapper.toResponse(keyPopulationRepository.save(entity));
+        return toResponse(keyPopulationRepository.save(entity));
     }
 
     @Override
@@ -59,7 +67,7 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
         if (entity.getFollowUpCycleDays() != null && entity.getFollowUpCycleDays() < 1) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "随访周期必须大于 0");
         }
-        return keyPopulationMapper.toResponse(keyPopulationRepository.save(entity));
+        return toResponse(keyPopulationRepository.save(entity));
     }
 
     @Override
@@ -73,7 +81,7 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
     @Override
     @Transactional(readOnly = true)
     public KeyPopulationResponse getById(String id) {
-        return keyPopulationMapper.toResponse(findEntity(id));
+        return toResponse(findEntity(id));
     }
 
     @Override
@@ -84,7 +92,7 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
                 PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")))
                 : keyPopulationRepository.findAll(
                 PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
-        return new PageResult<>(page.getContent().stream().map(keyPopulationMapper::toResponse).toList(),
+        return new PageResult<>(toResponses(page.getContent()),
                 pageNo, pageSize, page.getTotalElements());
     }
 
@@ -112,5 +120,41 @@ public class KeyPopulationServiceImpl implements KeyPopulationService {
         userRepository.findById(doctorId)
                 .filter(user -> "doctor".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
                 .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "负责医生不存在或不可用"));
+    }
+
+    private KeyPopulationResponse toResponse(KeyPopulation entity) {
+        KeyPopulationResponse response = keyPopulationMapper.toResponse(entity);
+        enrichNames(List.of(response));
+        return response;
+    }
+
+    private List<KeyPopulationResponse> toResponses(List<KeyPopulation> entities) {
+        List<KeyPopulationResponse> responses = entities.stream()
+                .map(keyPopulationMapper::toResponse).toList();
+        enrichNames(responses);
+        return responses;
+    }
+
+    private void enrichNames(List<KeyPopulationResponse> responses) {
+        List<String> elderlyUserIds = responses.stream()
+                .map(KeyPopulationResponse::getElderlyId).distinct().toList();
+        Map<String, String> elderlyNames = elderlyProfileRepository.findByUserIdIn(elderlyUserIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        p -> p.getUserId(),
+                        p -> p.getName(),
+                        (a, b) -> a));
+        List<String> doctorIds = responses.stream()
+                .map(KeyPopulationResponse::getOwnerDoctorId)
+                .filter(StringUtils::hasText).distinct().toList();
+        Map<String, String> doctorNames = userRepository.findAllById(doctorIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, User::getRealName, (a, b) -> a));
+        for (KeyPopulationResponse response : responses) {
+            response.setElderlyName(elderlyNames.get(response.getElderlyId()));
+            if (StringUtils.hasText(response.getOwnerDoctorId())) {
+                response.setOwnerDoctorName(doctorNames.get(response.getOwnerDoctorId()));
+            }
+        }
     }
 }

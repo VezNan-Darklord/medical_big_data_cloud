@@ -14,7 +14,7 @@ import csulzc.medical_big_data_cloud.module.entity.DeviceDataReport;
 import csulzc.medical_big_data_cloud.module.mapper.DeviceMapper;
 import csulzc.medical_big_data_cloud.module.repository.DeviceDataReportRepository;
 import csulzc.medical_big_data_cloud.module.repository.DeviceRepository;
-import csulzc.medical_big_data_cloud.module.repository.ElderlyProfileRepository;
+import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +36,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final DeviceDataReportRepository deviceDataReportRepository;
-    private final ElderlyProfileRepository elderlyProfileRepository;
+    private final UserRepository userRepository;
     private final DeviceMapper deviceMapper;
     private final ObjectMapper objectMapper;
 
@@ -81,9 +81,9 @@ public class DeviceServiceImpl implements DeviceService {
     @Transactional
     public DeviceResponse bind(DeviceBindRequest request) {
         Device device = findEntity(request.getDeviceId());
-        if (!elderlyProfileRepository.existsById(request.getElderlyId())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "老人档案不存在");
-        }
+        userRepository.findById(request.getElderlyId())
+                .filter(user -> "elderly".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
+                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "老人账户不存在或不可用"));
         if ("bound".equals(device.getBindingStatus())
                 && !request.getElderlyId().equals(device.getElderlyId())) {
             throw new BusinessException(ResultCode.CONFLICT, "设备已绑定其他老人");

@@ -270,7 +270,7 @@ paths:
     post:
       tags: [HealthWarning]
       summary: 新增健康预警
-      description: 管理员、医生和运营人员创建时 elderlyId 必须是老人档案 ID；老人本人创建时可不传 elderlyId，服务端会自动绑定当前账号关联的老人档案。
+      description: 管理员、医生和运营人员创建时 elderlyId 必须是老人账户用户 ID；老人本人创建时可不传 elderlyId，服务端会自动绑定当前账号的用户 ID。
       operationId: createHealthWarning
       requestBody:
         required: true
@@ -425,6 +425,54 @@ paths:
       description: 仅管理员和医生可访问。
       operationId: exportAssessmentReport
       parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200":
+          description: UTF-8 Markdown 文件
+          headers:
+            Content-Disposition:
+              schema: { type: string }
+          content:
+            text/markdown:
+              schema: { type: string, format: binary }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /assessment-reports/elderly:
+    get:
+      tags: [AssessmentReport]
+      summary: 当前老人账号的评估报告列表
+      description: 仅老人账号可访问，返回其本人的评估报告。
+      operationId: listElderlyAssessmentReports
+      parameters:
+        - { $ref: "#/components/parameters/PageNo" }
+        - { $ref: "#/components/parameters/PageSize" }
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiAssessmentReportPage" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /assessment-reports/elderly/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Id" }
+    get:
+      tags: [AssessmentReport]
+      summary: 当前老人账号的报告详情
+      description: 仅老人账号可访问。
+      operationId: getElderlyAssessmentReport
+      responses:
+        "200": { $ref: "#/components/responses/AssessmentReportResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /assessment-reports/elderly/{id}/export:
+    parameters:
+      - { $ref: "#/components/parameters/Id" }
+    get:
+      tags: [AssessmentReport]
+      summary: 当前老人账号导出 Markdown 报告文件
+      description: 仅老人账号可访问。
+      operationId: exportElderlyAssessmentReport
       responses:
         "200":
           description: UTF-8 Markdown 文件
@@ -603,7 +651,8 @@ paths:
   /devices/bind:
     post:
       tags: [Device]
-      summary: 绑定设备到老人档案
+      summary: 绑定设备到老人账户
+      description: elderlyId 为老人账户用户 ID（非老人档案 ID），管理员、医生和运营人员可操作。
       operationId: bindDevice
       requestBody:
         required: true
@@ -1482,7 +1531,7 @@ components:
         elderlyId:
           type: string
           maxLength: 64
-          description: 管理员、医生和运营人员传老人档案 ID；老人本人创建时可省略，服务端自动使用本人关联档案。
+          description: 管理员、医生和运营人员传老人账户用户 ID（非老人档案 ID）；老人本人创建时可省略，服务端自动使用本人用户 ID。
         warningType: { type: string, maxLength: 50 }
         severity: { type: string, enum: [low, medium, high, critical] }
         source: { type: string, maxLength: 20 }
@@ -1551,7 +1600,9 @@ components:
         [id, elderlyId, elderlyName, reportType, score, grade, summary, riskItems, recommendations, assessorId, assessedAt, reviewStatus]
       properties:
         id: { type: string }
-        elderlyId: { type: string }
+        elderlyId:
+          type: string
+          description: 老人账户用户 ID（非老人档案 ID）。
         elderlyName: { type: string }
         reportType:
           { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
@@ -1572,7 +1623,10 @@ components:
       required:
         [elderlyId, reportType, score, grade, summary, riskItems, recommendations, assessedAt]
       properties:
-        elderlyId: { type: string, maxLength: 64 }
+        elderlyId:
+          type: string
+          maxLength: 64
+          description: 老人账户用户 ID（非老人档案 ID）。
         reportType:
           { type: string, enum: [健康评估, 康复评估, 用药评估, 睡眠评估] }
         score: { type: integer, minimum: 0, maximum: 100 }
@@ -1656,10 +1710,18 @@ components:
         elderlyId:
           type: string
           description: 老人账户本人的用户 ID，不是老人档案 ID。
+        elderlyName:
+          type: string
+          nullable: true
+          description: 老人姓名（取自老人档案）。
         category: { type: string }
         reason: { type: string, nullable: true }
         level: { type: string }
         ownerDoctorId: { type: string, nullable: true }
+        ownerDoctorName:
+          type: string
+          nullable: true
+          description: 负责医生姓名。
         followUpCycleDays: { type: integer }
         status: { type: string, enum: [active, closed] }
         createdAt: { type: string, format: date-time }
@@ -1725,9 +1787,12 @@ components:
         deviceName: { type: string }
         deviceType: { type: string }
         deviceSn: { type: string }
-        elderlyId: { type: string, nullable: true }
+        elderlyId:
+          type: string
+          nullable: true
+          description: 绑定的老人账户用户 ID（非老人档案 ID）。
         bindingStatus: { type: string, enum: [bound, unbound] }
-        onlineStatus: { type: string, enum: [online, offline] }
+        onlineStatus: { type: string, enum: [online, offline], default: online }
         lastReportAt: { type: string, format: date-time, nullable: true }
         firmwareVersion: { type: string, nullable: true }
         createdAt: { type: string, format: date-time }
@@ -1752,7 +1817,10 @@ components:
       required: [deviceId, elderlyId]
       properties:
         deviceId: { type: string, maxLength: 64 }
-        elderlyId: { type: string, maxLength: 64 }
+        elderlyId:
+          type: string
+          maxLength: 64
+          description: 老人账户的用户 ID（非老人档案 ID）。
     DeviceDataReportRequest:
       type: object
       required: [metrics]

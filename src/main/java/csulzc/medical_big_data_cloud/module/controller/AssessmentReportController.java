@@ -3,6 +3,7 @@ package csulzc.medical_big_data_cloud.module.controller;
 import csulzc.medical_big_data_cloud.common.result.ApiResponse;
 import csulzc.medical_big_data_cloud.common.result.FilePayload;
 import csulzc.medical_big_data_cloud.common.result.PageResult;
+import csulzc.medical_big_data_cloud.common.util.SecurityUtil;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportCreateRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportReviewRequest;
 import csulzc.medical_big_data_cloud.module.dto.request.report.AssessmentReportUpdateRequest;
@@ -78,6 +79,33 @@ public class AssessmentReportController {
         return ApiResponse.success(assessmentReportService.review(id, request));
     }
 
+    @GetMapping("/elderly")
+    @PreAuthorize("hasRole('elderly')")
+    public ApiResponse<PageResult<AssessmentReportResponse>> listForElderly(
+            @RequestParam(defaultValue = "1") @Min(1) int pageNo,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int pageSize) {
+        return ApiResponse.success(assessmentReportService.listForElderlyUser(
+                SecurityUtil.getCurrentUserId(), pageNo, pageSize));
+    }
+
+    @GetMapping("/elderly/{id}")
+    @PreAuthorize("hasRole('elderly')")
+    public ApiResponse<AssessmentReportResponse> getByIdForElderly(@PathVariable String id) {
+        return ApiResponse.success(assessmentReportService.getById(id));
+    }
+
+    @GetMapping("/elderly/{id}/export")
+    @PreAuthorize("hasRole('elderly')")
+    public ResponseEntity<byte[]> exportForElderly(@PathVariable String id) {
+        FilePayload file = assessmentReportService.export(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(file.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(file.fileName(), StandardCharsets.UTF_8)
+                                .build().toString())
+                .body(file.content());
+    }
     @GetMapping("/{id}/export")
     @PreAuthorize("hasAnyRole('admin', 'doctor')")
     public ResponseEntity<byte[]> export(@PathVariable String id) {

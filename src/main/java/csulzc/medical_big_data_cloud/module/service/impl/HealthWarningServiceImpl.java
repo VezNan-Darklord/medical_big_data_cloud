@@ -12,7 +12,6 @@ import csulzc.medical_big_data_cloud.module.dto.response.warning.HealthWarningRe
 import csulzc.medical_big_data_cloud.module.entity.HealthWarning;
 import csulzc.medical_big_data_cloud.module.entity.User;
 import csulzc.medical_big_data_cloud.module.mapper.HealthWarningMapper;
-import csulzc.medical_big_data_cloud.module.repository.ElderlyProfileRepository;
 import csulzc.medical_big_data_cloud.module.repository.HealthWarningRepository;
 import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.HealthWarningService;
@@ -34,7 +33,6 @@ import java.util.List;
 public class HealthWarningServiceImpl implements HealthWarningService {
 
     private final HealthWarningRepository healthWarningRepository;
-    private final ElderlyProfileRepository elderlyProfileRepository;
     private final UserRepository userRepository;
     private final HealthWarningMapper healthWarningMapper;
 
@@ -42,9 +40,9 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     @Transactional
     public HealthWarningResponse create(HealthWarningCreateRequest request) {
         if (isElderlyUser()) {
-            request.setElderlyId(currentElderlyProfileId());
+            request.setElderlyId(SecurityUtil.getCurrentUserId());
         } else {
-            requireElderly(request.getElderlyId());
+            requireElderlyUser(request.getElderlyId());
         }
         HealthWarning entity = healthWarningMapper.toEntity(request);
         if (!StringUtils.hasText(entity.getStatus())) {
@@ -67,7 +65,7 @@ public class HealthWarningServiceImpl implements HealthWarningService {
     @Transactional(readOnly = true)
     public PageResult<HealthWarningResponse> list(HealthWarningQueryRequest request) {
         if (isElderlyUser()) {
-            request.setElderlyId(currentElderlyProfileId());
+            request.setElderlyId(SecurityUtil.getCurrentUserId());
         }
         if (request.getStartTime() != null && request.getEndTime() != null
                 && request.getStartTime().isAfter(request.getEndTime())) {
@@ -154,22 +152,16 @@ public class HealthWarningServiceImpl implements HealthWarningService {
                 .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "当前处理人账户不存在或不可用"));
     }
 
-    private void requireElderly(String id) {
-        if (!StringUtils.hasText(id) || !elderlyProfileRepository.existsById(id)) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "老人档案不存在");
-        }
-    }
-
     private void requireOwnProfile(String elderlyId) {
-        if (!currentElderlyProfileId().equals(elderlyId)) {
+        if (!SecurityUtil.getCurrentUserId().equals(elderlyId)) {
             throw new BusinessException(ResultCode.FORBIDDEN, "只能访问本人健康预警");
         }
     }
 
-    private String currentElderlyProfileId() {
-        return elderlyProfileRepository.findByUserId(SecurityUtil.getCurrentUserId())
-                .map(profile -> profile.getId())
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "当前账号尚未关联老人档案"));
+    private void requireElderlyUser(String elderlyId) {
+        if (!StringUtils.hasText(elderlyId) || !userRepository.existsById(elderlyId)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "老人账户不存在或不可用");
+        }
     }
 
     private boolean isElderlyUser() {

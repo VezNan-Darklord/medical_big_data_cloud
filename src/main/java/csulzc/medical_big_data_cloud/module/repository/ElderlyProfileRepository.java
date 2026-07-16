@@ -17,6 +17,8 @@ public interface ElderlyProfileRepository extends JpaRepository<ElderlyProfile, 
 
     Optional<ElderlyProfile> findByUserId(String userId);
 
+    List<ElderlyProfile> findByUserIdIn(List<String> userIds);
+
     List<ElderlyProfile> findByStatus(String status);
 
     List<ElderlyProfile> findByGender(String gender);

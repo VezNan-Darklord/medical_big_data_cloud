@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 public class KeyPopulationResponse {
     private String id;
     private String elderlyId;
+    private String elderlyName;
     private String category;
     private String reason;
     private String level;
     private String ownerDoctorId;
+    private String ownerDoctorName;
     private Integer followUpCycleDays;
     private String status;
     private LocalDateTime createdAt;

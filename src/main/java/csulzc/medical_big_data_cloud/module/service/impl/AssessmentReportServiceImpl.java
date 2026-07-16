@@ -14,6 +14,7 @@ import csulzc.medical_big_data_cloud.module.entity.ElderlyProfile;
 import csulzc.medical_big_data_cloud.module.mapper.AssessmentReportMapper;
 import csulzc.medical_big_data_cloud.module.repository.AssessmentReportRepository;
 import csulzc.medical_big_data_cloud.module.repository.ElderlyProfileRepository;
+import csulzc.medical_big_data_cloud.module.repository.UserRepository;
 import csulzc.medical_big_data_cloud.module.service.AssessmentReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,13 +37,15 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
 
     private final AssessmentReportRepository assessmentReportRepository;
     private final ElderlyProfileRepository elderlyProfileRepository;
+    private final UserRepository userRepository;
     private final AssessmentReportMapper assessmentReportMapper;
 
     @Override
     @Transactional
     public AssessmentReportResponse create(AssessmentReportCreateRequest request) {
-        elderlyProfileRepository.findById(request.getElderlyId())
-                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "老人档案不存在"));
+        userRepository.findById(request.getElderlyId())
+                .filter(user -> "elderly".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
+                .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "老人账户不存在或不可用"));
 
         AssessmentReport entity = assessmentReportMapper.toEntity(request);
         entity.setAssessorId(SecurityUtil.getCurrentUserId());
@@ -81,10 +84,8 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
     @Override
     @Transactional(readOnly = true)
     public PageResult<AssessmentReportResponse> listForElderlyUser(String userId, int pageNo, int pageSize) {
-        ElderlyProfile profile = elderlyProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "老人账号尚未关联档案"));
         PageRequest pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "assessedAt"));
-        Page<AssessmentReport> page = assessmentReportRepository.findByElderlyId(profile.getId(), pageable);
+        Page<AssessmentReport> page = assessmentReportRepository.findByElderlyId(userId, pageable);
         return new PageResult<>(toResponses(page.getContent()),
                 pageNo, pageSize, page.getTotalElements());
     }
@@ -103,7 +104,7 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
     @Transactional(readOnly = true)
     public FilePayload export(String id) {
         AssessmentReport report = findEntity(id);
-        ElderlyProfile elderly = elderlyProfileRepository.findById(report.getElderlyId())
+        ElderlyProfile elderly = elderlyProfileRepository.findByUserId(report.getElderlyId())
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "关联老人档案不存在"));
         StringBuilder markdown = new StringBuilder()
                 .append("# 健康评估报告\n\n")
@@ -136,17 +137,17 @@ public class AssessmentReportServiceImpl implements AssessmentReportService {
     }
 
     private AssessmentReportResponse toResponse(AssessmentReport report) {
-        String elderlyName = elderlyProfileRepository.findById(report.getElderlyId())
+        String elderlyName = elderlyProfileRepository.findByUserId(report.getElderlyId())
                 .map(ElderlyProfile::getName)
                 .orElse(null);
         return toResponse(report, elderlyName);
     }
 
     private List<AssessmentReportResponse> toResponses(List<AssessmentReport> reports) {
-        Map<String, String> elderlyNames = elderlyProfileRepository.findAllById(
-                        reports.stream().map(AssessmentReport::getElderlyId).distinct().toList())
+        List<String> userIds = reports.stream().map(AssessmentReport::getElderlyId).distinct().toList();
+        Map<String, String> elderlyNames = elderlyProfileRepository.findByUserIdIn(userIds)
                 .stream()
-                .collect(Collectors.toMap(ElderlyProfile::getId, ElderlyProfile::getName));
+                .collect(Collectors.toMap(ElderlyProfile::getUserId, ElderlyProfile::getName));
         return reports.stream()
                 .map(report -> toResponse(report, elderlyNames.get(report.getElderlyId())))
                 .toList();

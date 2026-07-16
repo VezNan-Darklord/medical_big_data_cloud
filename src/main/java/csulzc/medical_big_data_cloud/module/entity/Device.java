@@ -41,7 +41,7 @@ public class Device extends BaseEntity {
     private String bindingStatus = "unbound";
 
     @Column(nullable = false, length = 20)
-    private String onlineStatus = "offline";
+    private String onlineStatus = "online";
 
     private LocalDateTime lastReportAt;
 

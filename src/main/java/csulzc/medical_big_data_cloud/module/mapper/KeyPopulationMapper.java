@@ -13,6 +13,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface KeyPopulationMapper {
 
+    @Mapping(target = "elderlyName", ignore = true)
+    @Mapping(target = "ownerDoctorName", ignore = true)
     KeyPopulationResponse toResponse(KeyPopulation entity);
 
     @Mapping(target = "id", ignore = true)

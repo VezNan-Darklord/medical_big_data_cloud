@@ -63,7 +63,7 @@ public class DeviceController {
     }
 
     @PostMapping("/bind")
-    @PreAuthorize("hasAnyRole('admin', 'operator')")
+    @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator')")
     public ApiResponse<DeviceResponse> bind(@Valid @RequestBody DeviceBindRequest request) {
         return ApiResponse.success(deviceService.bind(request));
     }
