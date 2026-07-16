@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Card, Form, Input, InputNumber, Popconfirm, Select, Tag, message, Skeleton, Spin } from 'antd'
 import { PlusOutlined, CloseOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { useListKeyPopulationsQuery, useCreateKeyPopulationMutation, useCloseKeyPopulationMutation, useUpdateKeyPopulationMutation, useDeleteKeyPopulationMutation } from '../../../api/hooks/keyPopulationHooks'
-import { StatusTag, PopWindow, ElderlyAccountSelect } from '../common'
+import { StatusTag, PopWindow, AccountSelect } from '../common'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { KeyPopulationCreateRequest } from '../../../api/models/KeyPopulationCreateRequest'
 import type { KeyPopulationUpdateRequest } from '../../../api/models/KeyPopulationUpdateRequest'
@@ -17,13 +17,27 @@ function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) 
       <Form form={form} layout="vertical" onFinish={(v: KeyPopulationCreateRequest) => {
         createMutation.mutate(v, { onSuccess: () => { message.success('添加成功'); form.resetFields(); onClose() }, onError: (err: Error) => message.error(err?.message ?? '失败') })
       }}>
-        <Form.Item name="elderlyId" label="老人" rules={[{ required: true }]}><ElderlyAccountSelect /></Form.Item>
-        <Form.Item name="category" label="类别" rules={[{ required: true }]}><Select options={['慢病高风险','跌倒高风险','认知关注','失能','高龄'].map(v => ({ value: v, label: v }))} /></Form.Item>
-        <Form.Item name="level" label="等级"><Input placeholder="如: A, B, C" /></Form.Item>
-        <Form.Item name="reason" label="原因"><Input.TextArea rows={2} /></Form.Item>
-        <Form.Item name="ownerDoctorId" label="负责医生 ID"><Input /></Form.Item>
-        <Form.Item name="followUpCycleDays" label="随访周期(天)"><InputNumber className="w-full" min={1} /></Form.Item>
-        <Form.Item name="status" label="状态"><Select options={[{ value: 'active', label: '活跃' }, { value: 'closed', label: '关闭' }]} /></Form.Item>
+        <Form.Item name="elderlyId" label="老人" rules={[{ required: true }]}>
+          <AccountSelect />
+        </Form.Item>
+        <Form.Item name="category" label="类别" rules={[{ required: true }]}>
+          <Select options={['慢病高风险', '跌倒高风险', '认知关注', '失能', '高龄'].map(v => ({ value: v, label: v }))} />
+        </Form.Item>
+        <Form.Item name="level" label="等级">
+          <Input placeholder="如: A, B, C" />
+        </Form.Item>
+        <Form.Item name="reason" label="原因">
+          <Input.TextArea rows={2} />
+        </Form.Item>
+        <Form.Item name="ownerDoctorId" label="负责医生 ID">
+          <Input />
+        </Form.Item>
+        <Form.Item name="followUpCycleDays" label="随访周期(天)">
+          <InputNumber className="w-full" min={1} />
+        </Form.Item>
+        <Form.Item name="status" label="状态">
+          <Select options={[{ value: 'active', label: '活跃' }, { value: 'closed', label: '关闭' }]} />
+        </Form.Item>
         <Button type="primary" htmlType="submit" loading={createMutation.isPending} block>确认添加</Button>
       </Form>
     </PopWindow>
@@ -101,7 +115,7 @@ function PopulationCard({
 
 export default function KeyPopulationsPage() {
   const role = useCurrentRoleCode()
-  const canManage = role === 'admin' || role === 'doctor';
+  const canManage = role === 'admin';
   const canDelete = role === 'admin' || role === 'doctor';
   const [createOpen, setCreateOpen] = useState(false)
   const [editItem, setEditItem] = useState<PopulationItem | null>(null)

@@ -7,6 +7,7 @@ export const CUSTOM_ROUTES = new Set([
   '/assessment-reports',
   '/report-statistics',
   '/elderly-accounts',
+  '/doctor-accounts',
 ])
 
 const ROLE_ALLOWED_PATHS: Record<Exclude<RoleCode, 'admin'>, ReadonlySet<string>> = {

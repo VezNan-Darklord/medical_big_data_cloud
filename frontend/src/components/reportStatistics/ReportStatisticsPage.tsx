@@ -1,12 +1,11 @@
-import { Button, Empty, Skeleton, message } from 'antd'
+import { Button, Empty, Skeleton } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
 import type { EChartsCoreOption } from 'echarts'
 import {
   useStatisticsOverviewQuery,
   useStatisticsTrendsQuery,
-  useExportStatisticsMutation,
+  useExportStatisticsQuery,
 } from '../../../api/hooks/reportStatisticsHooks'
-import { downloadBlob } from '../../../api/download'
 import type { DashboardChart } from '../../../api/models/DashboardChart'
 import EChart from '../charts/ECharts'
 import { PanelCard } from '../common'
@@ -44,7 +43,7 @@ function chartOption(chart: DashboardChart): EChartsCoreOption {
 export default function ReportStatisticsPage() {
   const overviewQuery = useStatisticsOverviewQuery()
   const trendsQuery = useStatisticsTrendsQuery()
-  const exportMutation = useExportStatisticsMutation()
+  const exportQuery = useExportStatisticsQuery()
   const overview = overviewQuery.data?.data
   const charts = trendsQuery.data?.data ?? []
 
@@ -66,11 +65,16 @@ export default function ReportStatisticsPage() {
         </div>
         <Button
           icon={<DownloadOutlined />}
-          loading={exportMutation.isPending}
-          onClick={() => exportMutation.mutate(undefined, {
-            onSuccess: blob => downloadBlob(blob, 'report-statistics.csv'),
-            onError: (error: Error) => message.error(error.message || '导出失败'),
-          })}
+          loading={exportQuery.isLoading}
+          onClick={() => {
+            const blob = new Blob([exportQuery.data ?? ''], { type: 'text/csv;charset=utf-8;' })
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'report_statistics.csv');
+            link.click();
+            URL.revokeObjectURL(url);
+          }}
         >
           导出 CSV
         </Button>

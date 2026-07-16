@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Select } from 'antd'
 import type { SelectProps } from 'antd'
 import { useListElderlyAccountsQuery } from '../../../api/hooks/elderlyAccountHooks'
+import { useListDoctorAccountsQuery } from '../../../api/hooks/doctorAccountHooks'
 
 interface ElderlyOption {
   value: string
@@ -12,12 +13,35 @@ interface ElderlyOption {
 }
 
 interface ElderlyAccountSelectProps extends Omit<SelectProps<string>, 'options' | 'loading'> {
-  setMobile?: (value: string) => void;
-  setRealName?: (value: string) => void;
+  setMobile?: (value: string) => void
+  setRealName?: (value: string) => void
+  roleCode?: 'doctor'
 }
 
-export function ElderlyAccountSelect({ onChange, setMobile, setRealName, ...rest }: ElderlyAccountSelectProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListElderlyAccountsQuery({ pageSize: 30 })
+export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...rest }: ElderlyAccountSelectProps) {
+  const isDoctor = roleCode === 'doctor'
+
+  const {
+    data: elderlyData,
+    fetchNextPage: fetchNextElderly,
+    hasNextPage: hasNextElderly,
+    isFetchingNextPage: isFetchingNextElderly,
+    isLoading: isLoadingElderly,
+  } = useListElderlyAccountsQuery({ pageSize: 30 })
+
+  const {
+    data: doctorData,
+    fetchNextPage: fetchNextDoctor,
+    hasNextPage: hasNextDoctor,
+    isFetchingNextPage: isFetchingNextDoctor,
+    isLoading: isLoadingDoctor,
+  } = useListDoctorAccountsQuery({ pageSize: 30 })
+
+  const data = isDoctor ? doctorData : elderlyData;
+  const fetchNextPage = isDoctor ? fetchNextDoctor : fetchNextElderly;
+  const hasNextPage = isDoctor ? hasNextDoctor : hasNextElderly;
+  const isFetchingNextPage = isDoctor ? isFetchingNextDoctor : isFetchingNextElderly;
+  const isLoading = isDoctor ? isLoadingDoctor : isLoadingElderly;
 
   const options: ElderlyOption[] = useMemo(
     () => (data?.pages ?? []).flatMap(page =>
@@ -68,7 +92,7 @@ export function ElderlyAccountSelect({ onChange, setMobile, setRealName, ...rest
     <Select
       {...rest}
       showSearch
-      placeholder="搜索老人（ID / 用户名 / 姓名）"
+      placeholder={isDoctor ? '搜索医生（ID / 用户名 / 姓名）' : '搜索老人（ID / 用户名 / 姓名）'}
       loading={isLoading}
       options={options}
       filterOption={handleFilter}

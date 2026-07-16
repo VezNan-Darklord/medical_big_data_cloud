@@ -4,16 +4,19 @@ import type { UserUpdateRequest } from '../models/UserUpdateRequest'
 import type { PasswordRequest } from '../models/PasswordRequest'
 import type { SpecializedUserCreateRequest } from '../models/SpecializedUserCreateRequest'
 import type { ApiUserPage } from '../models/ApiUserPage'
+import { useCurrentRoleCode } from '../../src/store/useCurrentRoleCode'
 
 type LastPage = ApiUserPage
 
 export function useListDoctorAccountsQuery(params: { status?: 'enabled' | 'disabled'; pageSize?: number } = {}) {
+  const roleCode = useCurrentRoleCode();
   const { pageSize = 10, status } = params
   return useInfiniteQuery({
     queryKey: ['listDoctorAccounts', { status }],
     queryFn: async ({ pageParam = 1 }) => medical.doctorAccount.listDoctorAccounts(status, pageParam, pageSize),
     getNextPageParam: (lastPage: LastPage) => { const d = lastPage.data; if (d && d.pageNo! * pageSize < d.total!) return d.pageNo! + 1; return undefined },
     initialPageParam: 1,
+    enabled: roleCode === 'admin',
   })
 }
 
