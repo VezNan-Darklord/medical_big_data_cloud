@@ -11,7 +11,7 @@ export class AiAnalysisService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * 生成并持久化照护决策分析
-     * 当前实现使用可复现的业务规则引擎，根据请求中的结构化指标生成结果并持久化�?
+     * 当前实现使用可复现的业务规则引擎，根据请求中的结构化指标生成结果并持久化。
      * @param requestBody
      * @returns ApiAnalysis 成功
      * @throws ApiError
@@ -31,7 +31,7 @@ export class AiAnalysisService {
         });
     }
     /**
-     * 查询最�?100 条分析历�?
+     * 查询最近 100 条分析历史
      * @returns ApiAnalysisList 成功
      * @throws ApiError
      */

@@ -233,10 +233,6 @@ export const getResponseBody = async (response: Response): Promise<any> => {
     if (response.status !== 204) {
         try {
             const contentType = response.headers.get('Content-Type');
-            const contentDisposition = response.headers.get('Content-Disposition');
-            if (contentDisposition?.toLowerCase().includes('attachment')) {
-                return await response.blob();
-            }
             if (contentType) {
                 const jsonTypes = ['application/json', 'application/problem+json']
                 const isJSON = jsonTypes.some(type => contentType.toLowerCase().startsWith(type));

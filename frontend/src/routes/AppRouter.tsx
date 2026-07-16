@@ -13,11 +13,12 @@ const DecisionAnalysisPage = lazy(() => import('../components/decision/DecisionA
 const ProfilePage = lazy(() => import('../components/profile/ProfilePage'))
 const WorkspacePage = lazy(() => import('../components/common/WorkspacePage'))
 import NotFoundPage from '../components/common/NotFoundPage'
+import ElderlyAccountPage from '../components/elderlyAccount/ElderlyAccountPage'
 
-const ElderProfilePage = lazy(() => import('../components/elderProfile/ElderProfilePage'))
+const ElderProfilePage = lazy(() => import('../components/elderlyProfile/ElderProfilePage'))
 const ElderlyHealthPage = lazy(() => import('../components/health/ElderlyHealthPage'))
 
-const DoctorElderlyProfilesPage = lazy(() => import('../components/elderProfile/doctorElderlyProfilesPage'))
+const DoctorElderlyProfilesPage = lazy(() => import('../components/elderlyProfile/doctorElderlyProfilesPage'))
 const DoctorHealthWarningsPage = lazy(() => import('../components/health/doctorHealthWarningsPage'))
 const DoctorDevicesPage = lazy(() => import('../components/device/DevicesPage'))
 const DoctorKeyPopulationsPage = lazy(() => import('../components/keyPopulation/KeyPopulationsPage'))
@@ -36,14 +37,10 @@ function RouteFallback() {
 function RoleSwitch({
   elderly,
   doctor,
-  operator,
-  analyst,
   admin,
 }: {
   elderly: React.ReactNode
   doctor: React.ReactNode
-  operator?: React.ReactNode
-  analyst?: React.ReactNode
   admin: React.ReactNode
 }) {
   const { data, isLoading } = useGetCurrentUserQuery();
@@ -53,8 +50,6 @@ function RoleSwitch({
   if (isLoading) return <RouteFallback />
   if (role === 'elderly') return <>{elderly}</>
   if (role === 'doctor') return <>{doctor}</>
-  if (role === 'operator') return <>{operator ?? <NotFoundPage />}</>
-  if (role === 'analyst') return <>{analyst ?? <NotFoundPage />}</>
   if (role === 'admin') return <>{admin}</>
   return <NotFoundPage />
 }
@@ -70,22 +65,25 @@ export function AppRouter() {
             <Route path="/profile" element={<ProfilePage />} />
 
             <Route path="/elderly-profiles" element={
-              <RoleSwitch elderly={<ElderProfilePage />} doctor={<DoctorElderlyProfilesPage />} operator={<DoctorElderlyProfilesPage />} admin={<DoctorElderlyProfilesPage />} />
+              <RoleSwitch elderly={<ElderProfilePage />} doctor={<DoctorElderlyProfilesPage />} admin={<DoctorElderlyProfilesPage />} />
             } />
             <Route path="/health-warnings" element={
-              <RoleSwitch elderly={<ElderlyHealthPage />} doctor={<DoctorHealthWarningsPage />} operator={<DoctorHealthWarningsPage />} admin={<DoctorHealthWarningsPage />} />
+              <RoleSwitch elderly={<ElderlyHealthPage />} doctor={<DoctorHealthWarningsPage />} admin={<DoctorHealthWarningsPage />} />
             } />
             <Route path="/devices" element={
-              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorDevicesPage />} operator={<DoctorDevicesPage />} admin={<DoctorDevicesPage />} />
+              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorDevicesPage />} admin={<DoctorDevicesPage />} />
             } />
             <Route path="/key-populations" element={
-              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorKeyPopulationsPage />} operator={<DoctorKeyPopulationsPage />} admin={<DoctorKeyPopulationsPage />} />
+              <RoleSwitch elderly={<NotFoundPage />} doctor={<DoctorKeyPopulationsPage />} admin={<DoctorKeyPopulationsPage />} />
             } />
             <Route path="/assessment-reports" element={
               <RoleSwitch elderly={<ElderlyAssessmentReportPage />} doctor={<AssessmentReportPage />} admin={<AssessmentReportPage />} />
             } />
             <Route path="/report-statistics" element={
               <RoleSwitch elderly={<NotFoundPage />} doctor={<NotFoundPage />} admin={<ReportStatisticsPage />} />
+            } />
+            <Route path='/elderly-accounts' element={
+              <RoleSwitch elderly={<NotFoundPage />} doctor={<ElderlyAccountPage />} admin={<ElderlyAccountPage />} />
             } />
 
             {Object.entries(workspaceConfigs).filter(([p]) => !CUSTOM_ROUTES.has(p)).map(([path, config]) => (

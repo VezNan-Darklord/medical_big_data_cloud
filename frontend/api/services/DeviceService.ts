@@ -43,6 +43,7 @@ export class DeviceService {
     }
     /**
      * 新增设备
+     * 管理员、医生和运营人员可创建设备。
      * @param requestBody
      * @returns ApiDevice 成功
      * @throws ApiError
@@ -128,7 +129,8 @@ export class DeviceService {
         });
     }
     /**
-     * 软删除设�?
+     * 软删除设备
+     * 仅管理员可删除设备，医生无权删除。
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError
@@ -171,7 +173,7 @@ export class DeviceService {
         });
     }
     /**
-     * 查询最�?100 条设备上�?
+     * 查询最近 100 条设备上报
      * @param id
      * @returns ApiDeviceReportList 成功
      * @throws ApiError

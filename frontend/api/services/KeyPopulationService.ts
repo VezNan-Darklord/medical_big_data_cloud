@@ -36,6 +36,7 @@ export class KeyPopulationService {
     }
     /**
      * 新增重点人群
+     * elderlyId 必须传老人账户本人的用户 ID，不是老人档案 ID。
      * @param requestBody
      * @returns ApiKeyPopulation 成功
      * @throws ApiError
@@ -101,7 +102,8 @@ export class KeyPopulationService {
         });
     }
     /**
-     * 软删除重点人群记�?
+     * 软删除重点人群记录
+     * 管理员和医生可删除。
      * @param id
      * @returns ApiEmpty 成功
      * @throws ApiError

@@ -1,5 +1,4 @@
-import type { RoleCode } from '../../api/models/RoleCode'
-
+type RoleCode = 'admin' | 'doctor' | 'elderly'
 export const CUSTOM_ROUTES = new Set([
   '/elderly-profiles',
   '/health-warnings',
@@ -7,6 +6,7 @@ export const CUSTOM_ROUTES = new Set([
   '/key-populations',
   '/assessment-reports',
   '/report-statistics',
+  '/elderly-accounts',
 ])
 
 const ROLE_ALLOWED_PATHS: Record<Exclude<RoleCode, 'admin'>, ReadonlySet<string>> = {
@@ -25,20 +25,6 @@ const ROLE_ALLOWED_PATHS: Record<Exclude<RoleCode, 'admin'>, ReadonlySet<string>
     '/key-populations',
     '/assessment-reports',
     '/elderly-accounts',
-    '/profile',
-  ]),
-  operator: new Set([
-    '/',
-    '/elderly-profiles',
-    '/health-warnings',
-    '/devices',
-    '/key-populations',
-    '/elderly-accounts',
-    '/profile',
-  ]),
-  analyst: new Set([
-    '/',
-    '/decision-analysis',
     '/profile',
   ]),
 }
