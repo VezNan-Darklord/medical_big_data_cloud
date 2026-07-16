@@ -29,10 +29,9 @@ import {
   useListAssessmentReportsQuery,
   useCreateAssessmentReportMutation,
   useDeleteAssessmentReportMutation,
-  useExportAssessmentReportMutation,
   useUpdateAssessmentReportMutation,
+  useExportAssessmentReportQuery,
 } from '../../../api/hooks/assessmentReportHooks'
-import { downloadBlob } from '../../../api/download'
 import { useListElderlyProfilesQuery } from '../../../api/hooks/elderlyProfileHooks'
 import type { AssessmentReport } from '../../../api/models/AssessmentReport'
 import type { AssessmentReportCreateRequest } from '../../../api/models/AssessmentReportCreateRequest'
@@ -171,7 +170,7 @@ function ReportCard({
   onView: (report: AssessmentReport) => void
 }) {
   const deleteMutation = useDeleteAssessmentReportMutation()
-  const exportMutation = useExportAssessmentReportMutation()
+  const exportQuery = useExportAssessmentReportQuery(report.id)
 
   return (
     <Card className="overflow-hidden rounded-2xl border border-slate-200/70 shadow-sm" styles={{ body: { padding: 20 } }}>
@@ -183,7 +182,7 @@ function ReportCard({
         </div>
       </div>
       <div className="mt-3 text-xs text-slate-400">档案 ID：{report.elderlyId}</div>
-      <div className="mt-2 line-clamp-3 min-h-[60px] text-sm leading-5 text-slate-600">{report.summary}</div>
+      <div className="mt-2 line-clamp-3 min-h-15 text-sm leading-5 text-slate-600">{report.summary}</div>
       <div className="mt-3 flex min-h-6 flex-wrap gap-1">
         {report.riskItems.slice(0, 3).map(item => <Tag key={item} color="red">{item}</Tag>)}
       </div>
@@ -195,11 +194,16 @@ function ReportCard({
           <Button
             size="small"
             icon={<DownloadOutlined />}
-            loading={exportMutation.isPending}
-            onClick={() => exportMutation.mutate(report.id, {
-              onSuccess: blob => downloadBlob(blob, `assessment-report-${report.id}.md`),
-              onError: (error: Error) => message.error(error.message || '导出失败'),
-            })}
+            loading={exportQuery.isPending}
+            onClick={() => {
+              const blob = new Blob([exportQuery.data!], { type: 'application/pdf' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `${report.elderlyId}-${report.id}.pdf`
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
           />
           <Popconfirm
             title="确认删除这份报告？"
@@ -271,19 +275,15 @@ export default function AssessmentReportPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [editingReport, setEditingReport] = useState<AssessmentReport | null>(null)
   const [detailReport, setDetailReport] = useState<AssessmentReport | null>(null)
-  const reportsQuery = useListAssessmentReportsQuery()
-  const reports = useMemo(
-    () => reportsQuery.data?.pages.flatMap(page => page.data?.list ?? []) ?? [],
-    [reportsQuery.data],
-  )
-  const total = reportsQuery.data?.pages[0]?.data?.total ?? 0
+  const reportsQuery = useListAssessmentReportsQuery();
+  const reports = useMemo(() => reportsQuery.data?.pages.flatMap(page => page.data?.list) ?? [], [reportsQuery.data])
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
         <div>
           <div className="text-2xl font-semibold text-slate-900">评估报告</div>
-          <div className="mt-2 text-sm text-slate-500">共 {total} 份报告</div>
+          <div className="mt-2 text-sm text-slate-500">共 {reportsQuery.data?.pages.flatMap(page => page.data?.total).reduce((a, b) => a! + b!, 0) ?? 0} 份报告</div>
         </div>
         <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>创建报告</Button>
       </div>
@@ -292,14 +292,7 @@ export default function AssessmentReportPage() {
         <Empty description="暂无评估报告" />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {reports.map(report => (
-            <ReportCard
-              key={report.id}
-              report={report}
-              onEdit={setEditingReport}
-              onView={setDetailReport}
-            />
-          ))}
+          {reports.map(report => <ReportCard key={report!.id} report={report!} onView={setDetailReport} onEdit={setEditingReport} />)}
         </div>
       )}
 

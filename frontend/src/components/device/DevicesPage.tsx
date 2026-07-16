@@ -7,7 +7,7 @@ import { ElderlyAccountSelect } from '../common/ElderlyAccountSelect'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { DeviceCreateRequest } from '../../../api/models/DeviceCreateRequest'
 import type { DeviceUpdateRequest } from '../../../api/models/DeviceUpdateRequest'
-import { useCurrentRoleCode } from '../../hooks/useCurrentRoleCode'
+import { useCurrentRoleCode } from '../../store/useCurrentRoleCode'
 
 function CreateDeviceModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [form] = Form.useForm()
@@ -147,7 +147,7 @@ function EditDeviceModal({ open, device, onClose }: { open: boolean; device: Dev
 
 export default function DevicesPage() {
   const role = useCurrentRoleCode()
-  const canManage = role === 'admin' || role === 'operator'
+  const canManage = role === 'admin' || role === 'doctor'
   const canDelete = role === 'admin'
   const [createOpen, setCreateOpen] = useState(false)
   const [bindDeviceId, setBindDeviceId] = useState('')

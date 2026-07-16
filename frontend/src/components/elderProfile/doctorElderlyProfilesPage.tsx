@@ -9,7 +9,7 @@ import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { ElderlyProfileCreateRequest } from '../../../api/models/ElderlyProfileCreateRequest'
 import type { ElderlyProfileUpdateRequest } from '../../../api/models/ElderlyProfileUpdateRequest'
 import type { ElderlyProfile } from '../../../api/models/ElderlyProfile'
-import { useCurrentRoleCode } from '../../hooks/useCurrentRoleCode'
+import { useCurrentRoleCode } from '../../store/useCurrentRoleCode'
 import dayjs from 'dayjs'
 
 function CreateProfileModal({ open, onClose }: { open: boolean; onClose: () => void }) {

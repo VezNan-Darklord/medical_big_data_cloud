@@ -9,7 +9,7 @@ import type { HealthWarningCreateRequest } from '../../../api/models/HealthWarni
 import dayjs from 'dayjs'
 import type { HealthWarning } from '../../../api/models/HealthWarning'
 import type { HealthWarningHandleRequest } from '../../../api/models/HealthWarningHandleRequest'
-import { useCurrentRoleCode } from '../../hooks/useCurrentRoleCode'
+import { useCurrentRoleCode } from '../../store/useCurrentRoleCode'
 
 const severityColors: Record<string, string> = { low: 'blue', medium: 'orange', high: 'red', critical: '#7c0221' }
 const severityBg: Record<string, string> = { low: 'bg-blue-50 border-blue-200', medium: 'bg-orange-50 border-orange-200', high: 'bg-red-50 border-red-200', critical: 'bg-rose-100 border-rose-300' }

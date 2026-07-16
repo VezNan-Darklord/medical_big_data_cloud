@@ -36,10 +36,10 @@ export function useReviewAssessmentReportMutation() {
   return useMutation({ mutationFn: async ({ id, ...req }: AssessmentReportReviewRequest & { id: string }) => medical.assessmentReport.reviewAssessmentReport(id, req), onSuccess: () => { qc.invalidateQueries({ queryKey: ['listAssessmentReports'] }); qc.invalidateQueries({ queryKey: ['getAssessmentReport'] }) }, mutationKey: ['reviewAssessmentReport'] })
 }
 
-export function useExportAssessmentReportMutation() {
-  return useMutation({
-    mutationFn: async (id: string) => medical.assessmentReport.exportAssessmentReport(id),
-    mutationKey: ['exportAssessmentReport'],
+export function useExportAssessmentReportQuery(id: string) {
+  return useQuery({
+    queryKey: ['exportAssessmentReport', id],
+    queryFn: async () => medical.assessmentReport.exportAssessmentReport(id),
   })
 }
 

@@ -14,10 +14,10 @@ const ProfilePage = lazy(() => import('../components/profile/ProfilePage'))
 const WorkspacePage = lazy(() => import('../components/common/WorkspacePage'))
 import NotFoundPage from '../components/common/NotFoundPage'
 
-const ElderProfilePage = lazy(() => import('../components/elder/ElderProfilePage'))
+const ElderProfilePage = lazy(() => import('../components/elderProfile/ElderProfilePage'))
 const ElderlyHealthPage = lazy(() => import('../components/health/ElderlyHealthPage'))
 
-const DoctorElderlyProfilesPage = lazy(() => import('../components/elder/doctorElderlyProfilesPage'))
+const DoctorElderlyProfilesPage = lazy(() => import('../components/elderProfile/doctorElderlyProfilesPage'))
 const DoctorHealthWarningsPage = lazy(() => import('../components/health/doctorHealthWarningsPage'))
 const DoctorDevicesPage = lazy(() => import('../components/device/DevicesPage'))
 const DoctorKeyPopulationsPage = lazy(() => import('../components/keyPopulation/KeyPopulationsPage'))

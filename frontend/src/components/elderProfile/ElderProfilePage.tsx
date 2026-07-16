@@ -62,7 +62,7 @@ export default function ElderProfilePage() {
           <Descriptions.Item label="建档时间">{profile.createdAt || '-'}</Descriptions.Item>
         </Descriptions>
       </PanelCard>
-
+      <br />
       {/* 病史 */}
       <PanelCard title={<><MedicineBoxOutlined className="mr-2" />既往病史</>}>
         {profile.medicalHistory ? (
@@ -86,7 +86,7 @@ export default function ElderProfilePage() {
       )}
 
       {/* 更新记录 */}
-      <div className="text-center text-xs text-slate-400">
+      <div className="text-center text-xs text-slate-400 mt-5">
         档案最近更新于 {profile.updatedAt || '-'}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { StatusTag, PopWindow, ElderlyAccountSelect } from '../common'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { KeyPopulationCreateRequest } from '../../../api/models/KeyPopulationCreateRequest'
 import type { KeyPopulationUpdateRequest } from '../../../api/models/KeyPopulationUpdateRequest'
-import { useCurrentRoleCode } from '../../hooks/useCurrentRoleCode'
+import { useCurrentRoleCode } from '../../store/useCurrentRoleCode'
 
 function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [form] = Form.useForm()
@@ -78,7 +78,7 @@ function PopulationCard({
       <div className="mt-3 font-semibold text-slate-900">老人: {item.elderlyId?.slice(0, 8)}{item.level ? <Tag className="ml-2">{item.level}</Tag> : null}</div>
       {item.reason && <div className="mt-2 text-sm text-slate-500">{item.reason}</div>}
       <div className="mt-2 flex items-center gap-4 text-xs text-slate-400"><span>负责: {item.ownerDoctorId?.slice(0, 8) || '-'}</span><span>周期: {item.followUpCycleDays ? `${item.followUpCycleDays} 天` : '-'}</span></div>
-      <div className="mt-3 flex gap-1">
+      <div className="mt-3 flex gap-1 justify-between">
         {canManage && <Button size="small" icon={<EditOutlined />} onClick={() => onEdit(item)}>编辑</Button>}
         {canManage && item.status === 'active' && (
           <Button size="small" danger icon={<CloseOutlined />} onClick={() => closeMutation.mutate(item.id, { onSuccess: () => message.success('已关闭'), onError: (e: Error) => message.error(e?.message ?? '失败') })} loading={closeMutation.isPending}>关闭</Button>
@@ -101,8 +101,8 @@ function PopulationCard({
 
 export default function KeyPopulationsPage() {
   const role = useCurrentRoleCode()
-  const canManage = role === 'admin' || role === 'doctor'
-  const canDelete = role === 'admin'
+  const canManage = role === 'admin' || role === 'doctor';
+  const canDelete = role === 'admin' || role === 'doctor';
   const [createOpen, setCreateOpen] = useState(false)
   const [editItem, setEditItem] = useState<PopulationItem | null>(null)
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListKeyPopulationsQuery({ pageSize: 20 })
