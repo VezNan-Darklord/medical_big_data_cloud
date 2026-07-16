@@ -11,6 +11,7 @@ import csulzc.medical_big_data_cloud.module.dto.response.device.DeviceDataReport
 import csulzc.medical_big_data_cloud.module.dto.response.device.DeviceResponse;
 import csulzc.medical_big_data_cloud.module.entity.Device;
 import csulzc.medical_big_data_cloud.module.entity.DeviceDataReport;
+import csulzc.medical_big_data_cloud.module.entity.User;
 import csulzc.medical_big_data_cloud.module.mapper.DeviceMapper;
 import csulzc.medical_big_data_cloud.module.repository.DeviceDataReportRepository;
 import csulzc.medical_big_data_cloud.module.repository.DeviceRepository;
@@ -25,7 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -57,7 +59,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional(readOnly = true)
     public DeviceResponse getById(String id) {
-        return deviceMapper.toResponse(findEntity(id));
+        return enrichElderlyName(deviceMapper.toResponse(findEntity(id)));
     }
 
     @Override
@@ -73,16 +75,17 @@ public class DeviceServiceImpl implements DeviceService {
             }
             return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
         }, PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
-        return new PageResult<>(page.getContent().stream().map(deviceMapper::toResponse).toList(),
-                pageNo, pageSize, page.getTotalElements());
+        List<DeviceResponse> responses = enrichElderlyNames(
+                page.getContent().stream().map(deviceMapper::toResponse).toList());
+        return new PageResult<>(responses, pageNo, pageSize, page.getTotalElements());
     }
 
     @Override
     @Transactional
     public DeviceResponse bind(DeviceBindRequest request) {
         Device device = findEntity(request.getDeviceId());
-        userRepository.findById(request.getElderlyId())
-                .filter(user -> "elderly".equals(user.getRoleCode()) && "enabled".equals(user.getStatus()))
+        User user = userRepository.findById(request.getElderlyId())
+                .filter(u -> "elderly".equals(u.getRoleCode()) && "enabled".equals(u.getStatus()))
                 .orElseThrow(() -> new BusinessException(ResultCode.BAD_REQUEST, "老人账户不存在或不可用"));
         if ("bound".equals(device.getBindingStatus())
                 && !request.getElderlyId().equals(device.getElderlyId())) {
@@ -90,7 +93,9 @@ public class DeviceServiceImpl implements DeviceService {
         }
         device.setElderlyId(request.getElderlyId());
         device.setBindingStatus("bound");
-        return deviceMapper.toResponse(deviceRepository.save(device));
+        DeviceResponse response = deviceMapper.toResponse(deviceRepository.save(device));
+        response.setElderlyName(user.getRealName());
+        return response;
     }
 
     @Override
@@ -99,7 +104,7 @@ public class DeviceServiceImpl implements DeviceService {
         Device device = findEntity(id);
         device.setElderlyId(null);
         device.setBindingStatus("unbound");
-        return deviceMapper.toResponse(deviceRepository.save(device));
+        return enrichElderlyName(deviceMapper.toResponse(deviceRepository.save(device)));
     }
 
     @Override
@@ -110,7 +115,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (StringUtils.hasText(request.getOnlineStatus())) {
             device.setOnlineStatus(request.getOnlineStatus());
         }
-        return deviceMapper.toResponse(deviceRepository.save(device));
+        return enrichElderlyName(deviceMapper.toResponse(deviceRepository.save(device)));
     }
 
     @Override
@@ -166,5 +171,30 @@ public class DeviceServiceImpl implements DeviceService {
             throw new BusinessException(ResultCode.INTERNAL_ERROR, "设备上报数据损坏");
         }
         return response;
+    }
+
+    private DeviceResponse enrichElderlyName(DeviceResponse response) {
+        if (StringUtils.hasText(response.getElderlyId())) {
+            userRepository.findById(response.getElderlyId())
+                    .ifPresent(user -> response.setElderlyName(user.getRealName()));
+        }
+        return response;
+    }
+
+    private List<DeviceResponse> enrichElderlyNames(List<DeviceResponse> responses) {
+        Set<String> ids = responses.stream()
+                .map(DeviceResponse::getElderlyId)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toSet());
+        if (!ids.isEmpty()) {
+            Map<String, String> nameMap = userRepository.findAllById(ids).stream()
+                    .collect(Collectors.toMap(User::getId, User::getRealName, (a, b) -> a));
+            responses.forEach(r -> {
+                if (StringUtils.hasText(r.getElderlyId())) {
+                    r.setElderlyName(nameMap.get(r.getElderlyId()));
+                }
+            });
+        }
+        return responses;
     }
 }

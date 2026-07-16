@@ -84,6 +84,14 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
                 .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "分析记录不存在"));
     }
 
+    @Override
+    @Transactional
+    public void delete(String id) {
+        AIAnalysis entity = analysisRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResultCode.NOT_FOUND, "分析记录不存在"));
+        analysisRepository.delete(entity);
+    }
+
     private List<AnalysisResult.Insight> buildInsights(DashboardOverviewResponse metrics) {
         List<AnalysisResult.Insight> insights = new ArrayList<>();
         if (metrics.getUnhandledWarningCount() > 0) {

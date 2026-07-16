@@ -27,3 +27,12 @@ export function useCreateCareDecisionAnalysisMutation() {
         }
     })
 }
+
+export function useDeleteCareDecisionAnalysisMutation() {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: async (id: string) => medical.aiAnalysis.deleteCareDecisionAnalysis(id),
+        onSuccess: () => { qc.invalidateQueries({ queryKey: ['listCareDecisionHistory'] }) },
+        mutationKey: ['deleteCareDecisionAnalysis'],
+    })
+}

@@ -736,9 +736,10 @@ paths:
     get:
       tags: [ElderlyAccount]
       summary: 老人账户列表
-      description: 管理员、医生和运营人员可查询老人账户列表。
+      description: 管理员、医生和运营人员可查询老人账户列表。支持通过 keyword 模糊搜索用户名、姓名或 ID。
       operationId: listElderlyAccounts
       parameters:
+        - { $ref: "#/components/parameters/Keyword" }
         - {
             name: status,
             in: query,
@@ -1045,13 +1046,22 @@ paths:
       responses:
         "200": { $ref: "#/components/responses/AnalysisListResponse" }
   /ai/analysis/care-decision/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Id" }
     get:
       tags: [AIAnalysis]
       summary: 分析详情
       operationId: getCareDecisionAnalysis
-      parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
         "200": { $ref: "#/components/responses/AnalysisResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [AIAnalysis]
+      summary: 软删除分析记录
+      operationId: deleteCareDecisionAnalysis
+      responses:
+        "200": { $ref: "#/components/responses/EmptyResponse" }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
 
 components:
@@ -1791,6 +1801,10 @@ components:
           type: string
           nullable: true
           description: 绑定的老人账户用户 ID（非老人档案 ID）。
+        elderlyName:
+          type: string
+          nullable: true
+          description: 绑定的老人姓名（取自老人账户的 realName）。
         bindingStatus: { type: string, enum: [bound, unbound] }
         onlineStatus: { type: string, enum: [online, offline], default: online }
         lastReportAt: { type: string, format: date-time, nullable: true }

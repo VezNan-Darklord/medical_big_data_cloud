@@ -11,6 +11,7 @@ public class DeviceResponse {
     private String deviceType;
     private String deviceSn;
     private String elderlyId;
+    private String elderlyName;
     private String bindingStatus;
     private String onlineStatus;
     private LocalDateTime lastReportAt;

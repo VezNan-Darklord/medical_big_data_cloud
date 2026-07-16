@@ -14,7 +14,8 @@ export class ElderlyAccountService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * 老人账户列表
-     * 管理员、医生和运营人员可查询老人账户列表。
+     * 管理员、医生和运营人员可查询老人账户列表。支持通过 keyword 模糊搜索用户名、姓名或 ID。
+     * @param keyword
      * @param status
      * @param pageNo
      * @param pageSize
@@ -22,6 +23,7 @@ export class ElderlyAccountService {
      * @throws ApiError
      */
     public listElderlyAccounts(
+        keyword?: string,
         status?: 'enabled' | 'disabled',
         pageNo: number = 1,
         pageSize: number = 10,
@@ -30,6 +32,7 @@ export class ElderlyAccountService {
             method: 'GET',
             url: '/elderly-accounts',
             query: {
+                'keyword': keyword,
                 'status': status,
                 'pageNo': pageNo,
                 'pageSize': pageSize,

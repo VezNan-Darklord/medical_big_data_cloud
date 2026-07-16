@@ -11,4 +11,6 @@ public interface AIAnalysisService {
     List<AnalysisResult> history();
 
     AnalysisResult get(String id);
+
+    void delete(String id);
 }

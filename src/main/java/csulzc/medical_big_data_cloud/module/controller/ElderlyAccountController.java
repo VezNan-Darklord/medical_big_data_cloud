@@ -36,10 +36,11 @@ public class ElderlyAccountController {
     @GetMapping
     @PreAuthorize("hasAnyRole('admin', 'doctor', 'operator')")
     public ApiResponse<PageResult<UserResponse>> list(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") @Min(1) int pageNo,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int pageSize) {
-        return ApiResponse.success(userService.listUsers(null, "elderly", status, pageNo, pageSize));
+        return ApiResponse.success(userService.listUsers(keyword, "elderly", status, pageNo, pageSize));
     }
 
     @PostMapping

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useCallback, useRef } from 'react'
 import { Select } from 'antd'
 import type { SelectProps } from 'antd'
 import { useListElderlyAccountsQuery } from '../../../api/hooks/elderlyAccountHooks'
@@ -20,6 +20,8 @@ interface ElderlyAccountSelectProps extends Omit<SelectProps<string>, 'options' 
 
 export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...rest }: ElderlyAccountSelectProps) {
   const isDoctor = roleCode === 'doctor'
+  const [keyword, setKeyword] = useState<string | undefined>(undefined)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const {
     data: elderlyData,
@@ -27,7 +29,7 @@ export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...r
     hasNextPage: hasNextElderly,
     isFetchingNextPage: isFetchingNextElderly,
     isLoading: isLoadingElderly,
-  } = useListElderlyAccountsQuery({ pageSize: 30 })
+  } = useListElderlyAccountsQuery({ pageSize: 30, keyword })
 
   const {
     data: doctorData,
@@ -56,6 +58,15 @@ export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...r
     [data],
   )
 
+  const handleSearch = useCallback((value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+    timerRef.current = setTimeout(() => {
+      setKeyword(value || undefined)
+    }, 300)
+  }, [])
+
   const handlePopupScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget
     if (target.scrollHeight - target.scrollTop <= target.clientHeight + 50) {
@@ -69,11 +80,11 @@ export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...r
     if (!option) return false
     const opt = options.find(o => o.value === option.value)
     if (!opt) return false
-    const keyword = input.toLowerCase()
+    const kw = input.toLowerCase()
     return (
-      opt.value.toLowerCase().includes(keyword) ||
-      opt.username.toLowerCase().includes(keyword) ||
-      opt.realName.toLowerCase().includes(keyword)
+      opt.value.toLowerCase().includes(kw) ||
+      opt.username.toLowerCase().includes(kw) ||
+      opt.realName.toLowerCase().includes(kw)
     )
   }
 
@@ -96,9 +107,11 @@ export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...r
       loading={isLoading}
       options={options}
       filterOption={handleFilter}
+      onSearch={handleSearch}
       onPopupScroll={handlePopupScroll}
       notFoundContent={isLoading ? '加载中...' : '无匹配结果'}
       onChange={handleChange}
+      aria-autocomplete="none"
     />
   )
 }

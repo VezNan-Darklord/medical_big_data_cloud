@@ -12,6 +12,7 @@ import csulzc.medical_big_data_cloud.module.dto.response.keypop.KeyPopulationRes
 import csulzc.medical_big_data_cloud.module.dto.response.report.AssessmentReportResponse;
 import csulzc.medical_big_data_cloud.module.dto.response.warning.HealthWarningResponse;
 import csulzc.medical_big_data_cloud.module.entity.ElderlyProfile;
+import csulzc.medical_big_data_cloud.module.entity.User;
 import csulzc.medical_big_data_cloud.module.mapper.AssessmentReportMapper;
 import csulzc.medical_big_data_cloud.module.mapper.DeviceMapper;
 import csulzc.medical_big_data_cloud.module.mapper.ElderlyProfileMapper;
@@ -162,8 +163,12 @@ public class ElderlyProfileServiceImpl implements ElderlyProfileService {
         if (!StringUtils.hasText(profile.getUserId())) {
             return List.of();
         }
+        String elderlyName = userRepository.findById(profile.getUserId())
+                .map(User::getRealName).orElse(null);
         return deviceRepository.findByElderlyIdOrderByCreatedAtDesc(profile.getUserId()).stream()
-                .map(deviceMapper::toResponse).toList();
+                .map(deviceMapper::toResponse)
+                .peek(r -> r.setElderlyName(elderlyName))
+                .toList();
     }
 
     @Override

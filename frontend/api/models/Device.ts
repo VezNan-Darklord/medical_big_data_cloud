@@ -8,6 +8,7 @@ export type Device = {
     deviceType?: string;
     deviceSn?: string;
     elderlyId?: string | null;
+    elderlyName?: string | null;
     bindingStatus?: 'bound' | 'unbound';
     onlineStatus?: 'online' | 'offline';
     lastReportAt?: string | null;

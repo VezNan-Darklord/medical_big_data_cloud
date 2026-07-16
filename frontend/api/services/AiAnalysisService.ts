@@ -5,6 +5,7 @@
 import type { AnalysisRequest } from '../models/AnalysisRequest';
 import type { ApiAnalysis } from '../models/ApiAnalysis';
 import type { ApiAnalysisList } from '../models/ApiAnalysisList';
+import type { ApiEmpty } from '../models/ApiEmpty';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AiAnalysisService {
@@ -57,6 +58,27 @@ export class AiAnalysisService {
                 'id': id,
             },
             errors: {
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 软删除分析记录
+     * @param id
+     * @returns ApiEmpty 成功
+     * @throws ApiError
+     */
+    public deleteCareDecisionAnalysis(
+        id: string,
+    ): CancelablePromise<ApiEmpty> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/ai/analysis/care-decision/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                403: `当前角色无权访问`,
                 404: `数据不存在`,
             },
         });
