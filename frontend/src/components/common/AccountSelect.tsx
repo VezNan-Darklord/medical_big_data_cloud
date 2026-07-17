@@ -15,7 +15,7 @@ interface ElderlyOption {
 interface ElderlyAccountSelectProps extends Omit<SelectProps<string>, 'options' | 'loading'> {
   setMobile?: (value: string) => void
   setRealName?: (value: string) => void
-  roleCode?: 'doctor' | 'elderly'
+  roleCode?: 'doctor'
 }
 
 export function AccountSelect({ onChange, setMobile, setRealName, roleCode, ...rest }: ElderlyAccountSelectProps) {
