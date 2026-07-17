@@ -44,7 +44,7 @@ function BindDeviceModal({ open, deviceId, onClose }: { open: boolean; deviceId:
         })
       }}>
         <Form.Item name="elderlyId" label="选择老人" rules={[{ required: true }]}>
-          <AccountSelect roleCode='doctor'/>
+          <AccountSelect roleCode='elderly'/>
         </Form.Item>
         <Button type="primary" htmlType="submit" loading={bindMutation.isPending} block size="large">确认绑定</Button>
       </Form>
