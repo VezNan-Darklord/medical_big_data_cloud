@@ -4,6 +4,9 @@
 /* eslint-disable */
 export type DeviceBindRequest = {
     deviceId: string;
+    /**
+     * 老人账户的用户 ID（非老人档案 ID）。
+     */
     elderlyId: string;
 };
 

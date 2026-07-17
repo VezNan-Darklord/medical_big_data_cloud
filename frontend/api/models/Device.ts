@@ -7,6 +7,9 @@ export type Device = {
     deviceName?: string;
     deviceType?: string;
     deviceSn?: string;
+    /**
+     * 绑定的老人账户用户 ID（非老人档案 ID）。
+     */
     elderlyId?: string | null;
     elderlyName?: string | null;
     bindingStatus?: 'bound' | 'unbound';

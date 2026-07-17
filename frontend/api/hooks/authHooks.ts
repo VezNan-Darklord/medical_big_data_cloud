@@ -29,6 +29,7 @@ export function useGetCurrentUserQuery() {
       return medical.auth.getCurrentUser();
     },
     enabled: !!getAccessToken(),
+    retry: 3,
   })
 }
 

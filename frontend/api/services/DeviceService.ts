@@ -63,7 +63,8 @@ export class DeviceService {
         });
     }
     /**
-     * 绑定设备到老人档案
+     * 绑定设备到老人账户
+     * elderlyId 为老人账户用户 ID（非老人档案 ID），管理员、医生和运营人员可操作。
      * @param requestBody
      * @returns ApiDevice 成功
      * @throws ApiError

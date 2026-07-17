@@ -178,4 +178,72 @@ export class AssessmentReportService {
             },
         });
     }
+    /**
+     * 当前老人账号的评估报告列表
+     * 仅老人账号可访问，返回其本人的评估报告。
+     * @param pageNo
+     * @param pageSize
+     * @returns ApiAssessmentReportPage 成功
+     * @throws ApiError
+     */
+    public listElderlyAssessmentReports(
+        pageNo: number = 1,
+        pageSize: number = 10,
+    ): CancelablePromise<ApiAssessmentReportPage> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/assessment-reports/elderly',
+            query: {
+                'pageNo': pageNo,
+                'pageSize': pageSize,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+            },
+        });
+    }
+    /**
+     * 当前老人账号的报告详情
+     * 仅老人账号可访问。
+     * @param id
+     * @returns ApiAssessmentReport 成功
+     * @throws ApiError
+     */
+    public getElderlyAssessmentReport(
+        id: string,
+    ): CancelablePromise<ApiAssessmentReport> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/assessment-reports/elderly/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
+        });
+    }
+    /**
+     * 当前老人账号导出 Markdown 报告文件
+     * 仅老人账号可访问。
+     * @param id
+     * @returns binary UTF-8 Markdown 文件
+     * @throws ApiError
+     */
+    public exportElderlyAssessmentReport(
+        id: string,
+    ): CancelablePromise<Blob> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/assessment-reports/elderly/{id}/export',
+            path: {
+                'id': id,
+            },
+            errors: {
+                403: `当前角色无权访问`,
+                404: `数据不存在`,
+            },
+        });
+    }
 }

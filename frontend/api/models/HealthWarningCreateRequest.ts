@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type HealthWarningCreateRequest = {
     /**
-     * 管理员、医生和运营人员传老人档案 ID；老人本人创建时可省略，服务端自动使用本人关联档案。
+     * 管理员、医生和运营人员传老人账户用户 ID（非老人档案 ID）；老人本人创建时可省略，服务端自动使用本人用户 ID。
      */
     elderlyId?: string;
     warningType: string;

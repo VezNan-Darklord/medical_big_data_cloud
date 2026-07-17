@@ -58,7 +58,7 @@ export class HealthWarningService {
     }
     /**
      * 新增健康预警
-     * 管理员、医生和运营人员创建时 elderlyId 必须是老人档案 ID；老人本人创建时可不传 elderlyId，服务端会自动绑定当前账号关联的老人档案。
+     * 管理员、医生和运营人员创建时 elderlyId 必须是老人账户用户 ID；老人本人创建时可不传 elderlyId，服务端会自动绑定当前账号的用户 ID。
      * @param requestBody
      * @returns ApiWarning 成功
      * @throws ApiError

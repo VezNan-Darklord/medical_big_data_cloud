@@ -7,6 +7,7 @@ import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { KeyPopulationCreateRequest } from '../../../api/models/KeyPopulationCreateRequest'
 import type { KeyPopulationUpdateRequest } from '../../../api/models/KeyPopulationUpdateRequest'
 import { useCurrentRoleCode } from '../../store/useCurrentRoleCode'
+import type { KeyPopulation } from '../../../api/models/KeyPopulation'
 
 function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [form] = Form.useForm()
@@ -44,12 +45,8 @@ function CreateModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   )
 }
 
-interface PopulationItem {
-  id: string; category: string; status: string; elderlyId: string
-  level?: string; reason?: string; ownerDoctorId?: string; followUpCycleDays?: number
-}
 
-function EditModal({ open, item, onClose }: { open: boolean; item: PopulationItem | null; onClose: () => void }) {
+function EditModal({ open, item, onClose }: { open: boolean; item: KeyPopulation | null; onClose: () => void }) {
   const [form] = Form.useForm()
   const updateMutation = useUpdateKeyPopulationMutation()
 
@@ -58,9 +55,9 @@ function EditModal({ open, item, onClose }: { open: boolean; item: PopulationIte
   return (
     <PopWindow open={open} onClose={onClose} title="编辑重点人群" width={500}>
       <Form form={form} layout="vertical" initialValues={item} onFinish={(v: KeyPopulationUpdateRequest) => {
-        updateMutation.mutate({ id: item.id, ...v }, { onSuccess: () => { message.success('更新成功'); onClose() }, onError: (err: Error) => message.error(err?.message ?? '失败') })
+        updateMutation.mutate({ id: item.id!, ...v }, { onSuccess: () => { message.success('更新成功'); onClose() }, onError: (err: Error) => message.error(err?.message ?? '失败') })
       }}>
-        <Form.Item label="老人"><Input value={item.elderlyId} disabled /></Form.Item>
+        <Form.Item label="老人"><Input value={item.elderlyName!} disabled /></Form.Item>
         <Form.Item name="category" label="类别" rules={[{ required: true }]}><Select options={['慢病高风险','跌倒高风险','认知关注','失能','高龄'].map(v => ({ value: v, label: v }))} /></Form.Item>
         <Form.Item name="level" label="等级"><Input /></Form.Item>
         <Form.Item name="reason" label="原因"><Input.TextArea rows={2} /></Form.Item>
@@ -81,28 +78,28 @@ function PopulationCard({
   canManage,
   onEdit,
 }: {
-  item: PopulationItem
+  item: KeyPopulation
   canDelete: boolean
   canManage: boolean
-  onEdit: (item: PopulationItem) => void
+  onEdit: (item: KeyPopulation) => void
 }) {
   const closeMutation = useCloseKeyPopulationMutation()
   const deleteMutation = useDeleteKeyPopulationMutation()
   return (
     <Card className="overflow-hidden rounded-2xl border border-slate-200/70 shadow-sm" styles={{ body: { padding: 20 } }}>
-      <div className="flex items-center justify-between"><Tag color="processing">{item.category}</Tag><StatusTag value={item.status} /></div>
-      <div className="mt-3 font-semibold text-slate-900">老人: {item.elderlyId?.slice(0, 8)}{item.level ? <Tag className="ml-2">{item.level}</Tag> : null}</div>
+      <div className="flex items-center justify-between"><Tag color="processing">{item.category}</Tag><StatusTag value={item.status!} /></div>
+      <div className="mt-3 font-semibold text-slate-900">老人: {item.elderlyName!}{item.level ? <Tag className="ml-2">{item.level}</Tag> : null}</div>
       {item.reason && <div className="mt-2 text-sm text-slate-500">{item.reason}</div>}
-      <div className="mt-2 flex items-center gap-4 text-xs text-slate-400"><span>负责: {item.ownerDoctorId?.slice(0, 8) || '-'}</span><span>周期: {item.followUpCycleDays ? `${item.followUpCycleDays} 天` : '-'}</span></div>
+      <div className="mt-2 flex items-center gap-4 text-xs text-slate-400"><span>负责: {item.ownerDoctorName || '-'}</span><span>周期: {item.followUpCycleDays ? `${item.followUpCycleDays} 天` : '-'}</span></div>
       <div className="mt-3 flex gap-1 justify-between">
         {canManage && <Button size="small" icon={<EditOutlined />} onClick={() => onEdit(item)}>编辑</Button>}
         {canManage && item.status === 'active' && (
-          <Button size="small" danger icon={<CloseOutlined />} onClick={() => closeMutation.mutate(item.id, { onSuccess: () => message.success('已关闭'), onError: (e: Error) => message.error(e?.message ?? '失败') })} loading={closeMutation.isPending}>关闭</Button>
+          <Button size="small" danger icon={<CloseOutlined />} onClick={() => closeMutation.mutate(item.id!, { onSuccess: () => message.success('已关闭'), onError: (e: Error) => message.error(e?.message ?? '失败') })} loading={closeMutation.isPending}>关闭</Button>
         )}
         {canDelete && (
           <Popconfirm
             title="确认删除这条重点人群记录？"
-            onConfirm={() => deleteMutation.mutate(item.id, {
+            onConfirm={() => deleteMutation.mutate(item.id!, {
               onSuccess: () => message.success('记录已删除'),
               onError: (error: Error) => message.error(error.message || '删除失败'),
             })}
@@ -120,9 +117,9 @@ export default function KeyPopulationsPage() {
   const canManage = role === 'admin';
   const canDelete = role === 'admin' || role === 'doctor';
   const [createOpen, setCreateOpen] = useState(false)
-  const [editItem, setEditItem] = useState<PopulationItem | null>(null)
+  const [editItem, setEditItem] = useState<KeyPopulation | null>(null)
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useListKeyPopulationsQuery({ pageSize: 20 })
-  const allItems: PopulationItem[] = (data?.pages.flatMap(p => ((p.data as unknown as { list?: PopulationItem[] })?.list ?? [])) ?? []) as PopulationItem[]
+  const allItems: KeyPopulation[] = (data?.pages.flatMap(p => ((p.data as unknown as { list?: KeyPopulation[] })?.list ?? [])) ?? []) as KeyPopulation[]
   const sentinelRef = useIntersectionObserver(() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage() }, !isLoading)
 
   return (
