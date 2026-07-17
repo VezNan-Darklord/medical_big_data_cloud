@@ -1,0 +1,19 @@
+.ai-pet {
+  background:
+    radial-gradient(circle at top, rgba(14, 165, 233, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 38%, #ecf2f8 100%);
+  background-attachment: fixed;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.18);
+  animation: pet-sway 2.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes pet-sway {
+  0%, 100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}

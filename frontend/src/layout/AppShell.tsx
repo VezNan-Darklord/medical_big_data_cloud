@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { AppHeader } from './AppHeader'
 import  AppSidebar  from './AppSidebar'
+import { AIPet } from '../components/aidoctor/AIPet'
 
 export function AppShell() {
   return (
@@ -12,6 +13,7 @@ export function AppShell() {
           <Outlet />
         </div>
       </main>
+      <AIPet />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { AppHeader } from '../layout/AppHeader'
+import { AIPet } from '../components/aidoctor/AIPet'
 
 export function PublicLayout() {
   return (
@@ -10,6 +11,7 @@ export function PublicLayout() {
           <Outlet />
         </div>
       </main>
+      <AIPet />
     </div>
   )
 }
