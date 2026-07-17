@@ -44,7 +44,7 @@ function BindDeviceModal({ open, deviceId, onClose }: { open: boolean; deviceId:
         })
       }}>
         <Form.Item name="elderlyId" label="选择老人" rules={[{ required: true }]}>
-          <AccountSelect />
+          <AccountSelect roleCode='doctor'/>
         </Form.Item>
         <Button type="primary" htmlType="submit" loading={bindMutation.isPending} block size="large">确认绑定</Button>
       </Form>
@@ -107,7 +107,7 @@ function DeviceCard({
       </div>
       <div className="mt-3 font-semibold text-slate-900">{device.deviceName}</div>
       <div className="mt-1 text-sm text-slate-500">{device.deviceType} · {device.deviceSn}</div>
-      <div className="mt-2 text-xs text-slate-400">老人: {device.elderlyName || (device.elderlyId?.slice(0, 8)) || '-'} · {device.lastReportAt || '-'}</div>
+      <div className="mt-2 text-xs text-slate-400">老人: {device.elderlyName}</div>
       <div className="mt-3 flex gap-1">
         {canManage && <Button size="small" icon={<EditOutlined />} onClick={() => onEdit(device)}>编辑</Button>}
         {canManage && (isBound ? (

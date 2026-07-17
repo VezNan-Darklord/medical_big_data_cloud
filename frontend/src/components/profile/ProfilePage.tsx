@@ -1,9 +1,12 @@
-import { CheckCircleOutlined, LoginOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons'
-import { Avatar, Skeleton, Tag } from 'antd'
+import { useState } from 'react'
+import { Avatar, Skeleton, Tag, Button, Form, Input, message } from 'antd'
+import { CheckCircleOutlined, LoginOutlined, MessageOutlined, SettingOutlined, EditOutlined, LockOutlined } from '@ant-design/icons'
 import { useGetCurrentUserQuery } from '../../../api/hooks/authHooks'
-import { useGetTodosQuery } from '../../../api/hooks/profileHooks'
-import { PanelCard } from '../common'
+import { useGetTodosQuery, useUpdateProfileMutation, useChangePasswordMutation } from '../../../api/hooks/profileHooks'
+import { PanelCard, PopWindow } from '../common'
 import type { User } from '../../../api/models/User'
+import type { ProfileUpdateRequest } from '../../../api/models/ProfileUpdateRequest'
+import type { ChangePasswordRequest } from '../../../api/models/ChangePasswordRequest'
 
 const roleNames: Record<string, string> = {
   admin: '系统管理员',
@@ -11,11 +14,54 @@ const roleNames: Record<string, string> = {
   elderly: '老人',
 }
 
+function EditProfileModal({ open, user, onClose }: { open: boolean; user: User; onClose: () => void }) {
+  const [form] = Form.useForm()
+  const updateMutation = useUpdateProfileMutation()
+
+  return (
+    <PopWindow open={open} onClose={onClose} title="编辑个人资料" width={440}>
+      <Form form={form} layout="vertical" initialValues={{ realName: user.realName, mobile: user.mobile }} onFinish={(v: ProfileUpdateRequest) => {
+        updateMutation.mutate(v, {
+          onSuccess: () => { message.success('资料更新成功'); onClose() },
+          onError: (err: Error) => message.error(err?.message ?? '更新失败'),
+        })
+      }}>
+        <Form.Item name="realName" label="真实姓名"><Input /></Form.Item>
+        <Form.Item name="mobile" label="手机号"><Input /></Form.Item>
+        <Button type="primary" htmlType="submit" loading={updateMutation.isPending} block size="large">保存</Button>
+      </Form>
+    </PopWindow>
+  )
+}
+
+function ChangePasswordModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [form] = Form.useForm()
+  const changeMutation = useChangePasswordMutation()
+
+  return (
+    <PopWindow open={open} onClose={onClose} title="修改密码" width={400}>
+      <Form form={form} layout="vertical" onFinish={(v: ChangePasswordRequest) => {
+        changeMutation.mutate(v, {
+          onSuccess: () => { message.success('密码修改成功'); form.resetFields(); onClose() },
+          onError: (err: Error) => message.error(err?.message ?? '修改失败'),
+        })
+      }}>
+        <Form.Item name="oldPassword" label="当前密码" rules={[{ required: true }]}><Input.Password /></Form.Item>
+        <Form.Item name="newPassword" label="新密码" rules={[{ required: true, min: 6, max: 20 }]}><Input.Password placeholder="至少 6 位" /></Form.Item>
+        <Button type="primary" htmlType="submit" loading={changeMutation.isPending} block size="large">修改密码</Button>
+      </Form>
+    </PopWindow>
+  )
+}
+
 export default function ProfilePage() {
   const { data, isLoading } = useGetCurrentUserQuery()
-  const user = data?.data as User | undefined;
+  const user = data?.data as User | undefined
   const { data: todosData } = useGetTodosQuery()
-  const todos = todosData?.data;
+  const todos = todosData?.data
+
+  const [editOpen, setEditOpen] = useState(false)
+  const [pwdOpen, setPwdOpen] = useState(false)
 
   if (isLoading) {
     return <Skeleton active paragraph={{ rows: 8 }} className="rounded-[28px] bg-white p-8" />
@@ -38,6 +84,7 @@ export default function ProfilePage() {
               <Tag color={statusColor} className="mt-3">
                 {user?.status === 'enabled' ? '已启用' : user?.status === 'disabled' ? '已禁用' : user?.status ?? '-'}
               </Tag>
+              <Button className="mt-4! rounded-xl" type="primary" icon={<EditOutlined />} onClick={() => setEditOpen(true)}>编辑资料</Button>
             </div>
             <div className="grid flex-1 gap-4 md:grid-cols-2">
               {[
@@ -70,6 +117,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+            <Button block icon={<LockOutlined />} className="rounded-xl" onClick={() => setPwdOpen(true)}>修改密码</Button>
           </div>
         </PanelCard>
       </div>
@@ -85,6 +133,9 @@ export default function ProfilePage() {
           )}
         </div>
       </PanelCard>
+
+      {user && <EditProfileModal open={editOpen} user={user} onClose={() => setEditOpen(false)} />}
+      <ChangePasswordModal open={pwdOpen} onClose={() => setPwdOpen(false)} />
     </div>
   )
 }

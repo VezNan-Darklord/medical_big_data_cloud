@@ -19,7 +19,7 @@ const allNavigationItems: NavItem[] = [
 ]
 
 export default function AppSidebar() {
-  const location = useLocation()
+  const location = useLocation();
 
   const roleCode = useCurrentRoleCode();
   const visibleItems = roleCode
@@ -27,7 +27,6 @@ export default function AppSidebar() {
     : []
 
   const currentNav = visibleItems.find((item) => location.pathname === item.path) ?? visibleItems[0]
-
   return (
     <aside className="row-span-2 flex h-full min-h-0 flex-col border-r border-slate-200/80 bg-white/95">
       <div className="border-b border-slate-200/70 px-6 py-5">
@@ -41,9 +40,8 @@ export default function AppSidebar() {
       </div>
       <div className="px-4 py-4">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-          <div className="text-xs uppercase tracking-[0.18em] text-slate-400">今日态势</div>
-          <div className="mt-2 text-2xl font-semibold text-slate-900">运行平稳</div>
-          <div className="mt-1 text-xs text-slate-500">未处理预警 4 条，重点人群随访待推进</div>
+          <div className="mt-2 text-2xl font-semibold text-slate-900">欢迎使用</div>
+          <div className="mt-1 text-xs text-slate-500">请选择左侧菜单进行操作</div>
         </div>
       </div>
       <div className="min-h-0 flex-1 px-3 pb-4">

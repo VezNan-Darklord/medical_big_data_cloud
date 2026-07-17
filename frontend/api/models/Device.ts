@@ -11,6 +11,9 @@ export type Device = {
      * 绑定的老人账户用户 ID（非老人档案 ID）。
      */
     elderlyId?: string | null;
+    /**
+     * 绑定的老人姓名（取自老人账户的 realName）。
+     */
     elderlyName?: string | null;
     bindingStatus?: 'bound' | 'unbound';
     onlineStatus?: 'online' | 'offline';

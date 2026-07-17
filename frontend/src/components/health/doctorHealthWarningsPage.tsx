@@ -3,7 +3,7 @@ import { Button, Card, Form, Input, Select, DatePicker, Tag, message, Skeleton, 
 import { PlusOutlined, SendOutlined, CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useListHealthWarningsQuery, useCreateHealthWarningMutation, useHandleHealthWarningMutation, useAssignHealthWarningMutation, useDeleteHealthWarningMutation } from '../../../api/hooks/healthWarningHooks'
 import { useListElderlyProfilesQuery } from '../../../api/hooks/elderlyProfileHooks'
-import { StatusTag, PopWindow } from '../common'
+import { StatusTag, PopWindow, AccountSelect } from '../common'
 import { useIntersectionObserver } from '../common/useIntersectionObserver'
 import type { HealthWarningCreateRequest } from '../../../api/models/HealthWarningCreateRequest'
 import dayjs from 'dayjs'
@@ -123,7 +123,9 @@ function AssignModal({ open, warningId, onClose }: { open: boolean; warningId: s
           onError: (err: Error) => message.error(err?.message ?? '转派失败'),
         })
       }}>
-        <Form.Item name="handlerId" label="处理人 ID" rules={[{ required: true }]}><Input placeholder="输入医生 ID" /></Form.Item>
+        <Form.Item name="handlerId" label="处理人 ID" rules={[{ required: true }]}>
+          <AccountSelect roleCode="doctor" onChange={(value) => form.setFieldValue('handlerId', value)} />
+        </Form.Item>
         <Form.Item name="handlerName" label="处理人姓名"><Input placeholder="可选" /></Form.Item>
         <Form.Item name="remark" label="备注"><Input.TextArea rows={2} /></Form.Item>
         <Button type="primary" htmlType="submit" loading={assignMutation.isPending} block>确认转派</Button>
